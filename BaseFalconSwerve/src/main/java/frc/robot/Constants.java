@@ -10,6 +10,7 @@ import frc.lib.util.SwerveModuleConstants;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
+	public static final int kTICKS = 33024; // 16.125 * 2048;
 
     public static final class Swerve {
         public static final int pigeonID = 1;
@@ -119,7 +120,44 @@ public final class Constants {
 
     }
 
+    public static final class DriveConstants {
+
+		// Drive motor CAN IDs
+		public static final int kLeftFrontDriveMotorPort = 21;
+		public static final int kRightFrontDriveMotorPort = 22;
+		public static final int kLeftRearDriveMotorPort = 23;
+		public static final int kRightRearDriveMotorPort = 24;
+
+		// Turn motor CAN IDs
+		public static final int kLeftFrontTurningMotorPort = 11;
+		public static final int kRightFrontTurningMotorPort = 12;
+		public static final int kLeftRearTurningMotorPort = 13;
+		public static final int kRightRearTurningMotorPort = 14;
+
+		public static final double kTrackWidth = 0.7112;
+		// Distance between centers of right and left wheels on robot
+		public static final double kWheelBase = 0.7;
+		// Distance between front and back wheels on robot
+		public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics( // leftFront,
+																								// rightFront, leftRear,
+																								// rightRear
+				new Translation2d(kWheelBase / 2, kTrackWidth / 2), new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+				new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+				new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+
+		public static final boolean kGyroReversed = true; // 09FEB false;
+
+		public static final double kMaxSpeedMetersPerSecond = 3.5; // tune
+
+		public static final double kTurnP = 0.1; // was 0.05
+		public static final double kTurnI = 0;
+		public static final double kTurnD = 0;
+
+	}
+
     public static final class AutoConstants {
+        public static final String kDEFAULT_AUTO_CODE = "C4";
+		public static final String kAUTO_CODE = "Auto Selector";
         public static final double kMaxSpeedMetersPerSecond = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
@@ -134,5 +172,42 @@ public final class Constants {
             new TrapezoidProfile.Constraints(
                 kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
       }
+
+      public static final class VisionConstants {
+		// Ensure measurements are in METERS
+		public static final double kMaxTrackerDistance = 18.0;
+		public static final double kMaxGoalTrackAge = 1.0; // cp had 1.0
+		public static final double kGoalHeight = 2.67;
+
+		// Ensure measurements are in METERS
+		public static final double kCameraXOffset = 0;
+		public static final double kCameraYOffset = 0;
+		public static final double kCameraZOffset = 0;
+		public static final double kCameraPitchAngleDegrees = 41.67;
+		public static final double kCameraYawAngleDegrees = 0;
+		public static final double kCameraLensHeightMeters = 0.7142;
+
+		// #region DrivePID
+		public static final double kDriveP = 0.05;
+		public static final double kDriveI = 0;
+		public static final double kDriveD = 0;
+		public static final double kDriveMaxSpeed = 0.1;
+		public static final double kDriveMaxAcceleration = 0.1;
+		public static final double kDriveTolerance = 0.5;
+		public static final double kDriveAccelerationTolerance = 0.1;
+		// #endregion
+
+		// #region TurnPID
+		public static final double kTurnP = 0.12;
+		public static final double kTurnI = 0;
+		public static final double kTurnD = 0.00;
+		public static final double kMaxTurnVelocity = 360;
+		public static final double kMaxTurnAcceleration = 360;
+		public static final double kTurnToleranceDeg = 5;
+		public static final double kTurnRateToleranceDegPerS = 10; // degrees per second
+		// #endregion
+
+		public static final double kAverageKeepTime = 0.2;
+	}
 
 }
