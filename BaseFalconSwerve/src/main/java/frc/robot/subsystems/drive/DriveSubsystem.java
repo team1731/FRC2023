@@ -90,7 +90,7 @@ public class DriveSubsystem extends ToggleableSubsystem {
 	private final AHRS m_gyro = new AHRS(SPI.Port.kMXP);
 
 	// Odometry class for tracking robot pose
-	private SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getAngle(), null);
+	private SwerveDriveOdometry m_odometry = null; //new SwerveDriveOdometry(DriveConstants.kDriveKinematics, getAngle(), null);
 	private double _xVelocity;
 	private double _yVelocity;
 	private final Pose2d goalPose = new Pose2d(new Translation2d(8.188, 4.155), new Rotation2d(0));
@@ -102,11 +102,11 @@ public class DriveSubsystem extends ToggleableSubsystem {
 
 		if (m_odometry != null) {
 			SwerveModulePosition[] swerveModulePositions = null; //new SwerveModulePosition[]{m_leftFront.getState(), m_rightFront.getState(), m_leftRear.getState(), m_rightRear.getState()};
-			m_odometry.update(new Rotation2d(Math.toRadians(getHeading())), swerveModulePositions  // leftFront,
-																									// rightFront,
-																									// leftRear,
-																									// rightRear
-					);
+			// m_odometry.update(new Rotation2d(Math.toRadians(getHeading())), swerveModulePositions  // leftFront,
+			// 																						// rightFront,
+			// 																						// leftRear,
+			// 																						// rightRear
+			// 		);
 		}
 
 		var chassisState = DriveConstants.kDriveKinematics.toChassisSpeeds(m_leftFront.getState(), 
