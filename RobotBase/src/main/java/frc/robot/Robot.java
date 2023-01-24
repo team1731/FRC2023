@@ -10,6 +10,8 @@ import java.util.Scanner;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.net.PortForwarder;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -190,6 +192,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+	NetworkTable keypad = NetworkTableInstance.getDefault().getTable("KeyPad");
+	System.out.println(".\n.\n.\nDRIVER ENTRY ==========================>>>>>>> " + keypad.getEntry("driver entry").getDouble(0) + "\n.\n.\n.");
     m_drive.resetEncoders();
     if (System.currentTimeMillis() % 100 == 0) {
 			// SmartDashboard.putBoolean("LowSensor", m_sequencer.lowSensorHasBall());
