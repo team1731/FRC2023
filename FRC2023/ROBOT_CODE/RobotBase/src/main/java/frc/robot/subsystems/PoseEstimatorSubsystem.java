@@ -100,10 +100,10 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     for(String cameraName : this.cameraMap.keySet()){
       // Update pose estimator with visible targets
 
-      var res = this.cameraMap.get(cameraName).camera.getLatestResult();
+      //var res = this.cameraMap.get(cameraName).camera.getLatestResult();
 
       
-      if (res.hasTargets()) {
+      if (false) { //res.hasTargets()) {
     
         double imageCaptureTime = Timer.getFPGATimestamp() - (res.getLatencyMillis() / 1000d);
   
