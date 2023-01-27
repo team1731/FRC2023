@@ -1,6 +1,7 @@
 package frc.robot.util;
 
-import frc.robot.subsystems.drive.SwerveModule;
+//import frc.robot.subsystems.drive.SwerveModule;
+import frc.robot.SwerveModule;
 
 public class SwerveModuleDebug {
 	public double time;

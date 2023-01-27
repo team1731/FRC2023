@@ -79,8 +79,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   private final Field2d field2d = new Field2d();
 
   public PoseEstimatorSubsystem( Swerve m_swerve) {
-    this.cameraMap.put(CAM1, new CameraTransform(photonCamera1, CAMERA_TO_ROBOT_1));
-    this.cameraMap.put(CAM2, new CameraTransform(photonCamera2, CAMERA_TO_ROBOT_2));
+    // TODO temp removed cameras, b/c none are hooked up for init test
+    //this.cameraMap.put(CAM1, new CameraTransform(photonCamera1, CAMERA_TO_ROBOT_1));
+    //this.cameraMap.put(CAM2, new CameraTransform(photonCamera2, CAMERA_TO_ROBOT_2));
     this.m_swerve = m_swerve;
 
     ShuffleboardTab tab = Shuffleboard.getTab("Drivetrain");
@@ -100,10 +101,10 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     for(String cameraName : this.cameraMap.keySet()){
       // Update pose estimator with visible targets
 
-      //var res = this.cameraMap.get(cameraName).camera.getLatestResult();
+      var res = this.cameraMap.get(cameraName).camera.getLatestResult();
 
       
-      if (false) { //res.hasTargets()) {
+      if(res.hasTargets()) {
     
         double imageCaptureTime = Timer.getFPGATimestamp() - (res.getLatencyMillis() / 1000d);
   

@@ -13,7 +13,6 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.subsystems.drive.DriveSubsystem;
 import frc.robot.util.Utils;
 
 public class _DelayableStrafingAutoMode {
@@ -209,6 +208,8 @@ public class _DelayableStrafingAutoMode {
 		return convertedPoints;
 	}
 
+	/*
+	TODO DriveSubsystem is no longer in use, need to re-val this method, note: removed the _InstrumentedSwerveControllerCommand temporarily
 	public Command createSwerveCommand(DriveSubsystem m_robotDrive, String name, double endingHeading,
 			Trajectory trajectory, boolean trackTarget) {
 				return null;
@@ -239,7 +240,10 @@ public class _DelayableStrafingAutoMode {
 		// 	}
 		// };
 	}
+	*/
 
+	/*
+	 * TODO DriveSubsystem is no longer in use, need to re-val this method, note: removed the _InstrumentedSwerveControllerCommand temporarily
 	public _InstrumentedSwerveControllerCommand createSwerveCommand(DriveSubsystem m_robotDrive, String name,
 			TrajectoryDirection dir, TrajectoryHeading mode, double value, double[][] points, boolean trackTarget) {
 		if (mode == TrajectoryHeading.CONVERT_TO_METERS) {
@@ -264,5 +268,6 @@ public class _DelayableStrafingAutoMode {
 		// 	}
 		// };
 	}
+	*/
 
 }
