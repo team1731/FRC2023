@@ -22,11 +22,13 @@ public class SwerveModule {
     private CANCoder angleEncoder;
     private double lastAngle;
     private int falcontics = 0;
+    private DebugValues debugValues;
 
     SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.Swerve.driveKS, Constants.Swerve.driveKV, Constants.Swerve.driveKA);
 
     public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants){
         this.moduleNumber = moduleNumber;
+        debugValues = new DebugValues(moduleNumber);
         angleOffset = moduleConstants.angleOffset;
         
         /* Angle Encoder Config */
@@ -107,4 +109,28 @@ public class SwerveModule {
         return new SwerveModulePosition(position, angle);
     }
     
+    public class DebugValues {
+		public int id;
+
+		public double drive;
+		public double turningMotorOutput;
+		public double turnAppliedOutput;
+		public double turnVelocity;
+		public double driveAppliedOutput;
+		public double driveVelocity;
+
+		public DebugValues(int id) {
+			this.id = id;
+		}
+
+		public void update(double drive, double turningMotorOutput, double turnAppliedOutput, double turnVelocity,
+				double driveAppliedOutput, double driveVelocity) {
+			this.drive = drive;
+			this.turningMotorOutput = turningMotorOutput;
+			this.turnAppliedOutput = turnAppliedOutput;
+			this.turnVelocity = turnVelocity;
+			this.driveAppliedOutput = driveAppliedOutput;
+			this.driveVelocity = driveVelocity;
+		}
+	}
 }
