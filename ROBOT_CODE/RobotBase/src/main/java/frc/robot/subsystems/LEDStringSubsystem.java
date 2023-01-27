@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.Timer;
 
 import frc.robot.Constants.OpConstants;
 
-public class LedStringSubsystem extends SubsystemBase{
+public class LEDStringSubsystem extends SubsystemBase{
     private Timer mTimer;
     // Var to store last hue of first pixel
     private int m_rainbowFirstPixelHue;
@@ -26,7 +26,7 @@ public class LedStringSubsystem extends SubsystemBase{
     private boolean delay;
     private int length;
 
-    public LedStringSubsystem() {
+    public LEDStringSubsystem() {
         // PWM port 9
         // Must be a PWM header, not MXP or DIO
         m_led = new AddressableLED(OpConstants.kPWM_LedSting);
