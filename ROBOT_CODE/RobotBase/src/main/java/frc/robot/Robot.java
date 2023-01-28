@@ -33,7 +33,8 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private _NamedAutoMode namedAutoMode;
   private String autoCode = AutoConstants.kDEFAULT_AUTO_CODE;
-  
+  private String driverEntry = "";
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -142,8 +143,14 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledPeriodic() {
 	NetworkTable keypad = NetworkTableInstance.getDefault().getTable("KeyPad");
-	System.out.println(".\n.\n.\nDRIVER ENTRY ==========================>>>>>>> " + keypad.getEntry("driver entry").getDouble(0) + "\n.\n.\n.");
-    if (System.currentTimeMillis() % 100 == 0) {
+	String keypadEntry = keypad.getEntry("driver entry").getString("");
+	if (!keypadEntry.equals(driverEntry)){
+		System.out.println(".\n.\n.\nDRIVER ENTRY ==========================>>>>>>> " + keypadEntry + "\n.\n.\n.");
+		driverEntry = keypadEntry;
+		SmartDashboard.putString("CODRIVER ENTERED:", driverEntry);
+	}
+
+    if (System.currentTimeMillis() % 5000 == 0) {
 		// SmartDashboard.putBoolean("LowSensor", m_sequencer.lowSensorHasBall());
 		// SmartDashboard.putBoolean("MidSensor", m_sequencer.midSensorHasBall());
 		// SmartDashboard.putBoolean("HighSensor", m_sequencer.highSensorHasBall());
