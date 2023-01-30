@@ -253,4 +253,12 @@ public final class Constants {
         public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, 15.5, 5.0, 39.37, 45);
 	}
 
+    public static final class OpConstants{
+        public static final int kPWM_LedSting = 6;         // Addressable Led String
+
+        public enum LedOption {
+            TEAM, RED, BLUE, GREEN, YELLOW, ORANGE, PURPLE, RAINBOW, FULL, CLIMB, SHOOT, INTAKE, INTAKEBALL, WHEEL, BALLONE, BALLTWO, BALLTHREE, BALLFOUR
+          }
+    }
+
 }
