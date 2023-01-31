@@ -232,9 +232,19 @@ public final class Constants {
         */
         public static final String kArmStateMachineId = "ArmStateMachine";
 
-        public static final StateChangeRequest[] kTestSequence = new StateChangeRequest[]{
+        /*
+         * Sequences for the ArmStateMachine
+         * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
+         */
+        public static final StateChangeRequest[] kTestSequenceScore = new StateChangeRequest[]{
             new StateChangeRequest(ArmInput.EXTEND, new double[]{ 1, 2, 3, 4, 5 }),
             new StateChangeRequest(ArmInput.RELEASE, null, StateMachineWaitCondition.UNTIL_LINED_UP_FOR_SCORING),
+            new StateChangeRequest(ArmInput.RETRACT, new double[]{ 6, 7, 8, 9, 10 })
+        };
+
+        public static final StateChangeRequest[] kTestSequencePickup = new StateChangeRequest[]{
+            new StateChangeRequest(ArmInput.EXTEND, new double[]{ 1, 2, 3, 4, 5 }),
+            new StateChangeRequest(ArmInput.INTAKE),
             new StateChangeRequest(ArmInput.RETRACT, new double[]{ 6, 7, 8, 9, 10 })
         };
     }

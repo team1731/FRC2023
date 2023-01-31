@@ -2,6 +2,8 @@ package frc.robot.state;
  
 import java.util.ArrayList; 
 import java.util.Iterator;  
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.StateConstants;
 import frc.robot.Constants.StateConstants.StateMachineWaitCondition;
 
@@ -12,6 +14,7 @@ public abstract class StateMachine {
   protected Iterator<StateChangeRequest> sequence;
   protected State state;
   protected StateChangeRequest currentStep;
+  protected ArrayList<StateChange> processedSteps;
   protected ArrayList<StateMachineWaitCondition> unresolvedWaitConditions;
   protected StateMachineWaitCondition currentWaitCondition;
 
@@ -22,6 +25,7 @@ public abstract class StateMachine {
   public StateMachine(String id, StateHandler stateHandler) {
     this.id = id;
     this.stateHandler = stateHandler;
+    stateHandler.registerStateMachine(this);
   }
 
   public String getId() {
@@ -30,6 +34,10 @@ public abstract class StateMachine {
 
   public Status getStatus() {
     return status;
+  }
+
+  public ArrayList<StateChange> getProcessedSteps() {
+    return processedSteps;
   }
 
   protected StateHandler getStateHandler() {
@@ -41,6 +49,7 @@ public abstract class StateMachine {
     initializationChecks();
     status = Status.READY;
     currentStep = null;
+    processedSteps = new ArrayList<StateChange>();
     unresolvedWaitConditions = new ArrayList<StateMachineWaitCondition>();
     currentWaitCondition = null;
 
@@ -53,6 +62,7 @@ public abstract class StateMachine {
         unresolvedWaitConditions.add(request.waitCondition);
       }
     }
+    sequence = sequenceList.iterator();
   }
 
   protected void initializationChecks() throws StateMachineInitializationException {
@@ -83,10 +93,13 @@ public abstract class StateMachine {
   public void transition(Input input, StateChangeResult result) {
     // transition to next state based on the input provided by the state handler
     // this should be some kind of success/failure input
+    var previousState = state;
     transitionState(input);
     if(status == Status.INVALID) {
       return; // something went wrong w/transition
     }
+    
+    processedSteps.add(new StateChange(previousState, state, currentStep, result));
 
     // if state handler was successful move forward, otherwise, let subclass handle failure condition
     if(result.code.equals(StateConstants.kSuccessCode)) {
@@ -100,7 +113,7 @@ public abstract class StateMachine {
     try {
       state = state.next(input);
     } catch(StateMachineInvalidTransitionException ite) {
-      // TODO implement: DriverStation.reportError(ite.getMessage(), ite.getStackTrace());
+      DriverStation.reportError(ite.getMessage(), ite.getStackTrace());
       status = Status.INVALID;
       handleInvalidTransition();
     }
@@ -122,6 +135,7 @@ public abstract class StateMachine {
       var waitCondition = currentStep.waitCondition;
       if(currentStep.waitCondition != null && !checkWaitCondition(waitCondition)) {
         // we have an unresolved wait condition, can't process step until this is resolved
+        status = Status.WAITING;
         currentWaitCondition = waitCondition;
       } else {
         processCurrentSequenceStep();
@@ -133,11 +147,17 @@ public abstract class StateMachine {
 
   // Called from periodic, where we just cleared a wait condition and want to process the provided step
   protected void processCurrentSequenceStep() {
-    Input input = currentStep.input;
+    var input = currentStep.input;
+    var previousState = state;
     transitionState(input);
     if(status == Status.INVALID) {
       return; // something went wrong w/transition
     }
+
+    currentStep.timestamp = Timer.getFPGATimestamp();
+    processedSteps.add(new StateChange(previousState, state, currentStep));
+
+    // hand off to the subsystem
     stateHandler.changeState(input, currentStep.data);
   }
 
@@ -161,6 +181,7 @@ public abstract class StateMachine {
     if(currentWaitCondition != null && checkWaitCondition(currentWaitCondition)) {
       // this wait condition has been resolved, move on
       currentWaitCondition = null;
+      status = Status.RUNNING;
       processCurrentSequenceStep();
     }
   }

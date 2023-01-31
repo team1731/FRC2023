@@ -7,9 +7,10 @@ public class ArmStateMachine extends StateMachine {
 
   /*
    * Defines valid sequences that can be supplied to the state machine
+   * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
    */
   public enum ArmSequence implements StateSequence {
-    SCORE_TEST;
+    SCORE_TEST, PICKUP_TEST;
 
     public String getDescription() {
       return "ArmSequence: " + this.toString();
@@ -220,12 +221,15 @@ public class ArmStateMachine extends StateMachine {
 
   /*
    * Retrieves the sequence config matching the provided sequence, and maps them into an iterator of StateChangeRequest objects
+   * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
    */
   protected StateChangeRequest[] defineSequence(StateSequence selectedSequence) throws StateMachineInitializationException {
     ArmSequence ss = (ArmSequence)selectedSequence;
     switch(ss) {
       case SCORE_TEST:
-        return StateConstants.kTestSequence;
+        return StateConstants.kTestSequenceScore;
+      case PICKUP_TEST:
+        return StateConstants.kTestSequencePickup;
       default:
         throw new StateMachineInitializationException(getId(), "Sequence supplied is not supported " + selectedSequence);
     }

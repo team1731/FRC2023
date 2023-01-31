@@ -6,6 +6,7 @@ public class StateChangeRequest {
   public Input input;
   public Object data;
   public StateMachineWaitCondition waitCondition;
+  public double timestamp;
 
   public StateChangeRequest(Input input) {
     this(input, null, null);
