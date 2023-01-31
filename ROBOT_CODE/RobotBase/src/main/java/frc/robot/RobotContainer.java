@@ -71,7 +71,7 @@ public class RobotContainer {
       case 2:
         return new _2_13Top_B_Engage(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
       case 9:
-        return new _9_Move_Forward();
+        return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
     }
     System.err.println("FATAL: SELECTED AUTO MODE " + autoCode + " DOES NOT MAP TO A KNOWN AUTONOMOUS CLASS -- DOING NOTHING!!!!");
     return null;

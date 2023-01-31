@@ -107,7 +107,7 @@ public final class Constants {
         public static final double driveKA = (0.27 / 12);
 
         /* Swerve Profiling Values */
-        public static final double maxSpeed = 4.5; //meters per second
+        public static final double maxSpeed = 0.5; // disabled for testing = 4.5; //meters per second
         public static final double maxAngularVelocity = 11.5;
 
         /* Neutral Modes */
@@ -191,7 +191,7 @@ public final class Constants {
 
 		public static final boolean kGyroReversed = true; // 09FEB false;
 
-		public static final double kMaxSpeedMetersPerSecond = 3.5; // tune
+		public static final double kMaxSpeedMetersPerSecond = 0.5; // disabled for testing = 3.5; // tune
 
 		public static final double kTurnP = 0.1; // was 0.05
 		public static final double kTurnI = 0;
@@ -202,8 +202,8 @@ public final class Constants {
     public static final class AutoConstants {
         public static final String kDEFAULT_AUTO_CODE = "0";
 		public static final String kAUTO_CODE_KEY = "Auto Selector";
-        public static final double kMaxSpeedMetersPerSecond = 3;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+        public static final double kMaxSpeedMetersPerSecond = 0.5; // disabled for testing = 3;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 0.5; // disabled for testing = 3;
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
         public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
     
