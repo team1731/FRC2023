@@ -19,7 +19,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.autos._NamedAutoMode;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -31,11 +30,11 @@ public class Robot extends TimedRobot {
   public static CTREConfigs ctreConfigs;
   private RobotContainer m_robotContainer;
   private Command m_autonomousCommand;
-  private _NamedAutoMode namedAutoMode;
   private String autoCode = AutoConstants.kDEFAULT_AUTO_CODE;
   private String oldKeypadEntry = "";
   private String currentKeypadCommand = "";
   private NetworkTable keypad;
+  private NetworkTable fieldInfo;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -84,6 +83,7 @@ public class Robot extends TimedRobot {
 
 	autoInitPreload(SmartDashboard.getString(AutoConstants.kAUTO_CODE_KEY, AutoConstants.kDEFAULT_AUTO_CODE));
 	keypad = NetworkTableInstance.getDefault().getTable("KeyPad");
+	fieldInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
   }
   
   private void autoInitPreload(String useCode) {
@@ -98,7 +98,9 @@ public class Robot extends TimedRobot {
 		autoCode = AutoConstants.kDEFAULT_AUTO_CODE;
 	}
 	else{
-		m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode);
+		// NetworkTables called FMSInfo which contains an entry called IsRedAlliance
+		boolean isRedAlliance = Boolean.valueOf(fieldInfo.getEntry("IsRedAlliance").getString("true"));
+		m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);
 		if(m_autonomousCommand != null){
 			autoCode = useCode;
 		}
@@ -172,7 +174,7 @@ public class Robot extends TimedRobot {
 	if(m_autonomousCommand == null) {
 		System.err.println("SOMETHING WENT WRONG - UNABLE TO RUN AUTONOMOUS! CHECK SOFTWARE!");
 	} else {
-		System.out.println("Running actual autonomous mode --> " + namedAutoMode.name);
+		System.out.println("Running actual autonomous mode --> " + m_autonomousCommand.getClass().getSimpleName());
 		m_robotContainer.zeroHeading();
 		m_autonomousCommand.schedule();
 	}		

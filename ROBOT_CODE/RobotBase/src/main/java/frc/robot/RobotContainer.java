@@ -62,14 +62,18 @@ public class RobotContainer {
     adjustWheelEncoders.whenPressed(new InstantCommand(() -> s_Swerve.adjustWheelEncoders()));
   }
 
-  public Command getNamedAutonomousCommand(String autoCode) {
-	switch (Character.getNumericValue(autoCode.charAt(0))) {
-		case 0:
-			return new _0_exampleAuto(s_Swerve, s_poseEstimatorSubsystem);
-		case 9:
-			return new _9_Move_Forward();
-	}
-	System.err.println("FATAL: SELECTED AUTO MODE " + autoCode + " DOES NOT MAP TO A KNOWN AUTONOMOUS CLASS -- DOING NOTHING!!!!");
+  public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
+    switch (Character.getNumericValue(autoCode.charAt(0))) {
+      case 0:
+        return new _0_exampleAuto(s_Swerve, s_poseEstimatorSubsystem);
+      case 1:
+        return new _1_11Top_A_13Top_Drive_A(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+      case 2:
+        return new _2_13Top_B_Engage(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+      case 9:
+        return new _9_Move_Forward();
+    }
+    System.err.println("FATAL: SELECTED AUTO MODE " + autoCode + " DOES NOT MAP TO A KNOWN AUTONOMOUS CLASS -- DOING NOTHING!!!!");
     return null;
   }
 
