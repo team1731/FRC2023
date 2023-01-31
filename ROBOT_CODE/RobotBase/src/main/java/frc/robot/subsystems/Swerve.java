@@ -5,6 +5,7 @@ import com.kauailabs.navx.frc.AHRS;
 
 import frc.robot.SwerveModule;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -117,11 +118,12 @@ public class Swerve extends SubsystemBase {
     public void periodic(){
 
  
-
-        for(SwerveModule mod : mSwerveMods){
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getState().angle.getDegrees());
-            SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
+        if (Robot.doSD()) {
+            for(SwerveModule mod : mSwerveMods){
+                SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
+                SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getState().angle.getDegrees());
+                SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
+            }
         }
     }
 }

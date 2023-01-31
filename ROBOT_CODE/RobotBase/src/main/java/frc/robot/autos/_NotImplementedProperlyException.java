@@ -1,5 +1,6 @@
 package frc.robot.autos;
 
+@Deprecated
 public class _NotImplementedProperlyException extends Exception {
 
 	private static final long serialVersionUID = 1L;

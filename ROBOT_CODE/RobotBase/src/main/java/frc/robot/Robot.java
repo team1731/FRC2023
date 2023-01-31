@@ -8,11 +8,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -33,7 +33,9 @@ public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
   private _NamedAutoMode namedAutoMode;
   private String autoCode = AutoConstants.kDEFAULT_AUTO_CODE;
-  private String driverEntry = "";
+  private String oldKeypadEntry = "";
+  private String currentKeypadCommand = "";
+  private NetworkTable keypad;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -50,13 +52,7 @@ public class Robot extends TimedRobot {
 	
 	initSubsystems();
 
-	SmartDashboard.putString(AutoConstants.kAUTO_CODE, AutoConstants.kDEFAULT_AUTO_CODE); // see above for explanation
-	if (RobotBase.isReal()) {
-		autoCode = SmartDashboard.getString(AutoConstants.kAUTO_CODE, autoCode);
-	}
-        
-	autoInitPreload();
-
+	SmartDashboard.putString(AutoConstants.kAUTO_CODE_KEY, AutoConstants.kDEFAULT_AUTO_CODE);
 	SmartDashboard.putString("Build Info - Branch", "N/A");
 	SmartDashboard.putString("Build Info - Commit Hash", "N/A");
 	SmartDashboard.putString("Build Info - Date", "N/A");
@@ -66,58 +62,58 @@ public class Robot extends TimedRobot {
 	 */
 	try {
 		File buildInfoFile = new File(Filesystem.getDeployDirectory(), "DeployedBranchInfo.txt");
-		Scanner reader = new Scanner(buildInfoFile);
-		int i = 0;
-		while(reader.hasNext()){
-			if(i == 0){
-				SmartDashboard.putString("Build Info - Branch", reader.nextLine());
-			} else if(i == 1){
-				SmartDashboard.putString("Build Info - Commit Hash", reader.nextLine());
-			} else {
-				SmartDashboard.putString("Build Info - Date", reader.nextLine());
-			}
-			i++;
+		if(buildInfoFile.exists() && buildInfoFile.canRead()){
+			Scanner reader = new Scanner(buildInfoFile);
+			int i = 0;
+			while(reader.hasNext()){
+				if(i == 0){
+					SmartDashboard.putString("Build Info - Branch", reader.nextLine());
+				} else if(i == 1){
+					SmartDashboard.putString("Build Info - Commit Hash", reader.nextLine());
+				} else {
+					SmartDashboard.putString("Build Info - Date", reader.nextLine());
+				}
+				i++;
+			}			
+			reader.close();
 		}
-		
-		reader.close();
 	} catch (FileNotFoundException fnf) {
 		System.err.println("DeployedBranchInfo.txt not found");
 		fnf.printStackTrace();
 	}
+
+	autoInitPreload(SmartDashboard.getString(AutoConstants.kAUTO_CODE_KEY, AutoConstants.kDEFAULT_AUTO_CODE));
+	keypad = NetworkTableInstance.getDefault().getTable("KeyPad");
   }
   
-  private void initSubsystems() {
-	// TODO Not implemented yet
-  }
-  
-  private void autoInitPreload() {
-	System.out.println("autoInitPreload: Start");
+  private void autoInitPreload(String useCode) {
 	m_autonomousCommand = null;
 
-	if(RobotBase.isReal()) {
-		autoCode = SmartDashboard.getString(AutoConstants.kAUTO_CODE, autoCode);
-	}
-
-	System.out.println("AUTO CODE retrieved from Dashboard --> " + autoCode);
-	if(autoCode == null || autoCode.length() < 2) {
+	System.out.println("Preloading AUTO CODE --> " + useCode);
+	// 2023:
+	// 2023: auto code is a single digit [0-9]
+	// 2023:
+	if(useCode == null || useCode.length() != 1 || !Character.isDigit(useCode.charAt(0))) {
+		System.out.println("BAD AUTO CODE: " + useCode + " : DEFAULTING TO " + AutoConstants.kDEFAULT_AUTO_CODE);
 		autoCode = AutoConstants.kDEFAULT_AUTO_CODE;
-		SmartDashboard.putString(AutoConstants.kAUTO_CODE, AutoConstants.kDEFAULT_AUTO_CODE);
 	}
-	autoCode = autoCode.toUpperCase();
-	System.out.println("AUTO CODE being used by the software --> " + autoCode);
-
-	m_autonomousCommand = null;
-	namedAutoMode = m_robotContainer.getNamedAutonomousCommand(autoCode);
-	if(namedAutoMode != null) {
-		System.out.println("autoInitPreload: getCommand Auto Begin: "+namedAutoMode.name);
-		m_autonomousCommand = namedAutoMode.getCommand();
-		System.out.println("autoInitPreload: getCommand Auto Complete");
-	} else {
-		System.err.println("UNABLE TO EXECUTE SELECTED AUTONOMOUS MODE!!");
+	else{
+		m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode);
+		if(m_autonomousCommand != null){
+			autoCode = useCode;
+		}
+		else{
+			System.out.println("AUTO CODE " + useCode + " IS NOT IMPLEMENTED -- STAYING WITH AUTO CODE " + autoCode);
+		}
 	}
-	System.out.println("autoInitPreload: End");
+	SmartDashboard.putString(AutoConstants.kAUTO_CODE_KEY, autoCode);
+	System.out.println("AUTO CODE being used by the software --> " + autoCode + "\n\n\n");
   }
 
+  private void initSubsystems() {
+	m_robotContainer.resetEncoders();
+  }
+  
   /**
    * This function is called every robot packet, no matter the mode. Use this for items like
    * diagnostics that you want ran during disabled, autonomous, teleoperated and test.
@@ -132,37 +128,39 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
+
+	//
+	// read the KEYPAD, write to NETWORK TABLES
+	//
+	String newKeypadEntry = keypad.getEntry("driver entry").getString(oldKeypadEntry);
+	if (!newKeypadEntry.equals(oldKeypadEntry)){
+		System.out.println(".\n.\n.\nDRIVER ENTRY ==========================>>>>>>>> " + newKeypadEntry + "\n.\n.\n.");
+		oldKeypadEntry = newKeypadEntry;
+		SmartDashboard.putString("keypadCommand", newKeypadEntry);
+	}
+
+	m_robotContainer.displayEncoders();
   }
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-	// TODO not implemented yet
+	SmartDashboard.putString(AutoConstants.kAUTO_CODE_KEY, autoCode);
+	keypad.putValue("driver entry", NetworkTableValue.makeString(""));
   }
 
   @Override
   public void disabledPeriodic() {
-	NetworkTable keypad = NetworkTableInstance.getDefault().getTable("KeyPad");
-	String keypadEntry = keypad.getEntry("driver entry").getString("");
-	if (!keypadEntry.equals(driverEntry)){
-		System.out.println(".\n.\n.\nDRIVER ENTRY ==========================>>>>>>> " + keypadEntry + "\n.\n.\n.");
-		driverEntry = keypadEntry;
-		SmartDashboard.putString("CODRIVER ENTERED:", driverEntry);
-	}
-
     if (System.currentTimeMillis() % 5000 == 0) {
 		// SmartDashboard.putBoolean("LowSensor", m_sequencer.lowSensorHasBall());
 		// SmartDashboard.putBoolean("MidSensor", m_sequencer.midSensorHasBall());
 		// SmartDashboard.putBoolean("HighSensor", m_sequencer.highSensorHasBall());
 	}
 
-	if (RobotBase.isReal()) {
-		String newCode = SmartDashboard.getString(AutoConstants.kAUTO_CODE, autoCode);
-		if(!newCode.equals(autoCode)) {
-			System.out.println("New Auto Code read from dashboard. OLD: \""+autoCode+"\", NEW: \""+newCode+"\" - initializing.");
-			autoCode = newCode;
-			autoInitPreload();
-		}
+	String newCode = SmartDashboard.getString(AutoConstants.kAUTO_CODE_KEY, autoCode);
+	if(!newCode.equals(autoCode)) {
+		System.out.println("New Auto Code read from dashboard. OLD: " + autoCode + ", NEW: " + newCode);
+		autoInitPreload(newCode);
 	}
   }
 
@@ -170,17 +168,12 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 	CommandScheduler.getInstance().cancelAll();
-    m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
 	if(m_autonomousCommand == null) {
 		System.err.println("SOMETHING WENT WRONG - UNABLE TO RUN AUTONOMOUS! CHECK SOFTWARE!");
 	} else {
 		System.out.println("Running actual autonomous mode --> " + namedAutoMode.name);
-	
-		Pose2d initialPose = namedAutoMode.getInitialPose();
-		if(initialPose != null) {
-			System.out.println("Initial Pose: " + initialPose.toString());
-		}
+		m_robotContainer.zeroHeading();
 		m_autonomousCommand.schedule();
 	}		
 	System.out.println("autonomousInit: End");
@@ -192,6 +185,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+	CommandScheduler.getInstance().cancelAll();
+	initSubsystems();
     // This makes sure that the autonomous stops running when
 	// teleop starts running. If you want the autonomous to
 	// continue until interrupted by another command, remove
@@ -199,11 +194,33 @@ public class Robot extends TimedRobot {
 	if (m_autonomousCommand != null) {
 		m_autonomousCommand.cancel();
 	}
+	currentKeypadCommand = "";
+	SmartDashboard.getString("keypadCommand", currentKeypadCommand);
+	keypad.putValue("driver entry", NetworkTableValue.makeString(""));
   }
+
+  public static long millis = System.currentTimeMillis();
+
+  public static boolean doSD() {
+	  long now = System.currentTimeMillis();
+	  if (now - millis > 300) {
+		  millis = now;
+		  return true;
+	  }
+	  return false;
+  }
+
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    String newKeypadCommand = SmartDashboard.getString("keypadCommand", currentKeypadCommand);
+	if(!newKeypadCommand.equals(currentKeypadCommand)){
+		// FEED FSM
+		m_robotContainer.processKeypadCommand(newKeypadCommand);
+		currentKeypadCommand = newKeypadCommand;
+	}
+  }
 
   @Override
   public void testInit() {

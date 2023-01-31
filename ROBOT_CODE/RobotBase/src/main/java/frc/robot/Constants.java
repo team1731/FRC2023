@@ -200,8 +200,8 @@ public final class Constants {
 	}
 
     public static final class AutoConstants {
-        public static final String kDEFAULT_AUTO_CODE = "C4";
-		public static final String kAUTO_CODE = "Auto Selector";
+        public static final String kDEFAULT_AUTO_CODE = "0";
+		public static final String kAUTO_CODE_KEY = "Auto Selector";
         public static final double kMaxSpeedMetersPerSecond = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 3;
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;

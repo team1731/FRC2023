@@ -144,7 +144,7 @@ public class Keypad extends JDialog implements KeyListener {
             		inputBuffer = new StringBuffer(controlName);
             		break;
             	case CLEAR_ENTRY: picLabel.setIcon(none);
-            		inputBuffer = new StringBuffer("");
+            		inputBuffer = new StringBuffer("CLEAR");
             		label.setText("");
             		break;
             	case CONE_LEFT:
