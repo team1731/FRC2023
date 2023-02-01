@@ -34,7 +34,7 @@ public class Robot extends TimedRobot {
   private String currentKeypadCommand = "";
   private NetworkTable keypad;
   private NetworkTable fieldInfo;
-  private Boolean isRedAlliance = null;
+  private boolean isRedAlliance = true;
   private int stationNumber = 0;
 
   /**
@@ -86,11 +86,10 @@ public class Robot extends TimedRobot {
 	keypad = NetworkTableInstance.getDefault().getTable("KeyPad");
   }
   
-  private Boolean isRedAlliance(){
-	Boolean isRedAlliance = false;
+  private boolean isRedAlliance(){
 	fieldInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
 	if(fieldInfo != null){
-		isRedAlliance = Boolean.valueOf(fieldInfo.getEntry("IsRedAlliance").getString(null));
+		return Boolean.valueOf(fieldInfo.getEntry("IsRedAlliance").getString("true"));
 	}
 	else{
 		System.out.println("\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  ERROR: CAN'T TELL IF WE ARE RED ALLIANCE OR BLUE ALLIANCE  !!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n");
@@ -122,18 +121,13 @@ public class Robot extends TimedRobot {
 		autoCode = AutoConstants.kDEFAULT_AUTO_CODE;
 	}
 	else{
-		if(isRedAlliance != null){
-			m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);
-			if(m_autonomousCommand != null){
-				autoCode = useCode;
-				System.out.println("=====>>> PRELOADED AUTONOMOUS ROUTINE: " + m_autonomousCommand.getClass().getName() + " " + (isRedAlliance?"RED":"BLUE") + " <<<=====");
-			}
-			else{
-				System.out.println("AUTO CODE " + useCode + " IS NOT IMPLEMENTED -- STAYING WITH AUTO CODE " + autoCode);
-			}
+		m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);
+		if(m_autonomousCommand != null){
+			autoCode = useCode;
+			System.out.println("=====>>> PRELOADED AUTONOMOUS ROUTINE: " + m_autonomousCommand.getClass().getName() + " " + (isRedAlliance?"RED":"BLUE") + " <<<=====");
 		}
 		else{
-			System.out.println("Too early to load Autonomous routine -- waiting on Alliance COLOR to be available...");
+			System.out.println("AUTO CODE " + useCode + " IS NOT IMPLEMENTED -- STAYING WITH AUTO CODE " + autoCode);
 		}
 	}
 	SmartDashboard.putString(AutoConstants.kAUTO_CODE_KEY, autoCode);
@@ -194,7 +188,7 @@ public class Robot extends TimedRobot {
 	}
 
 	boolean isRedAlliance = isRedAlliance();
-	if(this.isRedAlliance == null || this.isRedAlliance != isRedAlliance){
+	if(this.isRedAlliance != isRedAlliance){
 		this.isRedAlliance = isRedAlliance;
 		System.out.println("\n===============>>>>>>>>>>>>>>  WE ARE " + (isRedAlliance?"RED":"BLUE") + " ALLIANCE  <<<<<<<<<<<<=========================\n");
 		this.autoInitPreload(autoCode);
