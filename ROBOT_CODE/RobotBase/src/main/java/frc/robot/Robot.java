@@ -9,7 +9,6 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -37,6 +36,8 @@ public class Robot extends TimedRobot {
   private String currentKeypadCommand = "";
   private NetworkTable keypad;
   private NetworkTable fieldInfo;
+  private Boolean isRedAlliance = null;
+  private int stationNumber = 0;
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -91,9 +92,32 @@ public class Robot extends TimedRobot {
 
 	autoInitPreload();
 	keypad = NetworkTableInstance.getDefault().getTable("KeyPad");
-	fieldInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
   }
   
+  private Boolean isRedAlliance(){
+	Boolean isRedAlliance = false;
+	fieldInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
+	if(fieldInfo != null){
+		isRedAlliance = Boolean.valueOf(fieldInfo.getEntry("IsRedAlliance").getString(null));
+	}
+	else{
+		System.out.println("\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  ERROR: CAN'T TELL IF WE ARE RED ALLIANCE OR BLUE ALLIANCE  !!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n");
+	}
+	return isRedAlliance;
+  }
+
+  private int getStationNumber(){
+	int stationNumber = 1;
+	fieldInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
+	if(fieldInfo != null){
+		stationNumber = (int)fieldInfo.getEntry("StationNumber").getInteger(0);
+	}
+	else{
+		System.out.println("\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  ERROR: CAN'T TELL WHAT OUR STATION NUMBER IS  !!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n");
+	}
+	return stationNumber;
+  }
+
   private void autoInitPreload() {
 	m_autonomousCommand = null;
 
@@ -108,15 +132,18 @@ public class Robot extends TimedRobot {
 		autoCode = AutoConstants.kDefault_AutoCode;
 	}
 	else{
-		// NetworkTables called FMSInfo which contains an entry called IsRedAlliance
-		// TODO temporarily disabled for testing, the field info was null
-		boolean isRedAlliance = true; //Boolean.valueOf(fieldInfo.getEntry("IsRedAlliance").getString("true"));
-		m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);
-		if(m_autonomousCommand != null){
-			autoCode = useCode;
+		if(isRedAlliance != null){
+			m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);
+			if(m_autonomousCommand != null){
+				autoCode = useCode;
+				System.out.println("=====>>> PRELOADED AUTONOMOUS ROUTINE: " + m_autonomousCommand.getClass().getName() + " " + (isRedAlliance?"RED":"BLUE") + " <<<=====");
+			}
+			else{
+				System.out.println("AUTO CODE " + useCode + " IS NOT IMPLEMENTED -- STAYING WITH AUTO CODE " + autoCode);
+			}
 		}
 		else{
-			System.out.println("AUTO CODE " + useCode + " IS NOT IMPLEMENTED -- STAYING WITH AUTO CODE " + autoCode);
+			System.out.println("Too early to load Autonomous routine -- waiting on Alliance COLOR to be available...");
 		}
 	}
 	System.out.println("AUTO CODE being used by the software --> " + autoCode + "\n\n\n");
@@ -173,6 +200,20 @@ public class Robot extends TimedRobot {
 		System.out.println("New Auto Code read from dashboard. OLD: " + autoCode + ", NEW: " + newCode);
 		autoInitPreload();
 	}
+
+	boolean isRedAlliance = isRedAlliance();
+	if(this.isRedAlliance == null || this.isRedAlliance != isRedAlliance){
+		this.isRedAlliance = isRedAlliance;
+		System.out.println("\n===============>>>>>>>>>>>>>>  WE ARE " + (isRedAlliance?"RED":"BLUE") + " ALLIANCE  <<<<<<<<<<<<=========================\n");
+		this.autoInitPreload();
+	}
+
+	int stationNumber = getStationNumber();
+	if(this.stationNumber != stationNumber){
+		this.stationNumber = stationNumber;
+		System.out.println("\n===============>>>>>>>>>>>>>>  WE ARE STATION NUMBER " + stationNumber + "  <<<<<<<<<<<<=========================\n");
+	}
+
   }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
@@ -183,7 +224,7 @@ public class Robot extends TimedRobot {
 	if(m_autonomousCommand == null) {
 		System.err.println("SOMETHING WENT WRONG - UNABLE TO RUN AUTONOMOUS! CHECK SOFTWARE!");
 	} else {
-		System.out.println("Running actual autonomous mode --> " + m_autonomousCommand.getClass().getSimpleName());
+		System.out.println("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand.getClass().getSimpleName() + " <----------");
 		m_robotContainer.zeroHeading();
 		m_autonomousCommand.schedule();
 	}		
