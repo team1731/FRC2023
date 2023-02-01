@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.Constants.AutoConstants;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -63,16 +64,18 @@ public class RobotContainer {
   }
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
-    switch (Character.getNumericValue(autoCode.charAt(0))) {
-      case 0:
+    switch(autoCode) {
+			case AutoConstants.kDefault_AutoCode:
+				return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
+      case AutoConstants.kMove_Forward_AutoCode:
+				return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
+      case AutoConstants.kExample_AutoCode:
         return new _0_exampleAuto(s_Swerve, s_poseEstimatorSubsystem);
-      case 1:
+      case AutoConstants.k11Top_A_13Top_Drive_A_AutoCode:
         return new _1_11Top_A_13Top_Drive_A(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
-      case 2:
+      case AutoConstants.k13Top_B_Engage:
         return new _2_13Top_B_Engage(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
-      case 9:
-        return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
-    }
+		}
     System.err.println("FATAL: SELECTED AUTO MODE " + autoCode + " DOES NOT MAP TO A KNOWN AUTONOMOUS CLASS -- DOING NOTHING!!!!");
     return null;
   }
