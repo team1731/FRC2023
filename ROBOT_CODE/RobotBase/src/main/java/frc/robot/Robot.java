@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.AutoConstants;
@@ -30,7 +31,8 @@ public class Robot extends TimedRobot {
   public static CTREConfigs ctreConfigs;
   private RobotContainer m_robotContainer;
   private Command m_autonomousCommand;
-  private String autoCode = AutoConstants.kDEFAULT_AUTO_CODE;
+  private final SendableChooser<String> autoChooser = new SendableChooser<>();
+  private String autoCode = AutoConstants.kDefault_AutoCode;
   private String oldKeypadEntry = "";
   private String currentKeypadCommand = "";
   private NetworkTable keypad;
@@ -51,7 +53,13 @@ public class Robot extends TimedRobot {
 	
 	initSubsystems();
 
-	SmartDashboard.putString(AutoConstants.kAUTO_CODE_KEY, AutoConstants.kDEFAULT_AUTO_CODE);
+	autoChooser.setDefaultOption("Default Auto", AutoConstants.kDefault_AutoCode);
+	autoChooser.setDefaultOption("Move Forward Auto", AutoConstants.kMove_Forward_AutoCode);
+	autoChooser.addOption("Example Auto", AutoConstants.kExample_AutoCode);
+	autoChooser.addOption("11Top_A_13Top_Drive_A", AutoConstants.k11Top_A_13Top_Drive_A_AutoCode);
+	autoChooser.addOption("13Top_B_Engage", AutoConstants.k13Top_B_Engage);
+    SmartDashboard.putData(AutoConstants.kAutoCodeKey, autoChooser);
+
 	SmartDashboard.putString("Build Info - Branch", "N/A");
 	SmartDashboard.putString("Build Info - Commit Hash", "N/A");
 	SmartDashboard.putString("Build Info - Date", "N/A");
@@ -81,25 +89,28 @@ public class Robot extends TimedRobot {
 		fnf.printStackTrace();
 	}
 
-	autoInitPreload(SmartDashboard.getString(AutoConstants.kAUTO_CODE_KEY, AutoConstants.kDEFAULT_AUTO_CODE));
+	autoInitPreload();
 	keypad = NetworkTableInstance.getDefault().getTable("KeyPad");
 	fieldInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
   }
   
-  private void autoInitPreload(String useCode) {
+  private void autoInitPreload() {
 	m_autonomousCommand = null;
+
+	String useCode = autoChooser.getSelected();
 
 	System.out.println("Preloading AUTO CODE --> " + useCode);
 	// 2023:
 	// 2023: auto code is a single digit [0-9]
 	// 2023:
-	if(useCode == null || useCode.length() != 1 || !Character.isDigit(useCode.charAt(0))) {
-		System.out.println("BAD AUTO CODE: " + useCode + " : DEFAULTING TO " + AutoConstants.kDEFAULT_AUTO_CODE);
-		autoCode = AutoConstants.kDEFAULT_AUTO_CODE;
+	if(useCode == null) {
+		System.out.println("NULL AUTO CODE : DEFAULTING TO " + AutoConstants.kDefault_AutoCode);
+		autoCode = AutoConstants.kDefault_AutoCode;
 	}
 	else{
 		// NetworkTables called FMSInfo which contains an entry called IsRedAlliance
-		boolean isRedAlliance = Boolean.valueOf(fieldInfo.getEntry("IsRedAlliance").getString("true"));
+		// TODO temporarily disabled for testing, the field info was null
+		boolean isRedAlliance = true; //Boolean.valueOf(fieldInfo.getEntry("IsRedAlliance").getString("true"));
 		m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);
 		if(m_autonomousCommand != null){
 			autoCode = useCode;
@@ -108,7 +119,6 @@ public class Robot extends TimedRobot {
 			System.out.println("AUTO CODE " + useCode + " IS NOT IMPLEMENTED -- STAYING WITH AUTO CODE " + autoCode);
 		}
 	}
-	SmartDashboard.putString(AutoConstants.kAUTO_CODE_KEY, autoCode);
 	System.out.println("AUTO CODE being used by the software --> " + autoCode + "\n\n\n");
   }
 
@@ -147,7 +157,6 @@ public class Robot extends TimedRobot {
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
   public void disabledInit() {
-	SmartDashboard.putString(AutoConstants.kAUTO_CODE_KEY, autoCode);
 	keypad.putValue("driver entry", NetworkTableValue.makeString(""));
   }
 
@@ -159,10 +168,10 @@ public class Robot extends TimedRobot {
 		// SmartDashboard.putBoolean("HighSensor", m_sequencer.highSensorHasBall());
 	}
 
-	String newCode = SmartDashboard.getString(AutoConstants.kAUTO_CODE_KEY, autoCode);
+	String newCode = autoChooser.getSelected();
 	if(!newCode.equals(autoCode)) {
 		System.out.println("New Auto Code read from dashboard. OLD: " + autoCode + ", NEW: " + newCode);
-		autoInitPreload(newCode);
+		autoInitPreload();
 	}
   }
 
