@@ -5,6 +5,8 @@ public class StateChange {
     public State newState;
     public StateChangeRequest request;
     public StateChangeResult result;
+    public boolean interrupted = false;
+    public double interruptedTimestamp = 0.0;
 
     public StateChange(State previousState, State newState, StateChangeRequest request) {
         this(previousState, newState, request, null);

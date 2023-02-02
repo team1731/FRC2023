@@ -1,5 +1,7 @@
 package frc.robot.state.arm;
 
+import java.util.ArrayList;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.StateConstants;
 import frc.robot.state.*;
 
@@ -10,7 +12,7 @@ public class ArmStateMachine extends StateMachine {
    * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
    */
   public enum ArmSequence implements StateSequence {
-    SCORE_TEST, PICKUP_TEST;
+    SCORE_TEST, PICKUP_TEST, UNDEFINED_TEST, INVALID_TEST;
 
     public String getDescription() {
       return "ArmSequence: " + this.toString();
@@ -210,6 +212,13 @@ public class ArmStateMachine extends StateMachine {
     state = ArmState.RETRACTED;
   }
 
+  // this method should be used with caution, it can be used to reset the state machine and it 
+  // should definitely not be called unless it is certain that the arm is in a safe retracted state
+  // there may not be a use case for this method outside of unit testing
+  public void reset() {
+    state = ArmState.RETRACTED;
+  }
+
   protected void initializationChecks() throws StateMachineInitializationException {
     if(state == ArmState.UNSAFE) {
       throw new StateMachineInitializationException(getId(), "Arm is in UNSAFE state. No actions can be performed.");
@@ -230,13 +239,15 @@ public class ArmStateMachine extends StateMachine {
         return StateConstants.kTestSequenceScore;
       case PICKUP_TEST:
         return StateConstants.kTestSequencePickup;
+      case INVALID_TEST:
+        return StateConstants.kTestInvalid;
       default:
         throw new StateMachineInitializationException(getId(), "Sequence supplied is not supported " + selectedSequence);
     }
   }
 
   public void interruptSequence() {
-    if(status != Status.READY || status != Status.WAITING) {
+    if(!isInInterruptibleStatus()) {
       return; // not interruptible
     }
 
@@ -252,10 +263,21 @@ public class ArmStateMachine extends StateMachine {
 
     if(shouldInterrupt) {
       getStateHandler().interruptStateChange();
+      previouState = state;
       transitionState(ArmInput.INTERRUPT);
       if(status == Status.INVALID) {
         return; // something went wrong w/transition
+      } else {
+        status = Status.INTERRUPTED;
       }
+
+      // Add current step we interrupted to the processed steps list
+      var change = new StateChange(previouState, state, currentStep);
+      change.interrupted = true;
+      change.interruptedTimestamp = Timer.getFPGATimestamp();
+      processedSteps.add(change);
+
+      // now initiate recovery
       recover();
     }
   }
@@ -269,7 +291,24 @@ public class ArmStateMachine extends StateMachine {
   }
 
   private void recover() {
-    // TODO implement recovery logic once we know what this looks like
-    // will need to define a new sequence with calculated positions to retract the arm
+    // calculate a recovery path for the arm
+    var data = generateRecoveryData();
+
+    // redefine the state sequence w/recovery step
+    var step = new StateChangeRequest(ArmInput.RECOVER, data);
+    var sequenceList = new ArrayList<StateChangeRequest>();
+    sequenceList.add(step);
+    sequence = sequenceList.iterator();
+
+    // advance the iterator to pre-load this step
+    currentStep = sequence.next();
+
+    // restart processing to initiate recovery
+    processCurrentSequenceStep();
+  }
+
+  private Object generateRecoveryData() {
+    // TODO, replace this, just passing some dummy data for the moment
+    return new double[]{ 11, 12, 13, 14, 15 };
   }
 }

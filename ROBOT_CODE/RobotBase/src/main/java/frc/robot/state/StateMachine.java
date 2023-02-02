@@ -10,8 +10,10 @@ import frc.robot.Constants.StateConstants.StateMachineWaitCondition;
 public abstract class StateMachine {
   private String id;
   private StateHandler stateHandler;
+  private boolean reportExceptions = true; // should only be false during unit testing
   protected Status status;
   protected Iterator<StateChangeRequest> sequence;
+  protected State previouState;
   protected State state;
   protected StateChangeRequest currentStep;
   protected ArrayList<StateChange> processedSteps;
@@ -19,7 +21,7 @@ public abstract class StateMachine {
   protected StateMachineWaitCondition currentWaitCondition;
 
   public enum Status {
-    READY, RUNNING, WAITING, INVALID, FINISHED
+    READY, RUNNING, WAITING, INTERRUPTED, FAILED_INIT, INVALID, FINISHED
   }
 
   public StateMachine(String id, StateHandler stateHandler) {
@@ -36,6 +38,19 @@ public abstract class StateMachine {
     return status;
   }
 
+  public State getState() {
+    return state;
+  }
+
+  public boolean isInInterruptibleStatus() {
+    return (status == Status.READY || status == Status.RUNNING ||  status == Status.WAITING);
+  }
+
+  // used for unit testing only to prevent intentionally intiated exceptions from printing out
+  public void setReportExceptions(boolean reportExceptions) {
+    this.reportExceptions = reportExceptions;
+  }
+
   public ArrayList<StateChange> getProcessedSteps() {
     return processedSteps;
   }
@@ -46,23 +61,30 @@ public abstract class StateMachine {
 
   // Called by a command to set up a state sequence and kick-off any pre-sequence checks
   public void initialize(StateSequence selectedSequence) throws StateMachineInitializationException {
-    initializationChecks();
-    status = Status.READY;
-    currentStep = null;
-    processedSteps = new ArrayList<StateChange>();
-    unresolvedWaitConditions = new ArrayList<StateMachineWaitCondition>();
-    currentWaitCondition = null;
+    try {
+      initializationChecks();
 
-    // grab and parse the sequence definition
-    var sequenceDefinition = defineSequence(selectedSequence);
-    var sequenceList = new ArrayList<StateChangeRequest>();
-    for(var request : sequenceDefinition) {
-      sequenceList.add(request);
-      if(request.waitCondition != null) {
-        unresolvedWaitConditions.add(request.waitCondition);
+      status = Status.READY;
+      currentStep = null;
+      processedSteps = new ArrayList<StateChange>();
+      unresolvedWaitConditions = new ArrayList<StateMachineWaitCondition>();
+      currentWaitCondition = null;
+
+      // grab and parse the sequence definition
+      var sequenceDefinition = defineSequence(selectedSequence);
+      var sequenceList = new ArrayList<StateChangeRequest>();
+      for(var request : sequenceDefinition) {
+        sequenceList.add(request);
+        if(request.waitCondition != null) {
+          unresolvedWaitConditions.add(request.waitCondition);
+        }
       }
+      sequence = sequenceList.iterator();
+    } catch(StateMachineInitializationException ie) {
+      status = Status.FAILED_INIT;
+      System.out.println("ERROR: " + id + " failed to initialize");
+      throw ie;
     }
-    sequence = sequenceList.iterator();
   }
 
   protected void initializationChecks() throws StateMachineInitializationException {
@@ -93,13 +115,13 @@ public abstract class StateMachine {
   public void transition(Input input, StateChangeResult result) {
     // transition to next state based on the input provided by the state handler
     // this should be some kind of success/failure input
-    var previousState = state;
+    previouState = state;
     transitionState(input);
     if(status == Status.INVALID) {
       return; // something went wrong w/transition
     }
     
-    processedSteps.add(new StateChange(previousState, state, currentStep, result));
+    processedSteps.add(new StateChange(previouState, state, currentStep, result));
 
     // if state handler was successful move forward, otherwise, let subclass handle failure condition
     if(result.code.equals(StateConstants.kSuccessCode)) {
@@ -113,7 +135,9 @@ public abstract class StateMachine {
     try {
       state = state.next(input);
     } catch(StateMachineInvalidTransitionException ite) {
-      DriverStation.reportError(ite.getMessage(), ite.getStackTrace());
+      if(reportExceptions) {
+        DriverStation.reportError(ite.getMessage(), ite.getStackTrace());
+      }
       status = Status.INVALID;
       handleInvalidTransition();
     }
@@ -148,14 +172,14 @@ public abstract class StateMachine {
   // Called from periodic, where we just cleared a wait condition and want to process the provided step
   protected void processCurrentSequenceStep() {
     var input = currentStep.input;
-    var previousState = state;
+    previouState = state;
     transitionState(input);
     if(status == Status.INVALID) {
       return; // something went wrong w/transition
     }
 
     currentStep.timestamp = Timer.getFPGATimestamp();
-    processedSteps.add(new StateChange(previousState, state, currentStep));
+    processedSteps.add(new StateChange(previouState, state, currentStep));
 
     // hand off to the subsystem
     stateHandler.changeState(input, currentStep.data);

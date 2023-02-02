@@ -16,12 +16,13 @@ public class MockStateSubsystem implements StateHandler {
 
     public void changeState(Input input, Object data) {
       StateChangeResult result;
-      if(shouldFail) {
+      if(shouldFail && input != ArmInput.RECOVER) {
         result = new StateChangeResult(StateConstants.kGenericFailedCode, "Failed", Timer.getFPGATimestamp());
+        stateMachine.transition(ArmInput.FAILED, result);
       } else {
         result = new StateChangeResult(StateConstants.kSuccessCode, "Success", Timer.getFPGATimestamp());
+        stateMachine.transition(ArmInput.SUCCESS, result);
       }
-      stateMachine.transition(ArmInput.SUCCESS, result);
     }
 
     public void interruptStateChange() {

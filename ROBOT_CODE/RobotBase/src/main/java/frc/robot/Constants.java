@@ -247,6 +247,11 @@ public final class Constants {
             new StateChangeRequest(ArmInput.INTAKE),
             new StateChangeRequest(ArmInput.RETRACT, new double[]{ 6, 7, 8, 9, 10 })
         };
+
+        public static final StateChangeRequest[] kTestInvalid = new StateChangeRequest[]{
+            new StateChangeRequest(ArmInput.EXTEND),
+            new StateChangeRequest(ArmInput.EXTEND)
+        };
     }
 
     public static final class VisionConstants {
