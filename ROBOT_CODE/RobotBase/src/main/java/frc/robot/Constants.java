@@ -17,7 +17,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.state.StateChangeRequest;
+import frc.robot.state.StateWaitCondition;
+import frc.robot.state.StateWaitCondition.WaitType;
 import frc.robot.state.arm.ArmInput;
+import frc.robot.state.arm.ArmWait;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
@@ -227,10 +230,6 @@ public final class Constants {
     public static final class StateConstants {
         public static final String kSuccessCode = "00";
         public static final String kGenericFailedCode = "01";
-
-        public enum StateMachineWaitCondition {
-            UNTIL_LINED_UP_FOR_SCORING
-        }
         
         /*
         * Constants specifically related to the ArmStateMachine
@@ -243,7 +242,7 @@ public final class Constants {
          */
         public static final StateChangeRequest[] kTestSequenceScore = new StateChangeRequest[]{
             new StateChangeRequest(ArmInput.EXTEND, new double[]{ 1, 2, 3, 4, 5 }),
-            new StateChangeRequest(ArmInput.RELEASE, null, StateMachineWaitCondition.UNTIL_LINED_UP_FOR_SCORING),
+            new StateChangeRequest(ArmInput.RELEASE, new StateWaitCondition(ArmWait.UNTIL_LINED_UP_FOR_SCORING, WaitType.PAUSE)),
             new StateChangeRequest(ArmInput.RETRACT, new double[]{ 6, 7, 8, 9, 10 })
         };
 

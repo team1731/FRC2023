@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import frc.robot.state.*;
 import frc.robot.state.StateMachine.Status;
 import frc.robot.state.arm.ArmStateMachine;
+import frc.robot.state.arm.ArmWait;
 import frc.robot.state.arm.ArmSequence;
-import frc.robot.Constants.StateConstants.StateMachineWaitCondition;
 import frc.robot.testsupport.mock.MockStateSubsystem;
 
 public class StateMachineCommandsTest {
@@ -36,10 +36,10 @@ public class StateMachineCommandsTest {
         stateMachineCommand.initialize();
 
         // this sequence has a wait condition, so it should be waiting
-        assertEquals(Status.WAITING, stateMachine.getStatus(), "Status should be WAITING");
+        assertEquals(Status.PAUSED, stateMachine.getStatus(), "Status should be PAUSED");
 
         // simulate resolving wait condition from a parallel process
-        stateMachine.resolveWaitCondition(StateMachineWaitCondition.UNTIL_LINED_UP_FOR_SCORING);
+        stateMachine.resolveWaitCondition(ArmWait.UNTIL_LINED_UP_FOR_SCORING);
 
         // call execute, its called repeatedly while command is scheduled, every ~20ms
         // calls state machine periodic() in turn, which will see the wait condition is resolved and restart
@@ -62,7 +62,7 @@ public class StateMachineCommandsTest {
         stateMachineCommand.initialize();
 
         // this sequence has a wait condition, so it should be waiting
-        assertEquals(Status.WAITING, stateMachine.getStatus(), "Status should be WAITING");
+        assertEquals(Status.PAUSED, stateMachine.getStatus(), "Status should be PAUSED");
 
         // simulate ending command with interruption
         stateMachineCommand.end(true);

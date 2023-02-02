@@ -9,6 +9,6 @@ public enum ArmInput implements Input {
     EXTEND, RETRACT, INTAKE, RELEASE, RECOVER, INTERRUPT, SUCCESS, FAILED;
 
     public String getDescription() {
-        return "ArmStateInput: " + this.toString();
+        return "ArmInput: " + this.toString();
     }
 }

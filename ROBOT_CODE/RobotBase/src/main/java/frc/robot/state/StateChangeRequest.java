@@ -1,11 +1,9 @@
 package frc.robot.state;
 
-import frc.robot.Constants.StateConstants.StateMachineWaitCondition;
-
 public class StateChangeRequest {
   public Input input;
   public Object data;
-  public StateMachineWaitCondition waitCondition;
+  public StateWaitCondition waitCondition;
   public double timestamp;
 
   public StateChangeRequest(Input input) {
@@ -16,11 +14,11 @@ public class StateChangeRequest {
     this(input, data, null);
   }
 
-  public StateChangeRequest(Input input, StateMachineWaitCondition waitCondition) {
+  public StateChangeRequest(Input input, StateWaitCondition waitCondition) {
     this(input, null, waitCondition);
   }
 
-  public StateChangeRequest(Input input, Object data, StateMachineWaitCondition waitCondition) {
+  public StateChangeRequest(Input input, Object data, StateWaitCondition waitCondition) {
     this.input = input;
     this.data = data;
     this.waitCondition = waitCondition;
