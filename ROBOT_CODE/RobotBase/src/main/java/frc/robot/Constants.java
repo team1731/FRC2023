@@ -17,7 +17,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.SwerveModuleConstants;
 import frc.robot.state.StateChangeRequest;
-import frc.robot.state.arm.ArmStateMachine.ArmInput;
+import frc.robot.state.arm.ArmInput;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;

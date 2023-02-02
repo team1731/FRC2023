@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import frc.robot.state.*;
 import frc.robot.state.StateMachine.Status;
 import frc.robot.state.arm.ArmStateMachine;
-import frc.robot.state.arm.ArmStateMachine.ArmSequence;
+import frc.robot.state.arm.ArmSequence;
 import frc.robot.Constants.StateConstants.StateMachineWaitCondition;
 import frc.robot.testsupport.mock.MockStateSubsystem;
 

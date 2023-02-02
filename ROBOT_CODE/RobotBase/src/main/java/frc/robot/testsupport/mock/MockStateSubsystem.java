@@ -1,7 +1,7 @@
 package frc.robot.testsupport.mock;
 
 import frc.robot.state.*;
-import frc.robot.state.arm.ArmStateMachine.ArmInput;
+import frc.robot.state.arm.ArmInput;
 import frc.robot.Constants.StateConstants;
 import edu.wpi.first.wpilibj.Timer;
 
