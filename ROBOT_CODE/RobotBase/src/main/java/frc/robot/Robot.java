@@ -31,7 +31,7 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   private Command m_autonomousCommand;
   private final SendableChooser<String> autoChooser = new SendableChooser<>();
-  private String autoCode = AutoConstants.kDefault_AutoCode;
+  private String autoCode = AutoConstants.kDefault;
   private String oldKeypadEntry = "";
   private String currentKeypadCommand = "";
   private NetworkTable keypad;
@@ -54,11 +54,11 @@ public class Robot extends TimedRobot {
 	
 	initSubsystems();
 
-	autoChooser.setDefaultOption("Default Auto", AutoConstants.kDefault_AutoCode);
-	autoChooser.setDefaultOption("Move Forward Auto", AutoConstants.kMove_Forward_AutoCode);
-	autoChooser.addOption("Example Auto", AutoConstants.kExample_AutoCode);
-	autoChooser.addOption("11Top_A_13Top_Drive_A", AutoConstants.k11Top_A_13Top_Drive_A_AutoCode);
-	autoChooser.addOption("13Top_B_Engage", AutoConstants.k13Top_B_Engage);
+	autoChooser.setDefaultOption("Default Auto",          AutoConstants.kDefault);
+	autoChooser.addOption(       "Example Auto",          AutoConstants.k_0_Example);
+	autoChooser.addOption(       "11Top_A_13Top_Drive_A", AutoConstants.k_1_11Top_A_13Top_Drive_A);
+	autoChooser.addOption(       "13Top_B_Engage",        AutoConstants.k_2_13Top_B_Engage);
+	autoChooser.addOption(       "Move Forward Auto",     AutoConstants.k_9_Move_Forward);
     SmartDashboard.putData(AutoConstants.kAutoCodeKey, autoChooser);
 
 	SmartDashboard.putString("Build Info - Branch", "N/A");
@@ -127,8 +127,8 @@ public class Robot extends TimedRobot {
 	// 2023: auto code is a single digit [0-9]
 	// 2023:
 	if(useCode == null) {
-		System.out.println("NULL AUTO CODE : DEFAULTING TO " + AutoConstants.kDefault_AutoCode);
-		autoCode = AutoConstants.kDefault_AutoCode;
+		System.out.println("NULL AUTO CODE : DEFAULTING TO " + AutoConstants.kDefault);
+		autoCode = AutoConstants.kDefault;
 	}
 	else{
 		m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);

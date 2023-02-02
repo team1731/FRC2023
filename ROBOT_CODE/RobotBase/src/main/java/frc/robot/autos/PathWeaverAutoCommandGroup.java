@@ -26,13 +26,25 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
 public class PathWeaverAutoCommandGroup extends SequentialCommandGroup {
-    public PathWeaverAutoCommandGroup(boolean isRedAlliance, String[][] trajectoryPaths, Swerve s_Swerve, PoseEstimatorSubsystem s_PoseEstimatorSubsystem){
+    
+    void loadCoordinateSystem(boolean isRedAlliance){
+        if(isRedAlliance){
+            // TDB: use translated April Tags coordinate system
+        }
+        else{
+            // TBD: use standard coordinate system
+        }
+    }
+
+    public PathWeaverAutoCommandGroup(boolean isRedAlliance, String[] trajectoryPaths, Swerve s_Swerve, PoseEstimatorSubsystem s_PoseEstimatorSubsystem){
+
+        loadCoordinateSystem(isRedAlliance);
 
         Trajectory[] trajectories = new Trajectory[trajectoryPaths.length];
 
         for(int i=0; i<trajectoryPaths.length; i++){
             try {
-                Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryPaths[isRedAlliance?0:1][i]);
+                Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(trajectoryPaths[i]);
                 String tP = trajectoryPath.toAbsolutePath().toString();
                 if(!tP.contains("output")){
                     trajectoryPath = new File(tP.replace("paths", "paths" + File.separator + "output")).toPath();

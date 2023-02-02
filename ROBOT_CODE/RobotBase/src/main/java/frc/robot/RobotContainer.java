@@ -65,16 +65,14 @@ public class RobotContainer {
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
     switch(autoCode) {
-			case AutoConstants.kDefault_AutoCode:
-				return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
-      case AutoConstants.kMove_Forward_AutoCode:
-				return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
-      case AutoConstants.kExample_AutoCode:
+      case AutoConstants.k_0_Example:
         return new _0_exampleAuto(s_Swerve, s_poseEstimatorSubsystem);
-      case AutoConstants.k11Top_A_13Top_Drive_A_AutoCode:
+      case AutoConstants.k_1_11Top_A_13Top_Drive_A:
         return new _1_11Top_A_13Top_Drive_A(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
-      case AutoConstants.k13Top_B_Engage:
+      case AutoConstants.k_2_13Top_B_Engage:
         return new _2_13Top_B_Engage(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+      case AutoConstants.k_9_Move_Forward:
+				return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
 		}
     System.err.println("FATAL: SELECTED AUTO MODE " + autoCode + " DOES NOT MAP TO A KNOWN AUTONOMOUS CLASS -- DOING NOTHING!!!!");
     return null;
