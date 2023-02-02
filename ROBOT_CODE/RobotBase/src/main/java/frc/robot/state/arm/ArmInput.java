@@ -10,6 +10,6 @@ public enum ArmInput implements Input {
     RETRACT_MOVE, RETRACT_PING, RECOVER, INTERRUPT, SUCCESS, FAILED;
 
     public String getDescription() {
-        return "ArmStateInput: " + this.toString();
+        return "ArmInput: " + this.toString();
     }
 }

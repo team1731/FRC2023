@@ -13,7 +13,6 @@ import frc.robot.state.arm.ArmInput;
 import frc.robot.state.arm.ArmState;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.Constants.StateConstants;
-import frc.robot.Constants.StateConstants.StateMachineWaitCondition;
 import frc.robot.testsupport.mock.MockStateSubsystem;
 
 class ArmStateMachineTest {
@@ -45,10 +44,10 @@ class ArmStateMachineTest {
     // start sequence and let it run until wait condition
     stateMachine.startSequence();
 
-    assertEquals(Status.WAITING, stateMachine.getStatus(), "Status should be WAITING");
+    assertEquals(Status.PAUSED, stateMachine.getStatus(), "Status should be PAUSED");
 
     // release the wait condition
-    stateMachine.resolveWaitCondition(StateMachineWaitCondition.UNTIL_LINED_UP_FOR_SCORING);
+    stateMachine.resolveWaitCondition(ArmWait.UNTIL_LINED_UP_FOR_SCORING);
     
     // continue the process to the end
     stateMachine.periodic();
@@ -183,7 +182,7 @@ class ArmStateMachineTest {
     // start sequence and let it run until wait condition
     stateMachine.startSequence();
 
-    assertEquals(Status.WAITING, stateMachine.getStatus(), "Status should be WAITING");
+    assertEquals(Status.PAUSED, stateMachine.getStatus(), "Status should be PAUSED");
 
     // now interrupt the sequence
     stateMachine.interruptSequence();

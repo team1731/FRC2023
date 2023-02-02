@@ -5,7 +5,7 @@ import java.util.Iterator;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.StateConstants;
-import frc.robot.Constants.StateConstants.StateMachineWaitCondition;
+import frc.robot.state.StateWaitCondition.WaitType;
 
 public abstract class StateMachine {
   private String id;
@@ -17,11 +17,11 @@ public abstract class StateMachine {
   protected State state;
   protected StateChangeRequest currentStep;
   protected ArrayList<StateChange> processedSteps;
-  protected ArrayList<StateMachineWaitCondition> unresolvedWaitConditions;
-  protected StateMachineWaitCondition currentWaitCondition;
+  protected ArrayList<Wait> unresolvedWaitConditions;
+  protected StateWaitCondition currentWaitCondition;
 
   public enum Status {
-    READY, RUNNING, WAITING, INTERRUPTED, FAILED_INIT, INVALID, FINISHED
+    READY, RUNNING, PAUSED, PINGING, INTERRUPTED, FAILED_INIT, INVALID, FINISHED
   }
 
   public StateMachine(String id, StateHandler stateHandler) {
@@ -43,7 +43,7 @@ public abstract class StateMachine {
   }
 
   public boolean isInInterruptibleStatus() {
-    return (status == Status.RUNNING ||  status == Status.WAITING);
+    return (status == Status.RUNNING ||  status == Status.PAUSED || status == Status.PINGING);
   }
 
   // used for unit testing only to prevent intentionally intiated exceptions from printing out
@@ -67,7 +67,7 @@ public abstract class StateMachine {
       status = Status.READY;
       currentStep = null;
       processedSteps = new ArrayList<StateChange>();
-      unresolvedWaitConditions = new ArrayList<StateMachineWaitCondition>();
+      unresolvedWaitConditions = new ArrayList<Wait>();
       currentWaitCondition = null;
 
       // grab and parse the sequence definition
@@ -76,7 +76,7 @@ public abstract class StateMachine {
       for(var request : sequenceDefinition) {
         sequenceList.add(request);
         if(request.waitCondition != null) {
-          unresolvedWaitConditions.add(request.waitCondition);
+          unresolvedWaitConditions.add(request.waitCondition.condition);
         }
       }
       sequence = sequenceList.iterator();
@@ -113,6 +113,13 @@ public abstract class StateMachine {
 
   // Called by the state handler to report success/failure and advance to the next state
   public void transition(Input input, StateChangeResult result) {
+    // if pinging, then this is the state handler letting us know the result, stop pinging
+    if(status == Status.PINGING) {
+      status = Status.RUNNING;
+      resolveWaitCondition(currentWaitCondition.condition);
+      currentWaitCondition = null;
+    }
+
     // transition to next state based on the input provided by the state handler
     // this should be some kind of success/failure input
     previouState = state;
@@ -157,10 +164,15 @@ public abstract class StateMachine {
 
       // check to see if we have a wait condition that needs to be resolved
       var waitCondition = currentStep.waitCondition;
-      if(currentStep.waitCondition != null && !checkWaitCondition(waitCondition)) {
-        // we have an unresolved wait condition, can't process step until this is resolved
-        status = Status.WAITING;
+      if(waitCondition != null && waitCondition.type == WaitType.PAUSE && !checkWaitCondition(waitCondition.condition)) {
+        // we have an unresolved PAUSE wait condition, can't process step until this is resolved
+        status = Status.PAUSED;
         currentWaitCondition = waitCondition;
+      } else if(waitCondition != null && waitCondition.type == WaitType.PING && !checkWaitCondition(waitCondition.condition)) { 
+        // we have an unresolved PING wait condition, set the status, but continue processing
+        status = Status.PINGING;
+        currentWaitCondition = waitCondition;
+        processCurrentSequenceStep();
       } else {
         processCurrentSequenceStep();
       }
@@ -181,18 +193,21 @@ public abstract class StateMachine {
     currentStep.timestamp = Timer.getFPGATimestamp();
     processedSteps.add(new StateChange(previouState, state, currentStep));
 
-    // hand off to the subsystem
-    stateHandler.changeState(input, currentStep.data);
+    // if pinging we won't call the subsystem yet, periodic will ping subsystem
+    if(status != Status.PINGING) {
+      // not pinging, go ahead and hand off to the subsystem
+      stateHandler.changeState(input, currentStep.data);
+    }
   }
 
   // Called by command running in parallel when it is complete
-  public void resolveWaitCondition(StateMachineWaitCondition waitCondition) {
+  public void resolveWaitCondition(Wait waitCondition) {
     if(unresolvedWaitConditions != null) {
       unresolvedWaitConditions.remove(waitCondition);
     }
   }
 
-  private boolean checkWaitCondition(StateMachineWaitCondition waitCondition) {
+  private boolean checkWaitCondition(Wait waitCondition) {
     if(unresolvedWaitConditions != null) {
       return unresolvedWaitConditions.indexOf(waitCondition) == -1;
     }
@@ -202,11 +217,17 @@ public abstract class StateMachine {
 
   // Called from the initiating command's execute method, which runs every ~20ms
   public void periodic() {
-    if(currentWaitCondition != null && checkWaitCondition(currentWaitCondition)) {
-      // this wait condition has been resolved, move on
+    if(currentWaitCondition != null && 
+       currentWaitCondition.type == WaitType.PAUSE && 
+       checkWaitCondition(currentWaitCondition.condition)) {
+      // this PAUSE wait condition has been resolved, move on and process the paused step
       currentWaitCondition = null;
       status = Status.RUNNING;
       processCurrentSequenceStep();
+    }
+
+    if(status == Status.PINGING) {
+      stateHandler.periodic(); // ping the subsystem's periodic method
     }
   }
 }
