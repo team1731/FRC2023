@@ -29,7 +29,7 @@ public abstract class StateMachine {
     this.stateHandler = stateHandler;
     stateHandler.registerStateMachine(this);
   }
-
+  
   public String getId() {
     return id;
   }
@@ -43,7 +43,7 @@ public abstract class StateMachine {
   }
 
   public boolean isInInterruptibleStatus() {
-    return (status == Status.READY || status == Status.RUNNING ||  status == Status.WAITING);
+    return (status == Status.RUNNING ||  status == Status.WAITING);
   }
 
   // used for unit testing only to prevent intentionally intiated exceptions from printing out

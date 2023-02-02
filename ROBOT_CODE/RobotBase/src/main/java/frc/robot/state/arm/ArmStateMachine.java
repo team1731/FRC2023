@@ -219,6 +219,7 @@ public class ArmStateMachine extends StateMachine {
     state = ArmState.RETRACTED;
   }
 
+  @Override
   protected void initializationChecks() throws StateMachineInitializationException {
     if(state == ArmState.UNSAFE) {
       throw new StateMachineInitializationException(getId(), "Arm is in UNSAFE state. No actions can be performed.");
@@ -232,6 +233,7 @@ public class ArmStateMachine extends StateMachine {
    * Retrieves the sequence config matching the provided sequence, and maps them into an iterator of StateChangeRequest objects
    * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
    */
+  @Override
   protected StateChangeRequest[] defineSequence(StateSequence selectedSequence) throws StateMachineInitializationException {
     ArmSequence ss = (ArmSequence)selectedSequence;
     switch(ss) {
@@ -246,6 +248,7 @@ public class ArmStateMachine extends StateMachine {
     }
   }
 
+  @Override
   public void interruptSequence() {
     if(!isInInterruptibleStatus()) {
       return; // not interruptible
@@ -282,10 +285,12 @@ public class ArmStateMachine extends StateMachine {
     }
   }
 
+  @Override
   protected void handleFailureCondition(StateChangeResult result) {
     recover();
   }
 
+  @Override
   protected void handleInvalidTransition() {
     state = ArmState.UNSAFE;
   }
