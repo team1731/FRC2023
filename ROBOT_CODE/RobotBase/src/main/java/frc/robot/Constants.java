@@ -16,6 +16,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.SwerveModuleConstants;
+import frc.robot.state.StateChangeRequest;
+import frc.robot.state.arm.ArmStateMachine.ArmInput;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
@@ -221,8 +223,43 @@ public final class Constants {
             new TrapezoidProfile.Constraints(
                 kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
       }
+      
+    public static final class StateConstants {
+        public static final String kSuccessCode = "00";
+        public static final String kGenericFailedCode = "01";
 
-      public static final class VisionConstants {
+        public enum StateMachineWaitCondition {
+            UNTIL_LINED_UP_FOR_SCORING
+        }
+        
+        /*
+        * Constants specifically related to the ArmStateMachine
+        */
+        public static final String kArmStateMachineId = "ArmStateMachine";
+
+        /*
+         * Sequences for the ArmStateMachine
+         * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
+         */
+        public static final StateChangeRequest[] kTestSequenceScore = new StateChangeRequest[]{
+            new StateChangeRequest(ArmInput.EXTEND, new double[]{ 1, 2, 3, 4, 5 }),
+            new StateChangeRequest(ArmInput.RELEASE, null, StateMachineWaitCondition.UNTIL_LINED_UP_FOR_SCORING),
+            new StateChangeRequest(ArmInput.RETRACT, new double[]{ 6, 7, 8, 9, 10 })
+        };
+
+        public static final StateChangeRequest[] kTestSequencePickup = new StateChangeRequest[]{
+            new StateChangeRequest(ArmInput.EXTEND, new double[]{ 1, 2, 3, 4, 5 }),
+            new StateChangeRequest(ArmInput.INTAKE),
+            new StateChangeRequest(ArmInput.RETRACT, new double[]{ 6, 7, 8, 9, 10 })
+        };
+
+        public static final StateChangeRequest[] kTestInvalid = new StateChangeRequest[]{
+            new StateChangeRequest(ArmInput.EXTEND),
+            new StateChangeRequest(ArmInput.EXTEND)
+        };
+    }
+
+    public static final class VisionConstants {
 		// Ensure measurements are in METERS
 		public static final double kMaxDistanceBetweenPoseEstimations = 1.0;
 
@@ -265,5 +302,4 @@ public final class Constants {
             TEAM, RED, BLUE, GREEN, YELLOW, ORANGE, PURPLE, RAINBOW, FULL, CLIMB, SHOOT, INTAKE, INTAKEBALL, WHEEL, BALLONE, BALLTWO, BALLTHREE, BALLFOUR
           }
     }
-
 }

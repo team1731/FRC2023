@@ -40,3 +40,5 @@ hs_err_pid*
 **/.recommenders/**
 
 **/Keypad/.gitignore
+
+*.hprof
