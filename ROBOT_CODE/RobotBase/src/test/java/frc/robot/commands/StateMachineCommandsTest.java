@@ -27,7 +27,7 @@ public class StateMachineCommandsTest {
     void shutdown() throws Exception {
         stateMachine.reset();
     }
-
+    
     @Test 
     void successfulScoreCommand() {
         StateMachineCommand stateMachineCommand = new StateMachineCommand(stateMachine, ArmSequence.SCORE_TEST);
@@ -41,7 +41,7 @@ public class StateMachineCommandsTest {
         // simulate resolving wait condition from a parallel process
         stateMachine.resolveWaitCondition(StateMachineWaitCondition.UNTIL_LINED_UP_FOR_SCORING);
 
-        // call execute, called repeatedly while command is scheduled, every ~20ms
+        // call execute, its called repeatedly while command is scheduled, every ~20ms
         // calls state machine periodic() in turn, which will see the wait condition is resolved and restart
         stateMachineCommand.execute();
 

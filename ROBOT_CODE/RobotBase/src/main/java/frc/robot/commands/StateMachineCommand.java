@@ -47,7 +47,9 @@ public class StateMachineCommand extends CommandBase {
 
     @Override
 	public void end(boolean interrupted) {
-		stateMachine.interruptSequence();
+        if(interrupted) {
+            stateMachine.interruptSequence();
+        }
         finished = true;
 	}
 
