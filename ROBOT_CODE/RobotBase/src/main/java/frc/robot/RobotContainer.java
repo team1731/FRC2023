@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.Constants.AutoConstants;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -62,73 +63,38 @@ public class RobotContainer {
     adjustWheelEncoders.whenPressed(new InstantCommand(() -> s_Swerve.adjustWheelEncoders()));
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return new exampleAuto(s_Swerve,s_poseEstimatorSubsystem);
+  public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
+    switch(autoCode) {
+      case AutoConstants.k_0_Example:
+        return new _0_exampleAuto(s_Swerve, s_poseEstimatorSubsystem);
+      case AutoConstants.k_1_11Top_A_13Top_Drive_A:
+        return new _1_11Top_A_13Top_Drive_A(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+      case AutoConstants.k_2_13Top_B_Engage:
+        return new _2_13Top_B_Engage(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+      case AutoConstants.k_9_Move_Forward:
+				return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
+		}
+    System.err.println("FATAL: SELECTED AUTO MODE " + autoCode + " DOES NOT MAP TO A KNOWN AUTONOMOUS CLASS -- DOING NOTHING!!!!");
+    return null;
   }
 
-  public _NamedAutoMode getNamedAutonomousCommand(String autoCode) {
-	String autoMode = "";
-	int initialDelaySeconds = 0;
-	int secondaryDelaySeconds = 0;
 
-	if(autoCode.length() > 1) {
-		autoMode = autoCode.substring(0, 2);
+	public void resetEncoders() {
 	}
 
-	// TODO revist these blocks, what is going on here?
-	if(autoCode.length() > 2) {
-		try {
-			initialDelaySeconds = Integer.parseInt(autoCode.substring(2, 2));
-		} catch (Exception e) {
-			System.out.println("INITIAL DELAY did not parse -- defaulting to 0 seconds!!!");
+
+	public void displayEncoders() {
+	}
+
+
+	public void zeroHeading() {
+	}
+
+
+	public void processKeypadCommand(String newKeypadCommand) {
+		if(newKeypadCommand.length() > 0){
+			// delegate to FSM
+			System.out.println("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
 		}
 	}
-
-	if (autoCode.length() > 3) {
-		try {
-			secondaryDelaySeconds = Integer.parseInt(autoCode.substring(3, 3));
-		} catch (Exception e) {
-			System.out.println("SECONDARY DELAY did not parse -- defaulting to 0 seconds!!!");
-		}
-	}
-
-	
-	_NamedAutoMode selectedAutoMode = null;
-
-	try {
-		selectedAutoMode = createNamedAutoMode(autoMode);
-	} catch (_NotImplementedProperlyException e) {
-		System.err.println("SELECTED MODE NOT IMPLEMENTED -- DEFAULT TO F1_MOVE_FORWARD!!!");
-		try {
-			selectedAutoMode = new _NamedAutoMode(new F1_Move_Forward());
-		} catch (_NotImplementedProperlyException e2) {
-			System.err.println("F1_Move_Forward could NOT be created -- Aborting!!!");
-			return null;
-		}
-	}
-	if(selectedAutoMode != null) {
-		// TODO temporarily removed these calls and the DelayableStrafing and InstrumentedSwerve classes
-		// We need to re-examine those classes to determine if we will still use them, if so they need updating
-		//selectedAutoMode.delayableStrafingAutoMode.setInitialDelaySeconds(initialDelaySeconds);
-		//selectedAutoMode.delayableStrafingAutoMode.setSecondaryDelaySeconds(secondaryDelaySeconds);
-	}
-
-	return selectedAutoMode;
-  }
-  
-  private _NamedAutoMode createNamedAutoMode(String autoModeName) throws _NotImplementedProperlyException {
-	switch (autoModeName) {
-		case "F1":
-			return new _NamedAutoMode(new F1_Move_Forward());
-		default:
-			return new _NamedAutoMode(new F1_Move_Forward());
-	}
-  }
-
 }

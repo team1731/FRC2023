@@ -15,6 +15,7 @@ import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.util.Utils;
 
+@Deprecated
 public class _DelayableStrafingAutoMode {
 	private int initialDelaySeconds;
 	private int secondaryDelaySeconds;

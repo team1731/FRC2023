@@ -2,15 +2,61 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.SwerveModuleConstants;
+import frc.robot.state.StateChangeRequest;
+import frc.robot.state.arm.ArmStateMachine.ArmInput;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
 	public static final int kTICKS = 33024; // 16.125 * 2048;
+
+    public static final class FieldConstants {
+        // Note: Field dimensions and April Tag positions pulled from the 2023 Field and Layout Marking document
+        public static final double kFieldLength = Units.inchesToMeters(651.22);
+        public static final double kFieldWidth = Units.inchesToMeters(315.1);
+
+        public static class AprilTagPoseValues {
+            public int id;
+            public double x;
+            public double y;
+            public double z;
+            public double yaw;
+
+            public AprilTagPoseValues(int tagId, double xInches, double yInches, double zInches, double yawDegrees) {
+                id = tagId;
+                x = Units.inchesToMeters(xInches);
+                y = Units.inchesToMeters(yInches);
+                z = Units.inchesToMeters(zInches);
+                yaw = Units.degreesToRadians(yawDegrees);
+            }
+
+            public AprilTag getAprilTag() {
+                return new AprilTag(id, new Pose3d(x, y, z, new Rotation3d(0.0, 0.0, yaw)));
+            }
+        }
+
+        public static final AprilTagPoseValues kAprilTagPose1 = new AprilTagPoseValues(1, 610.77, 42.19, 18.22, 180);
+        public static final AprilTagPoseValues kAprilTagPose2 = new AprilTagPoseValues(2, 610.77, 108.19, 18.22, 180);
+        public static final AprilTagPoseValues kAprilTagPose3 = new AprilTagPoseValues(3, 610.77, 147.19, 18.22, 180);
+        public static final AprilTagPoseValues kAprilTagPose4 = new AprilTagPoseValues(4, 636.96, 265.74, 27.38, 180);
+        public static final AprilTagPoseValues kAprilTagPose5 = new AprilTagPoseValues(5, 14.25, 265.74, 27.38, 0);
+        public static final AprilTagPoseValues kAprilTagPose6 = new AprilTagPoseValues(6, 40.45, 147.19, 18.22, 0);
+        public static final AprilTagPoseValues kAprilTagPose7 = new AprilTagPoseValues(7, 40.45, 108.19, 18.22, 0);
+        public static final AprilTagPoseValues kAprilTagPose8 = new AprilTagPoseValues(8, 40.45, 42.19, 18.22, 0);
+    }
 
     public static final class Swerve {
         public static final int pigeonID = 1;
@@ -63,7 +109,7 @@ public final class Constants {
         public static final double driveKA = (0.27 / 12);
 
         /* Swerve Profiling Values */
-        public static final double maxSpeed = 4.5; //meters per second
+        public static final double maxSpeed = 0.5; // disabled for testing = 4.5; //meters per second
         public static final double maxAngularVelocity = 11.5;
 
         /* Neutral Modes */
@@ -147,7 +193,7 @@ public final class Constants {
 
 		public static final boolean kGyroReversed = true; // 09FEB false;
 
-		public static final double kMaxSpeedMetersPerSecond = 3.5; // tune
+		public static final double kMaxSpeedMetersPerSecond = 0.5; // disabled for testing = 3.5; // tune
 
 		public static final double kTurnP = 0.1; // was 0.05
 		public static final double kTurnI = 0;
@@ -156,10 +202,15 @@ public final class Constants {
 	}
 
     public static final class AutoConstants {
-        public static final String kDEFAULT_AUTO_CODE = "C4";
-		public static final String kAUTO_CODE = "Auto Selector";
-        public static final double kMaxSpeedMetersPerSecond = 3;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
+        public static final String kDefault                  = "Default_Auto";
+        public static final String k_0_Example               = "0_Example_Auto";
+        public static final String k_1_11Top_A_13Top_Drive_A = "1_1Top_A_13Top_Drive_A";
+        public static final String k_2_13Top_B_Engage        = "2_13Top_B_Engage";
+        public static final String k_9_Move_Forward          = "9_Move_Forward";
+        
+		public static final String kAutoCodeKey = "Auto Selector";
+        public static final double kMaxSpeedMetersPerSecond = 0.5; // disabled for testing = 3;
+        public static final double kMaxAccelerationMetersPerSecondSquared = 0.5; // disabled for testing = 3;
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
         public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
     
@@ -172,42 +223,83 @@ public final class Constants {
             new TrapezoidProfile.Constraints(
                 kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
       }
+      
+    public static final class StateConstants {
+        public static final String kSuccessCode = "00";
+        public static final String kGenericFailedCode = "01";
 
-      public static final class VisionConstants {
+        public enum StateMachineWaitCondition {
+            UNTIL_LINED_UP_FOR_SCORING
+        }
+        
+        /*
+        * Constants specifically related to the ArmStateMachine
+        */
+        public static final String kArmStateMachineId = "ArmStateMachine";
+
+        /*
+         * Sequences for the ArmStateMachine
+         * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
+         */
+        public static final StateChangeRequest[] kTestSequenceScore = new StateChangeRequest[]{
+            new StateChangeRequest(ArmInput.EXTEND, new double[]{ 1, 2, 3, 4, 5 }),
+            new StateChangeRequest(ArmInput.RELEASE, null, StateMachineWaitCondition.UNTIL_LINED_UP_FOR_SCORING),
+            new StateChangeRequest(ArmInput.RETRACT, new double[]{ 6, 7, 8, 9, 10 })
+        };
+
+        public static final StateChangeRequest[] kTestSequencePickup = new StateChangeRequest[]{
+            new StateChangeRequest(ArmInput.EXTEND, new double[]{ 1, 2, 3, 4, 5 }),
+            new StateChangeRequest(ArmInput.INTAKE),
+            new StateChangeRequest(ArmInput.RETRACT, new double[]{ 6, 7, 8, 9, 10 })
+        };
+
+        public static final StateChangeRequest[] kTestInvalid = new StateChangeRequest[]{
+            new StateChangeRequest(ArmInput.EXTEND),
+            new StateChangeRequest(ArmInput.EXTEND)
+        };
+    }
+
+    public static final class VisionConstants {
 		// Ensure measurements are in METERS
-		public static final double kMaxTrackerDistance = 18.0;
-		public static final double kMaxGoalTrackAge = 1.0; // cp had 1.0
-		public static final double kGoalHeight = 2.67;
+		public static final double kMaxDistanceBetweenPoseEstimations = 1.0;
 
-		// Ensure measurements are in METERS
-		public static final double kCameraXOffset = 0;
-		public static final double kCameraYOffset = 0;
-		public static final double kCameraZOffset = 0;
-		public static final double kCameraPitchAngleDegrees = 41.67;
-		public static final double kCameraYawAngleDegrees = 0;
-		public static final double kCameraLensHeightMeters = 0.7142;
+        // Kalman Filter Configuration. These can be "tuned-to-taste" based on how much you trust your various sensors. 
+        // Smaller numbers will cause the filter to "trust" the estimate from that particular component more than the 
+        // others. This in turn means the particular component will have a stronger influence on the final pose estimate.
+        public static final Matrix<N3, N1> kVisionMeasurementStdDevs = VecBuilder.fill(0.1, 0.1, Units.degreesToRadians(180));
 
-		// #region DrivePID
-		public static final double kDriveP = 0.05;
-		public static final double kDriveI = 0;
-		public static final double kDriveD = 0;
-		public static final double kDriveMaxSpeed = 0.1;
-		public static final double kDriveMaxAcceleration = 0.1;
-		public static final double kDriveTolerance = 0.5;
-		public static final double kDriveAccelerationTolerance = 0.1;
-		// #endregion
+        public static class CameraMountPoseValues {
+            public String id;
+            public double x;
+            public double y;
+            public double z;
+            public double yaw;
 
-		// #region TurnPID
-		public static final double kTurnP = 0.12;
-		public static final double kTurnI = 0;
-		public static final double kTurnD = 0.00;
-		public static final double kMaxTurnVelocity = 360;
-		public static final double kMaxTurnAcceleration = 360;
-		public static final double kTurnToleranceDeg = 5;
-		public static final double kTurnRateToleranceDegPerS = 10; // degrees per second
-		// #endregion
+            // Note: this constructor assumes the camera is mounted parallel to the floor
+            public CameraMountPoseValues(String cameraId, double xInches, double yInches, double zInches, double yawDegrees) {
+                id = cameraId;
+                x = Units.inchesToMeters(xInches);
+                y = Units.inchesToMeters(yInches);
+                z = Units.inchesToMeters(zInches);
+                yaw = Units.degreesToRadians(yawDegrees);
+            }
 
-		public static final double kAverageKeepTime = 0.2;
+            public Transform3d getPoseTransform() {
+                return new Transform3d(new Translation3d(x, y, z), new Rotation3d(0.0,0.0,yaw));
+            }
+        }
+
+        public static final String kCameraMount1Id = "Global_Shutter_Camera";
+        public static final String kCameraMount2Id = "Microsoft_LifeCam_HD-3000";
+        public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, 15.5, 5.0, 39.37, 315);
+        public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, 15.5, 5.0, 39.37, 45);
 	}
 
+    public static final class OpConstants{
+        public static final int kPWM_LedSting = 6;         // Addressable Led String
+
+        public enum LedOption {
+            TEAM, RED, BLUE, GREEN, YELLOW, ORANGE, PURPLE, RAINBOW, FULL, CLIMB, SHOOT, INTAKE, INTAKEBALL, WHEEL, BALLONE, BALLTWO, BALLTHREE, BALLFOUR
+          }
+    }
 }

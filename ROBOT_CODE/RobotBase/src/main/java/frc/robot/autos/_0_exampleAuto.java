@@ -18,8 +18,8 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 
-public class exampleAuto extends SequentialCommandGroup {
-    public exampleAuto(Swerve s_Swerve, PoseEstimatorSubsystem s_PoseEstimatorSubsystem) {
+public class _0_exampleAuto extends SequentialCommandGroup {
+    public _0_exampleAuto(Swerve s_Swerve, PoseEstimatorSubsystem s_PoseEstimatorSubsystem) {
         TrajectoryConfig config =
             new TrajectoryConfig(
                     Constants.AutoConstants.kMaxSpeedMetersPerSecond,
