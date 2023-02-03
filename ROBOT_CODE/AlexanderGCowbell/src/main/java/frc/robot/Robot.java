@@ -54,11 +54,11 @@ public class Robot extends TimedRobot {
 	
 	initSubsystems();
 
-	autoChooser.setDefaultOption("Default Auto",          AutoConstants.kDefault);
-	autoChooser.addOption(       "Example Auto",          AutoConstants.k_0_Example);
-	autoChooser.addOption(       "11Top_A_13Top_Drive_A", AutoConstants.k_1_11Top_A_13Top_Drive_A);
-	autoChooser.addOption(       "13Top_B_Engage",        AutoConstants.k_2_13Top_B_Engage);
-	autoChooser.addOption(       "Move Forward Auto",     AutoConstants.k_9_Move_Forward);
+	autoChooser.setDefaultOption(AutoConstants.kDefault,                  AutoConstants.kDefault);
+	autoChooser.addOption(       AutoConstants.k_0_Example,               AutoConstants.k_0_Example);
+	autoChooser.addOption(       AutoConstants.k_1_11Top_A_13Top_Drive_A, AutoConstants.k_1_11Top_A_13Top_Drive_A);
+	autoChooser.addOption(       AutoConstants.k_2_13Top_B_Engage,        AutoConstants.k_2_13Top_B_Engage);
+	autoChooser.addOption(       AutoConstants.k_9_Move_Forward,          AutoConstants.k_9_Move_Forward);
     SmartDashboard.putData(AutoConstants.kAutoCodeKey, autoChooser);
 
 	SmartDashboard.putString("Build Info - Branch", "N/A");
@@ -122,25 +122,25 @@ public class Robot extends TimedRobot {
 
 	String useCode = autoChooser.getSelected();
 
-	System.out.println("Preloading AUTO CODE --> " + useCode);
+	System.out.println("\nPreloading AUTO CODE --> " + useCode);
 	// 2023:
 	// 2023: auto code is a single digit [0-9]
 	// 2023:
 	if(useCode == null) {
-		System.out.println("NULL AUTO CODE : DEFAULTING TO " + AutoConstants.kDefault);
+		System.out.println("\nNULL AUTO CODE : DEFAULTING TO " + AutoConstants.kDefault);
 		autoCode = AutoConstants.kDefault;
 	}
 	else{
 		m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);
 		if(m_autonomousCommand != null){
 			autoCode = useCode;
-			System.out.println("=====>>> PRELOADED AUTONOMOUS ROUTINE: " + m_autonomousCommand.getClass().getName() + " " + (isRedAlliance?"RED":"BLUE") + " <<<=====");
+			System.out.println("\n=====>>> PRELOADED AUTONOMOUS ROUTINE: " + m_autonomousCommand.getClass().getName() + " " + (isRedAlliance?"RED":"BLUE") + " <<<=====");
 		}
 		else{
-			System.out.println("AUTO CODE " + useCode + " IS NOT IMPLEMENTED -- STAYING WITH AUTO CODE " + autoCode);
+			System.out.println("\nAUTO CODE " + useCode + " IS NOT IMPLEMENTED -- STAYING WITH AUTO CODE " + autoCode);
 		}
 	}
-	System.out.println("AUTO CODE being used by the software --> " + autoCode + "\n\n\n");
+	System.out.println("\nAUTO CODE being used by the software --> " + autoCode + "\n\n\n");
   }
 
   private void initSubsystems() {

@@ -4,6 +4,8 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 import com.kauailabs.navx.frc.AHRS;
 
 import frc.robot.SwerveModule;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import edu.wpi.first.wpilibj.SPI;
@@ -14,17 +16,29 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.Nat;
 import edu.wpi.first.math.VecBuilder;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
 
 
+	private double driveSpeedScaler = 1.0;
+    private boolean headingOverride = true;
+	private boolean visionHeadingOverride = false;
+	private boolean visionDistanceOverride = false;
+    private Double lockedHeading = null;
+    private Double desiredHeading;
+	private double m_heading;
+    
+    private final ProfiledPIDController headingController = 
+        new ProfiledPIDController(DriveConstants.kTurnP, DriveConstants.kTurnI, DriveConstants.kTurnD,
+        new TrapezoidProfile.Constraints(VisionConstants.kMaxTurnVelocity, VisionConstants.kMaxTurnAcceleration));
 
     public SwerveModule[] mSwerveMods;
   //  public PigeonIMU gyro;
@@ -46,6 +60,60 @@ public class Swerve extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+
+        boolean useLockHeadingCode = false;
+
+        if(useLockHeadingCode){
+            double xSpeedAdjusted = translation.getX();
+            double ySpeedAdjusted = translation.getY();
+    
+            double rotationalOutput = rotation;
+    
+            // DEADBAND
+            if (Math.abs(xSpeedAdjusted) < 0.1) {
+                xSpeedAdjusted = 0;
+            }
+            if (Math.abs(ySpeedAdjusted) < 0.1) {
+                ySpeedAdjusted = 0;
+            }
+            xSpeedAdjusted *= this.driveSpeedScaler;
+            ySpeedAdjusted *= this.driveSpeedScaler;
+    
+    
+            // If the right stick is neutral - this code should lock on the last known
+            // heading
+            if (Math.abs(rotationalOutput) < 0.11) {
+                headingOverride = true;
+                if (lockedHeading == null) {
+                    headingController.reset(getHeading());
+                    desiredHeading = getHeading();
+                    lockedHeading = desiredHeading;
+                } else {
+                    desiredHeading = lockedHeading;
+                }
+            } else {
+                headingOverride = false;
+                lockedHeading = null;
+                rotationalOutput *= Math.PI;
+            }
+    
+            if (visionHeadingOverride || headingOverride) {
+    
+                if (visionHeadingOverride) {
+                    rotationalOutput = headingController.calculate(getHeading());
+                    desiredHeading = getHeading();
+                    lockedHeading = getHeading();
+                    SmartDashboard.putNumber("headingController Output", rotationalOutput);
+                } else {
+                    // headingController.reset(getHeading());
+                    // desiredHeading += rotationalOutput*2.5;
+                    rotationalOutput = headingController.calculate(getHeading(), desiredHeading);
+                    SmartDashboard.putNumber("desiredHeading", desiredHeading);
+                    SmartDashboard.putNumber("headingController Output", rotationalOutput);
+                }
+            }
+        }
+
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -90,6 +158,21 @@ public class Swerve extends SubsystemBase {
         }
         return positions;
     }
+
+    /**
+	 * Returns the heading of the robot.
+	 *
+	 * @return the robot's heading in degrees, from -180 to 180
+	 */
+	public double getHeading() {	
+		if (m_gyro != null) {
+			m_heading = Math.IEEEremainder(m_gyro.getAngle(), 360) * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+			if (System.currentTimeMillis() % 100 == 0) {
+				SmartDashboard.putNumber("Heading", m_heading);
+			}
+		}
+		return m_heading;
+	}
 
     public void zeroGyro(){
 

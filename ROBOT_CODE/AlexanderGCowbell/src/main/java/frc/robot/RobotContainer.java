@@ -65,6 +65,8 @@ public class RobotContainer {
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
     switch(autoCode) {
+      case AutoConstants.kDefault:
+        return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
       case AutoConstants.k_0_Example:
         return new _0_exampleAuto(s_Swerve, s_poseEstimatorSubsystem);
       case AutoConstants.k_1_11Top_A_13Top_Drive_A:
