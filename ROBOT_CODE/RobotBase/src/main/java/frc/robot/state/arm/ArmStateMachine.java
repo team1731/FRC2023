@@ -62,7 +62,7 @@ public class ArmStateMachine extends StateMachine {
     boolean shouldInterrupt = false;
     ArmState currentState = (ArmState)state;
     switch(currentState) {
-      case RETRACTED: case RETRACTING: case INTERRUPTED: case RECOVERING: case UNSAFE:
+      case RETRACTED: case INTERRUPTED: case RECOVERING: case UNSAFE:
         return; // not interruptible
       default:
         shouldInterrupt = true; // if we got here, we are in an interruptible status and state

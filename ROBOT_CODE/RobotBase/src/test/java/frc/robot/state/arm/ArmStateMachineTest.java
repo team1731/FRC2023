@@ -60,32 +60,32 @@ class ArmStateMachineTest {
     // Step 1
     StateChange step = (StateChange)processedSteps[0];
     assertEquals(step.previousState, ArmState.RETRACTED, "[0] Previous state should be RETRACTED");
-    assertEquals(step.newState, ArmState.EXTENDING, "[0] New state should be EXTENDING");
-    assertEquals(step.request.input, ArmInput.EXTEND, "[0] Request input should be EXTEND");
+    assertEquals(step.newState, ArmState.EXTEND_REQUESTED, "[0] New state should be EXTEND_REQUESTED");
+    assertEquals(step.request.input, ArmInput.EXTEND_INIT, "[0] Request input should be EXTEND_INIT");
     // Step 2
     step = (StateChange)processedSteps[1];
-    assertEquals(step.previousState, ArmState.EXTENDING, "[1] Previous state should be EXTENDING");
-    assertEquals(step.newState, ArmState.EXTENDED, "[1] New state should be EXTENDED");
+    assertEquals(step.previousState, ArmState.EXTEND_REQUESTED, "[1] Previous state should be EXTEND_REQUESTED");
+    assertEquals(step.newState, ArmState.EXTEND_INITIALIZED, "[1] New state should be EXTEND_INITIALIZED");
     assertEquals(step.result.code, StateConstants.kSuccessCode, "[1] Result should indicate success");
     // Step 3
     step = (StateChange)processedSteps[2];
-    assertEquals(step.previousState, ArmState.EXTENDED, "[2] Previous state should be EXTENDED");
-    assertEquals(step.newState, ArmState.RELEASING, "[2] New state should be RELEASING");
-    assertEquals(step.request.input, ArmInput.RELEASE, "[2] Request input should be RELEASE");
+    assertEquals(step.previousState, ArmState.EXTEND_INITIALIZED, "[2] Previous state should be EXTEND_INITIALIZED");
+    assertEquals(step.newState, ArmState.EXTEND_MOVE_REQUESTED, "[2] New state should be EXTEND_MOVE_REQUESTED");
+    assertEquals(step.request.input, ArmInput.EXTEND_MOVE, "[2] Request input should be EXTEND_MOVE");
     // Step 4
     step = (StateChange)processedSteps[3];
-    assertEquals(step.previousState, ArmState.RELEASING, "[3] Previous state should be RELEASING");
-    assertEquals(step.newState, ArmState.RELEASED, "[3] New state should be RELEASED");
+    assertEquals(step.previousState, ArmState.EXTEND_MOVE_REQUESTED, "[3] Previous state should be EXTEND_MOVE_REQUESTED");
+    assertEquals(step.newState, ArmState.EXTEND_MOVING, "[3] New state should be EXTEND_MOVE");
     assertEquals(step.result.code, StateConstants.kSuccessCode, "[3] Result should indicate success");
     // Step 5
     step = (StateChange)processedSteps[4];
-    assertEquals(step.previousState, ArmState.RELEASED, "[4] Previous state should be RELEASED");
-    assertEquals(step.newState, ArmState.RETRACTING, "[4] New state should be RETRACTING");
-    assertEquals(step.request.input, ArmInput.RETRACT, "[4] Request input should be RETRACT");
+    assertEquals(step.previousState, ArmState.EXTEND_MOVING, "[4] Previous state should be EXTEND_MOVING");
+    assertEquals(step.newState, ArmState.EXTEND_PINGING, "[4] New state should be EXTEND_PINGING");
+    assertEquals(step.request.input, ArmInput.EXTEND_PING, "[4] Request input should be EXTEND_PING");
     // Step 6
     step = (StateChange)processedSteps[5];
-    assertEquals(step.previousState, ArmState.RETRACTING, "[5] Previous state should be RETRACTING");
-    assertEquals(step.newState, ArmState.RETRACTED, "[5] New state should be RETRACTED");
+    assertEquals(step.previousState, ArmState.EXTEND_PINGING, "[5] Previous state should be EXTEND_PINGING");
+    assertEquals(step.newState, ArmState.EXTENDED, "[5] New state should be EXTENDED");
     assertEquals(step.result.code, StateConstants.kSuccessCode, "[5] Result should indicate success");
   }
 
@@ -109,12 +109,12 @@ class ArmStateMachineTest {
     assertEquals(6, processedSteps.length, "Wrong number of processed steps");
     // Step 1
     StateChange step = (StateChange)processedSteps[0];
-    assertEquals(step.previousState, ArmState.RETRACTED, "[0] Previous state should be RETRACTED");
-    assertEquals(step.newState, ArmState.EXTENDING, "[0] New state should be EXTENDING");
-    assertEquals(step.request.input, ArmInput.EXTEND, "[0] Request input should be EXTEND");
+    assertEquals(step.previousState, ArmState.EXTEND_MOVING, "[0] Previous state should be EXTEND_MOVING");
+    assertEquals(step.newState, ArmState.EXTEND_PINGING, "[0] New state should be EXTEND_PINGING");
+    assertEquals(step.request.input, ArmInput.EXTEND_PING, "[0] Request input should be EXTEND_PING");
     // Step 2
     step = (StateChange)processedSteps[1];
-    assertEquals(step.previousState, ArmState.EXTENDING, "[1] Previous state should be EXTENDING");
+    assertEquals(step.previousState, ArmState.EXTEND_PINGING, "[1] Previous state should be EXTEND_PINGING");
     assertEquals(step.newState, ArmState.EXTENDED, "[1] New state should be EXTENDED");
     assertEquals(step.result.code, StateConstants.kSuccessCode, "[1] Result should indicate success");
     // Step 3
@@ -130,12 +130,12 @@ class ArmStateMachineTest {
     // Step 5
     step = (StateChange)processedSteps[4];
     assertEquals(step.previousState, ArmState.RETRIEVED, "[4] Previous state should be RETRIEVED");
-    assertEquals(step.newState, ArmState.RETRACTING, "[4] New state should be RETRACTING");
-    assertEquals(step.request.input, ArmInput.RETRACT, "[4] Request input should be RETRACT");
+    assertEquals(step.newState, ArmState.RETRACT_REQUESTED, "[4] New state should be RETRACT_REQUESTED");
+    assertEquals(step.request.input, ArmInput.RETRACT_INIT, "[4] Request input should be RETRACT_INIT");
     // Step 6
     step = (StateChange)processedSteps[5];
-    assertEquals(step.previousState, ArmState.RETRACTING, "[5] Previous state should be RETRACTING");
-    assertEquals(step.newState, ArmState.RETRACTED, "[5] New state should be RETRACTED");
+    assertEquals(step.previousState, ArmState.RETRACT_REQUESTED, "[5] Previous state should be RETRACT_REQUESTED");
+    assertEquals(step.newState, ArmState.RETRACT_INITIALIZED, "[5] New state should be RETRACT_INITIALIZED");
     assertEquals(step.result.code, StateConstants.kSuccessCode, "[5] Result should indicate success");
   }
 
@@ -195,12 +195,12 @@ class ArmStateMachineTest {
     assertEquals(5, processedSteps.length, "Wrong number of processed steps");
     // Step 1
     StateChange step = (StateChange)processedSteps[0];
-    assertEquals(step.previousState, ArmState.RETRACTED, "[0] Previous state should be RETRACTED");
-    assertEquals(step.newState, ArmState.EXTENDING, "[0] New state should be EXTENDING");
-    assertEquals(step.request.input, ArmInput.EXTEND, "[0] Request input should be EXTEND");
+    assertEquals(step.previousState, ArmState.EXTEND_MOVING, "[0] Previous state should be EXTEND_MOVING");
+    assertEquals(step.newState, ArmState.EXTEND_PINGING, "[0] New state should be EXTEND_PINGING");
+    assertEquals(step.request.input, ArmInput.EXTEND_PING, "[0] Request input should be EXTEND_PING");
     // Step 2
     step = (StateChange)processedSteps[1];
-    assertEquals(step.previousState, ArmState.EXTENDING, "[1] Previous state should be EXTENDING");
+    assertEquals(step.previousState, ArmState.EXTEND_PINGING, "[1] Previous state should be EXTEND_PINGING");
     assertEquals(step.newState, ArmState.EXTENDED, "[1] New state should be EXTENDED");
     assertEquals(step.result.code, StateConstants.kSuccessCode, "[1] Result should indicate success");
     // Step 3
@@ -218,7 +218,7 @@ class ArmStateMachineTest {
     // Step 5
     step = (StateChange)processedSteps[4];
     assertEquals(step.previousState, ArmState.RECOVERING, "[4] Previous state should be RECOVERING");
-    assertEquals(step.newState, ArmState.RETRACTED, "[4] New state should be RETRACTING");
+    assertEquals(step.newState, ArmState.RETRACTED, "[4] New state should be RETRACTED");
     assertEquals(step.result.code, StateConstants.kSuccessCode, "[4] Result should indicate success");
   }
 
@@ -247,13 +247,13 @@ class ArmStateMachineTest {
     assertEquals(4, processedSteps.length, "Wrong number of processed steps");
     // Step 1
     StateChange step = (StateChange)processedSteps[0];
-    assertEquals(step.previousState, ArmState.RETRACTED, "[0] Previous state should be RETRACTED");
-    assertEquals(step.newState, ArmState.EXTENDING, "[0] New state should be EXTENDING");
-    assertEquals(step.request.input, ArmInput.EXTEND, "[0] Request input should be EXTEND");
+    assertEquals(step.previousState, ArmState.EXTEND_INITIALIZED, "[0] Previous state should be EXTEND_INITIALIZED");
+    assertEquals(step.newState, ArmState.EXTEND_MOVE_REQUESTED, "[0] New state should be EXTEND_MOVE_REQUESTED");
+    assertEquals(step.request.input, ArmInput.EXTEND_MOVE, "[0] Request input should be EXTEND_MOVE");
     // Step 2
     step = (StateChange)processedSteps[1];
-    assertEquals(step.previousState, ArmState.EXTENDING, "[1] Previous state should be EXTENDING");
-    assertEquals(step.newState, ArmState.INTERRUPTED, "[1] New state should be EXTENDED");
+    assertEquals(step.previousState, ArmState.EXTEND_MOVE_REQUESTED, "[1] Previous state should be EXTEND_MOVE_REQUESTED");
+    assertEquals(step.newState, ArmState.INTERRUPTED, "[1] New state should be INTERRUPTED");
     assertEquals(step.result.code, StateConstants.kGenericFailedCode, "[1] Result should indicate failure");
     // Step 3
     step = (StateChange)processedSteps[2];
