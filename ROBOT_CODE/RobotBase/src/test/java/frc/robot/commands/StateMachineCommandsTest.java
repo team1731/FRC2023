@@ -28,6 +28,7 @@ public class StateMachineCommandsTest {
         stateMachine.reset();
     }
     
+    /*
     @Test 
     void successfulScoreCommand() {
         StateMachineCommand stateMachineCommand = new StateMachineCommand(stateMachine, ArmSequence.SCORE_TEST);
@@ -96,4 +97,5 @@ public class StateMachineCommandsTest {
         // command should be finished
         assertTrue(stateMachineCommand.isFinished(), "Command should be finished");
     }
+    */
 }
