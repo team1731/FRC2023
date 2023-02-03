@@ -21,6 +21,7 @@ import frc.robot.state.StateWaitCondition;
 import frc.robot.state.StateWaitCondition.WaitType;
 import frc.robot.state.arm.ArmInput;
 import frc.robot.state.arm.ArmWait;
+import frc.robot.util.Gains;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
@@ -256,6 +257,29 @@ public final class Constants {
             new StateChangeRequest(ArmInput.EXTEND),
             new StateChangeRequest(ArmInput.EXTEND)
         };
+    }
+
+    public static final class ArmConstants {
+        public final static int proximalCancoderId = 10;
+        public final static int distalCancoderId = 11;
+
+        /**
+         * How many sensor units per rotation.
+         * Using Talon FX Integrated Sensor.
+         * @link https://github.com/CrossTheRoadElec/Phoenix-Documentation#what-are-the-units-of-my-sensor
+         */
+        public final static int kSensorUnitsPerRotation = 2048;
+        
+        /**
+         * Motor neutral dead-band, set to the minimum 0.1%.
+         */
+        public final static double kNeutralDeadband = 0.001;
+        
+        /**
+         * PID Gains may have to be adjusted based on the responsiveness of control loop
+         * 	                                    			  kP   kI    kD     kF             Iz    PeakOut */
+        public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/6800.0,  400,  1.00 ); /* measured 6800 velocity units at full motor output */
+        public final static int kPrimaryPIDSlot = 0; // any slot [0,3]
     }
 
     public static final class VisionConstants {
