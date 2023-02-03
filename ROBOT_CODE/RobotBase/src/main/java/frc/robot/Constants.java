@@ -293,7 +293,17 @@ public final class Constants {
         public static final String kCameraMount2Id = "Microsoft_LifeCam_HD-3000";
         public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, 15.5, 5.0, 39.37, 315);
         public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, 15.5, 5.0, 39.37, 45);
-	}
+
+		// #region TurnPID
+		public static final double kTurnP = 0.12;
+		public static final double kTurnI = 0;
+		public static final double kTurnD = 0.01;
+		public static final double kMaxTurnVelocity = 360;
+		public static final double kMaxTurnAcceleration = 360;
+		public static final double kTurnToleranceDeg = 5;
+		public static final double kTurnRateToleranceDegPerS = 10; // degrees per second
+		// #endregion
+    }
 
     public static final class OpConstants{
         public static final int kPWM_LedSting = 6;         // Addressable Led String
