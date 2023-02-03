@@ -124,7 +124,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void initializeArmMovement() {
-        proximalMotor.set(0.25);
+        proximalMotor.set(0.5);
         Instrum.printLine("Proximal motor initialized");
     }
 
