@@ -277,6 +277,22 @@ public final class Constants {
         public final static int wristCancoderId = 12;
         public final static int handCancoderId = 13;
 
+        // Wrist/Hand PID coefficients
+        public final static double handP = 5e-5; 
+        public final static double handI = 1e-6;
+        public final static double handD = 0; 
+        public final static double handIz = 0; 
+        public final static double handFF = 0.000156; 
+        public final static double handMaxOutput = 1; 
+        public final static double handMinOutput = -1;
+        public final static double handMaxRPM = 5700;
+
+        // Wrist/Hand Smart Motion Coefficients
+        public final static double handMaxVel = 2000; // rpm
+        public final static double handMinVel = 0;
+        public final static double handMaxAcc = 1500;
+        public final static double handAllowedErr = 0;
+
         /**
          * How many sensor units per rotation.
          * Using Talon FX Integrated Sensor.

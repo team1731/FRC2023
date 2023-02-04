@@ -29,7 +29,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     // motors for the arm
     private WPI_TalonFX proximalMotor;
     private WPI_TalonFX distalMotor;
-    private TalonFXConfiguration talonConfig;
+    private TalonFXConfiguration proximalTalonConfig;
+    private TalonFXConfiguration distalTalonConfig;
 
     // motion profiles/buffers for arm proximal and distal motors
     private BufferedTrajectoryPointStream proximalBufferedStream;
@@ -40,8 +41,9 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private CANSparkMax wristMotor;
     private CANSparkMax handMotor;
     private SparkMaxPIDController wristPIDController;
+    private SparkMaxPIDController handPIDController;
     private RelativeEncoder wristEncoder;
-    public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM, maxVel, minVel, maxAcc, allowedErr;
+    private RelativeEncoder handEncoder;
 
     // state tracking
     private boolean proximalMotorRunning = false;
@@ -55,7 +57,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         proximalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
         distalMotor = new WPI_TalonFX(ArmConstants.distalCancoderId, "canivore1");
         distalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
-        talonConfig = new TalonFXConfiguration(); // factory default settings
+        proximalTalonConfig = new TalonFXConfiguration(); // factory default settings
+        distalTalonConfig = new TalonFXConfiguration(); // factory default settings
         proximalBufferedStream = new BufferedTrajectoryPointStream();
         distalBufferedStream = new BufferedTrajectoryPointStream();
 
@@ -64,8 +67,10 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         handMotor = new CANSparkMax(ArmConstants.handCancoderId, MotorType.kBrushless);
 
         // kick off initializations
-        initializeArm();
-        //initializeHand();
+        initializeProximalMotor();
+        initializeDistalMotor();
+        initializeWrist();
+        initializeHand();
     }
 
     /*
@@ -73,57 +78,41 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
      */
 
     // configures the arm motors, should be called 
-    private void initializeArm() {
+    private void initializeProximalMotor() {
         // TODO clean up configuration code
+        proximalTalonConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice();
+        proximalTalonConfig.neutralDeadband = ArmConstants.kNeutralDeadband; /* 0.1 % super small for best low-speed control */
+        proximalTalonConfig.slot0.kF = ArmConstants.kGains_MotProf.kF;
+        proximalTalonConfig.slot0.kP = ArmConstants.kGains_MotProf.kP;
+        proximalTalonConfig.slot0.kI = ArmConstants.kGains_MotProf.kI;
+        proximalTalonConfig.slot0.kD = ArmConstants.kGains_MotProf.kD;
+        proximalTalonConfig.slot0.integralZone = (int) ArmConstants.kGains_MotProf.kIzone;
+        proximalTalonConfig.slot0.closedLoopPeakOutput = ArmConstants.kGains_MotProf.kPeakOutput;
+        // proximalTalonConfig.slot0.allowableClosedloopError // left default for this example
+        // proximalTalonConfig.slot0.maxIntegralAccumulator; // left default for this example
+        // proximalTalonConfig.slot0.closedLoopPeriod; // left default for this example
+        proximalMotor.configAllSettings(proximalTalonConfig);
 
-        /* _config the master specific settings */
-        talonConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice();
-        talonConfig.neutralDeadband = ArmConstants.kNeutralDeadband; /* 0.1 % super small for best low-speed control */
-        talonConfig.slot0.kF = ArmConstants.kGains_MotProf.kF;
-        talonConfig.slot0.kP = ArmConstants.kGains_MotProf.kP;
-        talonConfig.slot0.kI = ArmConstants.kGains_MotProf.kI;
-        talonConfig.slot0.kD = ArmConstants.kGains_MotProf.kD;
-        talonConfig.slot0.integralZone = (int) ArmConstants.kGains_MotProf.kIzone;
-        talonConfig.slot0.closedLoopPeakOutput = ArmConstants.kGains_MotProf.kPeakOutput;
-        // _config.slot0.allowableClosedloopError // left default for this example
-        // _config.slot0.maxIntegralAccumulator; // left default for this example
-        // _config.slot0.closedLoopPeriod; // left default for this example
-        proximalMotor.configAllSettings(talonConfig);
-        distalMotor.configAllSettings(talonConfig);
-
-        /* pick the sensor phase and desired direction */
+        // pick the sensor phase and desired direction
         proximalMotor.setInverted(TalonFXInvertType.CounterClockwise);
-        distalMotor.setInverted(TalonFXInvertType.CounterClockwise);
 
         /*
-        proximalMotor.configSelectedFeedbackSensor(
-			TalonFXFeedbackDevice.IntegratedSensor, // Sensor Type
-			OpConstants.kPIDLoopIdx, // PID Index
-			OpConstants.kTimeoutMs); // Config Timeout
+        NOTE: this is motor config from last year's climber
 
-		distalMotor.configSelectedFeedbackSensor(
+        proximalMotor.configSelectedFeedbackSensor(
 			TalonFXFeedbackDevice.IntegratedSensor, // Sensor Type
 			OpConstants.kPIDLoopIdx, // PID Index
 			OpConstants.kTimeoutMs); // Config Timeout
         
         proximalMotor.configNeutralDeadband(0.001, OpConstants.kTimeoutMs);
-		_swingerSlaveMotor.configNeutralDeadband(0.001, OpConstants.kTimeoutMs);
-
 
 		proximalMotor.setSensorPhase(true);
 		proximalMotor.setInverted(false);
-		distalMotor.setSensorPhase(true);
-		distalMotor.setInverted(false);
 
 		proximalMotor.configNominalOutputForward(0, OpConstants.kTimeoutMs);
 		proximalMotor.configNominalOutputReverse(0, OpConstants.kTimeoutMs);
 		proximalMotor.configPeakOutputForward(1, OpConstants.kTimeoutMs);
 		proximalMotor.configPeakOutputReverse(-1, OpConstants.kTimeoutMs);
-
-		distalMotor.configNominalOutputForward(0, OpConstants.kTimeoutMs);
-		distalMotor.configNominalOutputReverse(0, OpConstants.kTimeoutMs);
-		distalMotor.configPeakOutputForward(1, OpConstants.kTimeoutMs);
-		distalMotor.configPeakOutputReverse(-1, OpConstants.kTimeoutMs);
 
 		proximalMotor.selectProfileSlot(OpConstants.SLOT_0, OpConstants.kPIDLoopIdx);
 		proximalMotor.config_kP(OpConstants.SLOT_0, ClimbConstants.kP, OpConstants.kTimeoutMs);
@@ -131,13 +120,52 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 		proximalMotor.config_kD(OpConstants.SLOT_0, ClimbConstants.kD, OpConstants.kTimeoutMs);
 		proximalMotor.config_kF(OpConstants.SLOT_0, ClimbConstants.kFF, OpConstants.kTimeoutMs);
 
+        proximalMotor.setSelectedSensorPosition(0, OpConstants.kPIDLoopIdx, 0);
+        */
+    }
+
+    private void initializeDistalMotor() {
+        // TODO clean up configuration code
+        distalTalonConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice();
+        distalTalonConfig.neutralDeadband = ArmConstants.kNeutralDeadband; /* 0.1 % super small for best low-speed control */
+        distalTalonConfig.slot0.kF = ArmConstants.kGains_MotProf.kF;
+        distalTalonConfig.slot0.kP = ArmConstants.kGains_MotProf.kP;
+        distalTalonConfig.slot0.kI = ArmConstants.kGains_MotProf.kI;
+        distalTalonConfig.slot0.kD = ArmConstants.kGains_MotProf.kD;
+        distalTalonConfig.slot0.integralZone = (int) ArmConstants.kGains_MotProf.kIzone;
+        distalTalonConfig.slot0.closedLoopPeakOutput = ArmConstants.kGains_MotProf.kPeakOutput;
+        // proximalTalonConfig.slot0.allowableClosedloopError // left default for this example
+        // proximalTalonConfig.slot0.maxIntegralAccumulator; // left default for this example
+        // proximalTalonConfig.slot0.closedLoopPeriod; // left default for this example
+        distalMotor.configAllSettings(distalTalonConfig);
+
+        // pick the sensor phase and desired direction
+        distalMotor.setInverted(TalonFXInvertType.CounterClockwise);
+
+        /*
+        NOTE: this is motor config from last year's climber
+
+		distalMotor.configSelectedFeedbackSensor(
+			TalonFXFeedbackDevice.IntegratedSensor, // Sensor Type
+			OpConstants.kPIDLoopIdx, // PID Index
+			OpConstants.kTimeoutMs); // Config Timeout
+        
+		distalMotor.configNeutralDeadband(0.001, OpConstants.kTimeoutMs);
+        
+		distalMotor.setSensorPhase(true);
+		distalMotor.setInverted(false);
+
+		distalMotor.configNominalOutputForward(0, OpConstants.kTimeoutMs);
+		distalMotor.configNominalOutputReverse(0, OpConstants.kTimeoutMs);
+		distalMotor.configPeakOutputForward(1, OpConstants.kTimeoutMs);
+		distalMotor.configPeakOutputReverse(-1, OpConstants.kTimeoutMs);
+
 		distalMotor.selectProfileSlot(OpConstants.SLOT_0, OpConstants.kPIDLoopIdx);
 		distalMotor.config_kP(OpConstants.SLOT_0, ClimbConstants.kP, OpConstants.kTimeoutMs);
 		distalMotor.config_kI(OpConstants.SLOT_0, ClimbConstants.kI, OpConstants.kTimeoutMs);
 		distalMotor.config_kD(OpConstants.SLOT_0, ClimbConstants.kD, OpConstants.kTimeoutMs);
 		distalMotor.config_kF(OpConstants.SLOT_0, ClimbConstants.kFF, OpConstants.kTimeoutMs);
 
-        proximalMotor.setSelectedSensorPosition(0, OpConstants.kPIDLoopIdx, 0);
 		distalMotor.setSelectedSensorPosition(0, OpConstants.kPIDLoopIdx, 0);
         */
     }
@@ -198,10 +226,10 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     }
 
     /*
-     * METHODS FOR INITIALIZING AND MOVING THE HAND/WRIST
+     * METHODS FOR INITIALIZING THE HAND/WRIST
      */
-    public void initializeHand() {
-        // initialize motor
+    public void initializeWrist() {
+        // initialize motors
         wristMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
         wristMotor.restoreFactoryDefaults();
 
@@ -209,48 +237,58 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         wristPIDController = wristMotor.getPIDController();
         wristEncoder = wristMotor.getEncoder();
 
-        // PID coefficients
-        kP = 5e-5; 
-        kI = 1e-6;
-        kD = 0; 
-        kIz = 0; 
-        kFF = 0.000156; 
-        kMaxOutput = 1; 
-        kMinOutput = -1;
-        maxRPM = 5700;
+        // set PID coefficients
+        wristPIDController.setP(ArmConstants.handP);
+        wristPIDController.setI(ArmConstants.handI);
+        wristPIDController.setD(ArmConstants.handD);
+        wristPIDController.setIZone(ArmConstants.handIz);
+        wristPIDController.setFF(ArmConstants.handFF);
+        wristPIDController.setOutputRange(ArmConstants.handMinOutput, ArmConstants.handMaxOutput);
 
-        // Smart Motion Coefficients
-        maxVel = 2000; // rpm
-        maxAcc = 1500;
+        // set smart motion coefficients
+        int smartMotionSlot = 0;
+        wristPIDController.setSmartMotionMaxVelocity(ArmConstants.handMaxVel, smartMotionSlot);
+        wristPIDController.setSmartMotionMinOutputVelocity(ArmConstants.handMinVel, smartMotionSlot);
+        wristPIDController.setSmartMotionMaxAccel(ArmConstants.handMaxAcc, smartMotionSlot);
+        wristPIDController.setSmartMotionAllowedClosedLoopError(ArmConstants.handAllowedErr, smartMotionSlot);
+    }
+
+    public void initializeHand() {
+        // initialize motors
+        handMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
+        handMotor.restoreFactoryDefaults();
+
+        // initialze PID controller and encoder objects
+        handPIDController = handMotor.getPIDController();
+        handEncoder = handMotor.getEncoder();
+        
 
         // set PID coefficients
-        wristPIDController.setP(kP);
-        wristPIDController.setI(kI);
-        wristPIDController.setD(kD);
-        wristPIDController.setIZone(kIz);
-        wristPIDController.setFF(kFF);
-        wristPIDController.setOutputRange(kMinOutput, kMaxOutput);
+        handPIDController.setP(ArmConstants.handP);
+        handPIDController.setI(ArmConstants.handI);
+        handPIDController.setD(ArmConstants.handD);
+        handPIDController.setIZone(ArmConstants.handIz);
+        handPIDController.setFF(ArmConstants.handFF);
+        handPIDController.setOutputRange(ArmConstants.handMinOutput, ArmConstants.handMaxOutput);
 
-        //
-         // Smart Motion coefficients are set on a SparkMaxPIDController object
-         // 
-         // - setSmartMotionMaxVelocity() will limit the velocity in RPM of
-         // the pid controller in Smart Motion mode
-         // - setSmartMotionMinOutputVelocity() will put a lower bound in
-         // RPM of the pid controller in Smart Motion mode
-         // - setSmartMotionMaxAccel() will limit the acceleration in RPM^2
-         // of the pid controller in Smart Motion mode
-         // - setSmartMotionAllowedClosedLoopError() will set the max allowed
-         // error for the pid controller in Smart Motion mode
-        //
+        // set smart motion coefficients
         int smartMotionSlot = 0;
-        wristPIDController.setSmartMotionMaxVelocity(maxVel, smartMotionSlot);
-        wristPIDController.setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
-        wristPIDController.setSmartMotionMaxAccel(maxAcc, smartMotionSlot);
-        wristPIDController.setSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);
+        handPIDController.setSmartMotionMaxVelocity(ArmConstants.handMaxVel, smartMotionSlot);
+        handPIDController.setSmartMotionMinOutputVelocity(ArmConstants.handMinVel, smartMotionSlot);
+        handPIDController.setSmartMotionMaxAccel(ArmConstants.handMaxAcc, smartMotionSlot);
+        handPIDController.setSmartMotionAllowedClosedLoopError(ArmConstants.handAllowedErr, smartMotionSlot);
+    }
 
-        //wristPIDController.setReference(0, CANSparkMax.ControlType.kVelocity);
-        
+    public void moveWrist(double rotations) {
+        // TODO handle errors
+        wristPIDController.setReference(rotations, CANSparkMax.ControlType.kSmartMotion);
+        System.out.println("Wrist position " + wristEncoder.getPosition());
+    }
+
+    public void moveHand(double rotations) {
+        // TODO handle errors
+        handPIDController.setReference(rotations, CANSparkMax.ControlType.kSmartMotion);
+        System.out.println("Hand position " + handEncoder.getPosition());
     }
 
 
