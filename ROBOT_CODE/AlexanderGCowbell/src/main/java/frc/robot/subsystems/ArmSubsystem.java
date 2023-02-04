@@ -181,6 +181,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
     @Override
     public void periodic() {
+        stateMachine.periodic(); // prompt the state machine to process any periodic tasks
         boolean isArmMovingAtPeriodicStart = isArmMoving();
 
         if(proximalMotorRunning && proximalMotor.isMotionProfileFinished()) {

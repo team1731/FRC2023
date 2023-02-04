@@ -225,9 +225,5 @@ public abstract class StateMachine {
       status = Status.RUNNING;
       processCurrentSequenceStep();
     }
-
-    if(status == Status.PINGING) {
-      stateHandler.periodic(); // ping the subsystem's periodic method
-    }
   }
 }
