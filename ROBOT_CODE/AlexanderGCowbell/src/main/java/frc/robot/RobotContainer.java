@@ -61,7 +61,10 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     /* Driver Buttons */
-    zeroGyro.whenPressed(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    zeroGyro.whenPressed(new InstantCommand(() -> {
+      s_Swerve.zeroGyro();
+      s_armSubSystem.resetSensorPosition();
+    }));
     adjustWheelEncoders.whenPressed(new InstantCommand(() -> s_Swerve.adjustWheelEncoders()));
     runMotor.whenPressed(new ArmTestCommand(s_armSubSystem));
   }

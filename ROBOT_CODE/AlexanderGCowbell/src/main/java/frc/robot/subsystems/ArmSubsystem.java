@@ -225,6 +225,11 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         return proximalMotorRunning || distalMotorRunning;
     }
 
+    public void resetSensorPosition() {
+        proximalMotor.setSelectedSensorPosition(0);
+        distalMotor.setSelectedSensorPosition(0);
+    }
+
     /*
      * METHODS FOR INITIALIZING THE HAND/WRIST
      */
@@ -379,7 +384,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private String initBuffer(MotionProfile profile, BufferedTrajectoryPointStream bufferedStream) {
         int numberOfPoints = profile.numberOfPoints;
         double[][] points = profile.points;
-        boolean forward = true; // TODO, determine if we will use this, or use negative values in motion profile
         TrajectoryPoint point = new TrajectoryPoint(); 
         ErrorCode code;
 
@@ -391,16 +395,14 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         // Insert points into the buffer
         for (int i = 0; i < numberOfPoints; ++i) {
-
-            double direction = forward ? +1 : -1;
             double positionRot = points[i][0];
             double velocityRPM = points[i][1];
             int durationMilliseconds = (int) points[i][2];
 
             // populate point values
             point.timeDur = durationMilliseconds;
-            point.position = direction * positionRot * ArmConstants.kSensorUnitsPerRotation; // Convert Revolutions to Units
-            point.velocity = direction * velocityRPM * ArmConstants.kSensorUnitsPerRotation / 600.0; // Convert RPM to Units/100ms
+            point.position = positionRot * ArmConstants.kSensorUnitsPerRotation; // Convert Revolutions to Units
+            point.velocity = velocityRPM * ArmConstants.kSensorUnitsPerRotation / 600.0; // Convert RPM to Units/100ms
             point.auxiliaryPos = 0;
             point.auxiliaryVel = 0;
             point.profileSlotSelect0 = ArmConstants.kPrimaryPIDSlot; // set of gains you would like to use

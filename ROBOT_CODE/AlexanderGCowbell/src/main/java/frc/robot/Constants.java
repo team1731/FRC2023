@@ -277,6 +277,9 @@ public final class Constants {
         public final static int wristCancoderId = 12;
         public final static int handCancoderId = 13;
 
+        // Arm PID constants
+        public final static int armPIDLoopIdx = 0;
+
         // Wrist/Hand PID coefficients
         public final static double handP = 5e-5; 
         public final static double handI = 1e-6;
