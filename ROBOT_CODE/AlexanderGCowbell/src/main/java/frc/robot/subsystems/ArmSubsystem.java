@@ -398,11 +398,12 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
             double positionRot = points[i][0];
             double velocityRPM = points[i][1];
             int durationMilliseconds = (int) points[i][2];
+            int direction = profile.forward? +1 : -1;
 
             // populate point values
             point.timeDur = durationMilliseconds;
-            point.position = positionRot * ArmConstants.kSensorUnitsPerRotation; // Convert Revolutions to Units
-            point.velocity = velocityRPM * ArmConstants.kSensorUnitsPerRotation / 600.0; // Convert RPM to Units/100ms
+            point.position = direction * positionRot * ArmConstants.kSensorUnitsPerRotation; // Convert Revolutions to Units
+            point.velocity = direction * velocityRPM * ArmConstants.kSensorUnitsPerRotation / 600.0; // Convert RPM to Units/100ms
             point.auxiliaryPos = 0;
             point.auxiliaryVel = 0;
             point.profileSlotSelect0 = ArmConstants.kPrimaryPIDSlot; // set of gains you would like to use

@@ -262,7 +262,7 @@ public final class Constants {
             new StateChangeRequest(ArmInput.INTAKE),
             new StateChangeRequest(ArmInput.RETRACT_INIT),
             new StateChangeRequest(ArmInput.RETRACT_MOVE),
-            new StateChangeRequest(ArmInput.RETRACT_PING, TestProfile.getProfile())
+            new StateChangeRequest(ArmInput.RETRACT_PING, DistalTestProfile.getProfile())
         };
         
         public static final StateChangeRequest[] kTestInvalid = new StateChangeRequest[]{
