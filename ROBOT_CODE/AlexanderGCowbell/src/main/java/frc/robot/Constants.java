@@ -246,20 +246,28 @@ public final class Constants {
          * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
          */
         public static final StateChangeRequest[] kTestSequenceScore = new StateChangeRequest[]{
-            new StateChangeRequest(ArmInput.EXTEND_INIT, TestProfile.getProfile()),
-            //new StateChangeRequest(ArmInput.RELEASE, null, StateMachineWaitCondition.UNTIL_LINED_UP_FOR_SCORING),
-            new StateChangeRequest(ArmInput.RETRACT_INIT, TestProfile.getProfile())
+            new StateChangeRequest(ArmInput.EXTEND_INIT),
+            new StateChangeRequest(ArmInput.EXTEND_MOVE),
+            new StateChangeRequest(ArmInput.EXTEND_PING),
+            new StateChangeRequest(ArmInput.RELEASE, new StateWaitCondition(ArmWait.UNTIL_LINED_UP_FOR_SCORING, WaitType.PAUSE)),
+            new StateChangeRequest(ArmInput.RETRACT_INIT),
+            new StateChangeRequest(ArmInput.RETRACT_MOVE),
+            new StateChangeRequest(ArmInput.RETRACT_PING)
         };
 
         public static final StateChangeRequest[] kTestSequencePickup = new StateChangeRequest[]{
-            new StateChangeRequest(ArmInput.EXTEND_INIT, TestProfile.getProfile()),
+            new StateChangeRequest(ArmInput.EXTEND_INIT),
+            new StateChangeRequest(ArmInput.EXTEND_MOVE),
+            new StateChangeRequest(ArmInput.EXTEND_PING),
             new StateChangeRequest(ArmInput.INTAKE),
-            new StateChangeRequest(ArmInput.RETRACT_INIT, TestProfile.getProfile())
+            new StateChangeRequest(ArmInput.RETRACT_INIT),
+            new StateChangeRequest(ArmInput.RETRACT_MOVE),
+            new StateChangeRequest(ArmInput.RETRACT_PING, TestProfile.getProfile())
         };
-
+        
         public static final StateChangeRequest[] kTestInvalid = new StateChangeRequest[]{
             new StateChangeRequest(ArmInput.EXTEND_INIT),
-            new StateChangeRequest(ArmInput.EXTEND_INIT)
+            new StateChangeRequest(ArmInput.EXTEND_INIT),
         };
     }
 
