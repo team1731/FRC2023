@@ -4,7 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -51,16 +50,10 @@ public class RobotContainer {
   }
    
 
-  /**
-   * Use this method to define your button->command mappings. Buttons can be created by
-   * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
-   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
-   */
   private void configureButtonBindings() {
     /* Driver Buttons */
-    zeroGyro.whenPressed(new InstantCommand(() -> s_Swerve.zeroGyro()));
-    adjustWheelEncoders.whenPressed(new InstantCommand(() -> s_Swerve.adjustWheelEncoders()));
+    zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    adjustWheelEncoders.onTrue(new InstantCommand(() -> s_Swerve.adjustWheelEncoders()));
   }
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
@@ -73,6 +66,14 @@ public class RobotContainer {
         return new _1_11Top_A_13Top_Drive_A(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
       case AutoConstants.k_2_13Top_B_Engage:
         return new _2_13Top_B_Engage(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+      case AutoConstants.k_3_31Top_C_Engage:
+        return new _3_31Top_C_Engage(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+      case AutoConstants.k_4_33Top_D_31Top_Drive_D:
+        return new _4_33Top_D_31Top_Drive_D(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+      case AutoConstants.k_5_11Top_A_11Middle_Drive_A:
+        return new _5_11Top_A_11Middle_Drive_A(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+      case AutoConstants.k_6_33Top_D_33Middle_Drive_D:
+        return new _6_33Top_D_33Middle_Drive_D(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
       case AutoConstants.k_9_Move_Forward:
 				return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
 		}

@@ -202,11 +202,15 @@ public final class Constants {
 	}
 
     public static final class AutoConstants {
-        public static final String kDefault                  = "_Default_Auto";
-        public static final String k_0_Example               = "_0_Example_Auto";
-        public static final String k_1_11Top_A_13Top_Drive_A = "_1_1Top_A_13Top_Drive_A";
-        public static final String k_2_13Top_B_Engage        = "_2_13Top_B_Engage";
-        public static final String k_9_Move_Forward          = "_9_Move_Forward";
+        public static final String kDefault                      = "_Default_Auto";
+        public static final String k_0_Example                   = "_0_Example_Auto";
+        public static final String k_1_11Top_A_13Top_Drive_A     = "_1_1Top_A_13Top_Drive_A";
+        public static final String k_2_13Top_B_Engage            = "_2_13Top_B_Engage";
+        public static final String k_3_31Top_C_Engage            = "_3_31Top_C_Engage";
+        public static final String k_4_33Top_D_31Top_Drive_D     = "_4_33Top_D_31Top_Drive_D";
+        public static final String k_5_11Top_A_11Middle_Drive_A  = "_5_11Top_A_11Middle_Drive_A";
+        public static final String k_6_33Top_D_33Middle_Drive_D  = "_6_33Top_D_33Middle_Drive_D";
+        public static final String k_9_Move_Forward              = "_9_Move_Forward";
         
 		public static final String kAutoCodeKey = "Auto Selector";
         public static final double kMaxSpeedMetersPerSecond = 0.5; // disabled for testing = 3;
