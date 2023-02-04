@@ -22,6 +22,7 @@ import frc.robot.state.StateWaitCondition.WaitType;
 import frc.robot.state.arm.ArmInput;
 import frc.robot.state.arm.ArmWait;
 import frc.robot.util.Gains;
+import frc.data.mp.*;
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
@@ -229,8 +230,11 @@ public final class Constants {
       }
       
     public static final class StateConstants {
-        public static final String kSuccessCode = "00";
-        public static final String kGenericFailedCode = "01";
+        public enum ResultCode {
+            SUCCESS, FAILED, INVALID_REQUEST,
+            // Arm Specific
+            ARM_BUFFERING_FAILED, ARM_MOTION_START_FAILED
+        }
         
         /*
         * Constants specifically related to the ArmStateMachine
@@ -242,15 +246,15 @@ public final class Constants {
          * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
          */
         public static final StateChangeRequest[] kTestSequenceScore = new StateChangeRequest[]{
-            new StateChangeRequest(ArmInput.EXTEND_INIT, new double[]{ 1, 2, 3, 4, 5 }),
+            new StateChangeRequest(ArmInput.EXTEND_INIT, TestProfile.getProfile()),
             //new StateChangeRequest(ArmInput.RELEASE, null, StateMachineWaitCondition.UNTIL_LINED_UP_FOR_SCORING),
-            new StateChangeRequest(ArmInput.RETRACT_INIT, new double[]{ 6, 7, 8, 9, 10 })
+            new StateChangeRequest(ArmInput.RETRACT_INIT, TestProfile.getProfile())
         };
 
         public static final StateChangeRequest[] kTestSequencePickup = new StateChangeRequest[]{
-            new StateChangeRequest(ArmInput.EXTEND_INIT, new double[]{ 1, 2, 3, 4, 5 }),
+            new StateChangeRequest(ArmInput.EXTEND_INIT, TestProfile.getProfile()),
             new StateChangeRequest(ArmInput.INTAKE),
-            new StateChangeRequest(ArmInput.RETRACT_INIT, new double[]{ 6, 7, 8, 9, 10 })
+            new StateChangeRequest(ArmInput.RETRACT_INIT, TestProfile.getProfile())
         };
 
         public static final StateChangeRequest[] kTestInvalid = new StateChangeRequest[]{

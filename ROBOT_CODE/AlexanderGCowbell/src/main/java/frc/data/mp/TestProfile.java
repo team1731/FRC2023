@@ -1,6 +1,10 @@
 package frc.data.mp;
 	
-public class TestProfile {			
+public class TestProfile {	
+    public static MotionProfile getProfile() {
+        return new MotionProfile(kNumPoints, Points);
+    }
+
 	public static final int kNumPoints = 224;	
 
 	// Position (rotations)	Velocity (RPM)	Duration (ms)

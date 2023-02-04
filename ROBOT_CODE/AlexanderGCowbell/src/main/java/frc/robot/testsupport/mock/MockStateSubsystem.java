@@ -2,7 +2,7 @@ package frc.robot.testsupport.mock;
 
 import frc.robot.state.*;
 import frc.robot.state.arm.ArmInput;
-import frc.robot.Constants.StateConstants;
+import frc.robot.Constants.StateConstants.ResultCode;
 import edu.wpi.first.wpilibj.Timer;
 
 public class MockStateSubsystem implements StateHandler {
@@ -16,13 +16,13 @@ public class MockStateSubsystem implements StateHandler {
 
     public void changeState(Input input, Object data) {
       if(shouldFail && input != ArmInput.RECOVER) {
-        notifyStateMachine(ArmInput.FAILED, StateConstants.kGenericFailedCode, "Failed");
+        notifyStateMachine(ArmInput.FAILED, ResultCode.FAILED, "Failed");
       } else {
-        notifyStateMachine(ArmInput.SUCCESS, StateConstants.kSuccessCode, "Success");
+        notifyStateMachine(ArmInput.SUCCESS, ResultCode.SUCCESS, "Success");
       }
     }
 
-    private void notifyStateMachine(Input input, String resultCode, String resultMessage) {
+    private void notifyStateMachine(Input input, ResultCode resultCode, String resultMessage) {
       StateChangeResult result = new StateChangeResult(resultCode, resultMessage, Timer.getFPGATimestamp());
       stateMachine.transition(input, result);
     }
@@ -32,6 +32,6 @@ public class MockStateSubsystem implements StateHandler {
     }
 
     public void periodic() {
-      notifyStateMachine(ArmInput.SUCCESS, StateConstants.kSuccessCode, "Success");
+      notifyStateMachine(ArmInput.SUCCESS, ResultCode.SUCCESS, "Success");
     }
 }

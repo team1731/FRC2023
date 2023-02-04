@@ -35,7 +35,6 @@ public class RobotContainer {
   private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
   private final JoystickButton adjustWheelEncoders = new JoystickButton(driver, XboxController.Button.kX.value);
   private final JoystickButton runMotor = new JoystickButton(driver, XboxController.Button.kB.value);
-  private final JoystickButton printMotorValues = new JoystickButton(driver, XboxController.Button.kA.value);
 
   /* Subsystems */
 
@@ -65,8 +64,6 @@ public class RobotContainer {
     zeroGyro.whenPressed(new InstantCommand(() -> s_Swerve.zeroGyro()));
     adjustWheelEncoders.whenPressed(new InstantCommand(() -> s_Swerve.adjustWheelEncoders()));
     runMotor.whenPressed(new ArmTestCommand(s_armSubSystem));
-    printMotorValues.whenHeld(new InstantCommand(() -> s_armSubSystem.printMotionValues(true)))
-      .whenReleased(new InstantCommand(() -> s_armSubSystem.printMotionValues(false)));
   }
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {

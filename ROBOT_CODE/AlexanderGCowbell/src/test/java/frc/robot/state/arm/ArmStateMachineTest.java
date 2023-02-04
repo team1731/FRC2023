@@ -13,6 +13,7 @@ import frc.robot.state.arm.ArmInput;
 import frc.robot.state.arm.ArmState;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.Constants.StateConstants;
+import frc.robot.Constants.StateConstants.ResultCode;
 import frc.robot.testsupport.mock.MockStateSubsystem;
 
 class ArmStateMachineTest {
@@ -30,7 +31,6 @@ class ArmStateMachineTest {
     stateMachine.reset();
   }
 
-  /* 
   @Test 
   void successfulScoreSequence() {
     try {
@@ -67,7 +67,7 @@ class ArmStateMachineTest {
     step = (StateChange)processedSteps[1];
     assertEquals(step.previousState, ArmState.EXTEND_REQUESTED, "[1] Previous state should be EXTEND_REQUESTED");
     assertEquals(step.newState, ArmState.EXTEND_INITIALIZED, "[1] New state should be EXTEND_INITIALIZED");
-    assertEquals(step.result.code, StateConstants.kSuccessCode, "[1] Result should indicate success");
+    assertEquals(step.result.code, ResultCode.SUCCESS, "[1] Result should indicate success");
     // Step 3
     step = (StateChange)processedSteps[2];
     assertEquals(step.previousState, ArmState.EXTEND_INITIALIZED, "[2] Previous state should be EXTEND_INITIALIZED");
@@ -77,7 +77,7 @@ class ArmStateMachineTest {
     step = (StateChange)processedSteps[3];
     assertEquals(step.previousState, ArmState.EXTEND_MOVE_REQUESTED, "[3] Previous state should be EXTEND_MOVE_REQUESTED");
     assertEquals(step.newState, ArmState.EXTEND_MOVING, "[3] New state should be EXTEND_MOVE");
-    assertEquals(step.result.code, StateConstants.kSuccessCode, "[3] Result should indicate success");
+    assertEquals(step.result.code, ResultCode.SUCCESS, "[3] Result should indicate success");
     // Step 5
     step = (StateChange)processedSteps[4];
     assertEquals(step.previousState, ArmState.EXTEND_MOVING, "[4] Previous state should be EXTEND_MOVING");
@@ -87,7 +87,7 @@ class ArmStateMachineTest {
     step = (StateChange)processedSteps[5];
     assertEquals(step.previousState, ArmState.EXTEND_PINGING, "[5] Previous state should be EXTEND_PINGING");
     assertEquals(step.newState, ArmState.EXTENDED, "[5] New state should be EXTENDED");
-    assertEquals(step.result.code, StateConstants.kSuccessCode, "[5] Result should indicate success");
+    assertEquals(step.result.code, ResultCode.SUCCESS, "[5] Result should indicate success");
   }
 
   @Test 
@@ -117,7 +117,7 @@ class ArmStateMachineTest {
     step = (StateChange)processedSteps[1];
     assertEquals(step.previousState, ArmState.EXTEND_PINGING, "[1] Previous state should be EXTEND_PINGING");
     assertEquals(step.newState, ArmState.EXTENDED, "[1] New state should be EXTENDED");
-    assertEquals(step.result.code, StateConstants.kSuccessCode, "[1] Result should indicate success");
+    assertEquals(step.result.code, ResultCode.SUCCESS, "[1] Result should indicate success");
     // Step 3
     step = (StateChange)processedSteps[2];
     assertEquals(step.previousState, ArmState.EXTENDED, "[2] Previous state should be EXTENDED");
@@ -127,7 +127,7 @@ class ArmStateMachineTest {
     step = (StateChange)processedSteps[3];
     assertEquals(step.previousState, ArmState.RETRIEVING, "[3] Previous state should be RETRIEVING");
     assertEquals(step.newState, ArmState.RETRIEVED, "[3] New state should be RETRIEVED");
-    assertEquals(step.result.code, StateConstants.kSuccessCode, "[3] Result should indicate success");
+    assertEquals(step.result.code, ResultCode.SUCCESS, "[3] Result should indicate success");
     // Step 5
     step = (StateChange)processedSteps[4];
     assertEquals(step.previousState, ArmState.RETRIEVED, "[4] Previous state should be RETRIEVED");
@@ -137,7 +137,7 @@ class ArmStateMachineTest {
     step = (StateChange)processedSteps[5];
     assertEquals(step.previousState, ArmState.RETRACT_REQUESTED, "[5] Previous state should be RETRACT_REQUESTED");
     assertEquals(step.newState, ArmState.RETRACT_INITIALIZED, "[5] New state should be RETRACT_INITIALIZED");
-    assertEquals(step.result.code, StateConstants.kSuccessCode, "[5] Result should indicate success");
+    assertEquals(step.result.code, ResultCode.SUCCESS, "[5] Result should indicate success");
   }
 
   @Test 
@@ -203,7 +203,7 @@ class ArmStateMachineTest {
     step = (StateChange)processedSteps[1];
     assertEquals(step.previousState, ArmState.EXTEND_PINGING, "[1] Previous state should be EXTEND_PINGING");
     assertEquals(step.newState, ArmState.EXTENDED, "[1] New state should be EXTENDED");
-    assertEquals(step.result.code, StateConstants.kSuccessCode, "[1] Result should indicate success");
+    assertEquals(step.result.code, ResultCode.SUCCESS, "[1] Result should indicate success");
     // Step 3
     step = (StateChange)processedSteps[2];
     assertEquals(step.previousState, ArmState.EXTENDED, "[2] Previous state should be EXTENDED");
@@ -220,7 +220,7 @@ class ArmStateMachineTest {
     step = (StateChange)processedSteps[4];
     assertEquals(step.previousState, ArmState.RECOVERING, "[4] Previous state should be RECOVERING");
     assertEquals(step.newState, ArmState.RETRACTED, "[4] New state should be RETRACTED");
-    assertEquals(step.result.code, StateConstants.kSuccessCode, "[4] Result should indicate success");
+    assertEquals(step.result.code, ResultCode.SUCCESS, "[4] Result should indicate success");
   }
 
   @Test 
@@ -255,7 +255,7 @@ class ArmStateMachineTest {
     step = (StateChange)processedSteps[1];
     assertEquals(step.previousState, ArmState.EXTEND_MOVE_REQUESTED, "[1] Previous state should be EXTEND_MOVE_REQUESTED");
     assertEquals(step.newState, ArmState.INTERRUPTED, "[1] New state should be INTERRUPTED");
-    assertEquals(step.result.code, StateConstants.kGenericFailedCode, "[1] Result should indicate failure");
+    assertEquals(step.result.code, ResultCode.FAILED, "[1] Result should indicate failure");
     // Step 3
     step = (StateChange)processedSteps[2];
     assertEquals(step.previousState, ArmState.INTERRUPTED, "[2] Previous state should be INTERRUPTED");
@@ -265,7 +265,6 @@ class ArmStateMachineTest {
     step = (StateChange)processedSteps[3];
     assertEquals(step.previousState, ArmState.RECOVERING, "[3] Previous state should be RECOVERING");
     assertEquals(step.newState, ArmState.RETRACTED, "[3] New state should be RETRACTING");
-    assertEquals(step.result.code, StateConstants.kSuccessCode, "[3] Result should indicate success");
+    assertEquals(step.result.code, ResultCode.SUCCESS, "[3] Result should indicate success");
   }
-  */
 }

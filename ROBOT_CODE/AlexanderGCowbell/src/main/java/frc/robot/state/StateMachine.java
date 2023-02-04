@@ -5,6 +5,7 @@ import java.util.Iterator;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.StateConstants;
+import frc.robot.Constants.StateConstants.ResultCode;
 import frc.robot.state.StateWaitCondition.WaitType;
 
 public abstract class StateMachine {
@@ -131,7 +132,7 @@ public abstract class StateMachine {
     processedSteps.add(new StateChange(previouState, state, currentStep, result));
 
     // if state handler was successful move forward, otherwise, let subclass handle failure condition
-    if(result.code.equals(StateConstants.kSuccessCode)) {
+    if(result.code == ResultCode.SUCCESS) {
       pickupNextSequenceStep();
     } else {
       handleFailureCondition(result);

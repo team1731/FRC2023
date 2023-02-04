@@ -8,30 +8,33 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motion.*;
+import com.ctre.phoenix.ErrorCode;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.state.arm.ArmStateMachine;
+import edu.wpi.first.wpilibj.Timer;
+import frc.robot.state.arm.ArmInput;
 import frc.robot.state.*;
+import frc.robot.Constants.StateConstants.ResultCode;
 import frc.robot.Constants.ArmConstants;
 import frc.data.mp.*;
 
-public class ArmSubsystem extends SubsystemBase {
+public class ArmSubsystem extends SubsystemBase implements StateHandler {
+    private StateMachine stateMachine;
+
     // motors for the arm
     private WPI_TalonFX proximalMotor;
     private WPI_TalonFX distalMotor;
     private TalonFXConfiguration talonConfig;
 
-    // motor for the wrist/hand
+    // motion profiles/buffers for arm proximal and distal motors
+    private BufferedTrajectoryPointStream proximalBufferedStream;
+    private BufferedTrajectoryPointStream distalBufferedStream;
+
+    // motor for the wrist/hand motors
     // TODO implement
 
-    // buffer for the motion profile values
-    private BufferedTrajectoryPointStream mpBufferedStream;
-    // the current raw motion profile values
-    private double[][] mpPoints;
-    private int mpNumPoints;
-
     // state tracking
-    private boolean isArmMoving = false;
-    private boolean printMotionValues = false;
+    private boolean proximalMotorRunning = false;
+    private boolean distalMotorRunning = false;
 
 
 
@@ -41,7 +44,8 @@ public class ArmSubsystem extends SubsystemBase {
         distalMotor = new WPI_TalonFX(ArmConstants.distalCancoderId, "canivore1");
         distalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
         talonConfig = new TalonFXConfiguration(); // factory default settings
-        mpBufferedStream = new BufferedTrajectoryPointStream();
+        proximalBufferedStream = new BufferedTrajectoryPointStream();
+        distalBufferedStream = new BufferedTrajectoryPointStream();
     }
 
     public void initialize() {
@@ -53,10 +57,7 @@ public class ArmSubsystem extends SubsystemBase {
      */
 
     private void initializeArm() {
-        /* fill our buffer object with the motion profile points */
-        mpPoints = TestProfile.Points;
-        mpNumPoints = TestProfile.kNumPoints;
-        initBuffer(mpPoints, mpNumPoints);
+        // TODO clean up configuration code
 
         /* _config the master specific settings */
         talonConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice();
@@ -123,123 +124,190 @@ public class ArmSubsystem extends SubsystemBase {
         proximalMotor.setInverted(TalonFXInvertType.CounterClockwise);
     }
 
-    public void initializeArmMovement() {
-        proximalMotor.set(0.5);
-        Instrum.printLine("Proximal motor initialized");
+    public void initializeArmMovement(MotionProfile[] profiles) {
+        if(isArmMoving()) {
+            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: attempt to initialize when arm is already moving");
+            return;
+        }
+
+        // init motion profile buffers for proximal/distal motors
+
+        String errorMessage;
+        errorMessage = initBuffer(profiles[0], proximalBufferedStream);
+        if(errorMessage != null) {
+            notifyStateMachine(ResultCode.ARM_BUFFERING_FAILED, "Proximal buffer failed to initialize with message: " + errorMessage);
+            return;
+        }
+        errorMessage = initBuffer(profiles[1], distalBufferedStream);
+        if(errorMessage != null) {
+            notifyStateMachine(ResultCode.ARM_BUFFERING_FAILED, "Distal buffer failed to initialize with message: " + errorMessage);
+            return;
+        }
+
+        notifyStateMachine(ResultCode.SUCCESS, "Successfully initialized arm profile buffers");
     }
 
     public void moveArm() {
-        isArmMoving = true;
-        proximalMotor.startMotionProfile(mpBufferedStream, 10, TalonFXControlMode.MotionProfile.toControlMode());
-        Instrum.printLine("Proximal motor motion started");
+        if(isArmMoving()) {
+            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: attempt to start new movement when arm is already moving");
+            return;
+        }
+
+        // start motion profile for proximal/distal motors
+
+        ErrorCode code;
+        proximalMotorRunning = true;
+        proximalMotor.set(0.5);
+        code = proximalMotor.startMotionProfile(proximalBufferedStream, 10, TalonFXControlMode.MotionProfile.toControlMode());
+        if(code != ErrorCode.OK) {
+            notifyStateMachine(ResultCode.ARM_MOTION_START_FAILED, "Failed to start proximal motion profile");
+            return;
+        }
+
+        distalMotorRunning = true;
+        distalMotor.set(0.5);
+        code = distalMotor.startMotionProfile(distalBufferedStream, 10, TalonFXControlMode.MotionProfile.toControlMode());
+        if(code != ErrorCode.OK) {
+            notifyStateMachine(ResultCode.ARM_MOTION_START_FAILED, "Failed to start distal motion profile");
+            return;
+        }
+
+        notifyStateMachine(ResultCode.SUCCESS, "Successfully started arm movement");
     }
 
     public boolean isArmMoving() {
-        return isArmMoving;
+        return proximalMotorRunning || distalMotorRunning;
     }
 
     @Override
     public void periodic() {
-        if(isArmMoving && proximalMotor.isMotionProfileFinished()) {
-            isArmMoving = false;
+        boolean isArmMovingAtPeriodicStart = isArmMoving();
+
+        if(proximalMotorRunning && proximalMotor.isMotionProfileFinished()) {
             proximalMotor.set(0);
-            Instrum.printLine("Proximal motor motion finished");
+            proximalMotorRunning = false;
+        } else if(proximalMotorRunning) {
+            logMotionProfileStatus(proximalMotor);
         }
 
-        Instrum.loop(printMotionValues, proximalMotor);
+        if(distalMotorRunning && distalMotor.isMotionProfileFinished()) {
+            distalMotor.set(0);
+            distalMotorRunning = false;
+        } else if(distalMotorRunning) {
+            logMotionProfileStatus(distalMotor);
+        }
+
+        if(isArmMoving()) { // arm is still moving
+            // TODO implement, check for issues?
+        }
+
+        if(isArmMovingAtPeriodicStart && !isArmMoving()) { // arm was moving, but has now stopped
+            // TODO any checking to ensure we are where we expect to be?
+            notifyStateMachine(ResultCode.SUCCESS, "Completed arm movement");
+        }
     }
 
-    public void printMotionValues(boolean printValues) {
-        printMotionValues = printValues;
-    }
 
-
-    /**
-     * BUFFER HANDLING
-     *
-     * @param profile  generated array of points
-     * @param totalCnt num points in profile
+    /*
+     * STATE HANDLER INTERFACE
      */
-    private void initBuffer(double[][] profile, int totalCnt) {
 
-        boolean forward = true; // set to false to drive in opposite direction of profile (not really needed
-                                // since you can use negative numbers in profile).
+    public void registerStateMachine(StateMachine stateMachine) {
+        this.stateMachine = stateMachine;
+    }
 
-        TrajectoryPoint point = new TrajectoryPoint(); // temp for for loop, since unused params are initialized
-                                                       // automatically, you can alloc just one
+    public void changeState(Input input, Object data) {
+        ArmInput ai = (ArmInput)input;
+        switch(ai) {
+            case EXTEND_INIT:
+            case RETRACT_INIT:
+                initializeArmMovement((MotionProfile[])data);
+                break;
+            case EXTEND_MOVE:
+            case RETRACT_MOVE:
+                moveArm();
+                break;
+            case INTAKE:
+            case RELEASE:
+                // TODO implement, for the moment just send back success to keep the state process moving
+                notifyStateMachine(ResultCode.SUCCESS, "TEST: sending success code for unimplemented step");
+                break;
+            default:
+                // unrecognized state change, send back failure
+                notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: state change request was not recognized");
+        }
+    }
 
-        /* clear the buffer, in case it was used elsewhere */
-        mpBufferedStream.Clear();
+    public void interruptStateChange() {
+        // TODO implement
+    }
 
-        /* Insert every point into buffer, no limit on size */
-        for (int i = 0; i < totalCnt; ++i) {
+    private void notifyStateMachine(ResultCode resultCode, String resultMessage) {
+        ArmInput input = resultCode == ResultCode.SUCCESS? ArmInput.SUCCESS : ArmInput.FAILED;
+        StateChangeResult result = new StateChangeResult(resultCode, resultMessage, Timer.getFPGATimestamp());
+        stateMachine.transition(input, result);
+    }
+
+
+    /*
+     * Helper methods for buffer handling and logging
+     */
+
+    private String initBuffer(MotionProfile profile, BufferedTrajectoryPointStream bufferedStream) {
+        int numberOfPoints = profile.numberOfPoints;
+        double[][] points = profile.points;
+        boolean forward = true; // TODO, determine if we will use this, or use negative values in motion profile
+        TrajectoryPoint point = new TrajectoryPoint(); 
+        ErrorCode code;
+
+        // clear the buffer, it may have been used before
+        code = bufferedStream.Clear();
+        if(code != ErrorCode.OK) {
+            return "buffer failed to clear";
+        }
+
+        // Insert points into the buffer
+        for (int i = 0; i < numberOfPoints; ++i) {
 
             double direction = forward ? +1 : -1;
-            double positionRot = profile[i][0];
-            double velocityRPM = profile[i][1];
-            int durationMilliseconds = (int) profile[i][2];
+            double positionRot = points[i][0];
+            double velocityRPM = points[i][1];
+            int durationMilliseconds = (int) points[i][2];
 
-            /* for each point, fill our structure and pass it to API */
+            // populate point values
             point.timeDur = durationMilliseconds;
-            point.position = direction * positionRot * ArmConstants.kSensorUnitsPerRotation; // Convert Revolutions to
-                                                                                          // Units
-            point.velocity = direction * velocityRPM * ArmConstants.kSensorUnitsPerRotation / 600.0; // Convert RPM to
-                                                                                                  // Units/100ms
+            point.position = direction * positionRot * ArmConstants.kSensorUnitsPerRotation; // Convert Revolutions to Units
+            point.velocity = direction * velocityRPM * ArmConstants.kSensorUnitsPerRotation / 600.0; // Convert RPM to Units/100ms
             point.auxiliaryPos = 0;
             point.auxiliaryVel = 0;
-            point.profileSlotSelect0 = ArmConstants.kPrimaryPIDSlot; /* which set of gains would you like to use [0,3]? */
-            point.profileSlotSelect1 = 0; /* auxiliary PID [0,1], leave zero */
-            point.zeroPos = (i == 0); /* set this to true on the first point */
-            point.isLastPoint = ((i + 1) == totalCnt); /* set this to true on the last point */
-            point.arbFeedFwd = 0; /* you can add a constant offset to add to PID[0] output here */
+            point.profileSlotSelect0 = ArmConstants.kPrimaryPIDSlot; // set of gains you would like to use
+            point.profileSlotSelect1 = 0; // auxiliary PID [0,1], leave zero
+            point.zeroPos = (i == 0); // set this to true on the first point
+            point.isLastPoint = ((i + 1) == numberOfPoints); // set this to true on the last point
+            point.arbFeedFwd = 0; // you can add a constant offset to add to PID[0] output here - TODO implement
 
-            mpBufferedStream.Write(point);
+            code = bufferedStream.Write(point);
+            if(code != ErrorCode.OK) {
+                return "buffer failed to write point at index: " + i;
+            }
         }
+
+        return null;
     }
 
-    static class Instrum {
-        static int _loops = 0;
-        static boolean _bPrintValues = false;
-        
-        public static void printLine(String s) {
-            System.out.println(s);
-        }
-    
-        public static void loop(boolean bPrintValues, TalonFX talon) {
-            if (!_bPrintValues && bPrintValues) {
-                /* user just pressed button, immediete print */
-                _loops = 999;
-            }
-            /* if button is off, don't print */
-            if (bPrintValues == false) {
-                /* reset so we don't print */
-                _loops = 0;
-            }
-            /* save for next compare */
-            _bPrintValues = bPrintValues;
-    
-            /* build string and print if button is down */
-            if (++_loops >= 10) {
-                _loops = 0;
-                /* get status info */
-                MotionProfileStatus status = new MotionProfileStatus();
-                talon.getMotionProfileStatus(status);
-    
-                String line = "";
-                line += "  topBufferRem: " + status.topBufferRem + "\n";
-                line += "  topBufferCnt: " + status.topBufferCnt + "\n";
-                line += "  btmBufferCnt: " + status.btmBufferCnt + "\n";
-                line += "  hasUnderrun: " + status.hasUnderrun + "\n";
-                line += "  isUnderrun: " + status.isUnderrun + "\n";
-                line += "  activePointValid: " + status.activePointValid + "\n";
-                line += "  isLast: " + status.isLast + "\n";
-                line += "  profileSlotSelect0: " + status.profileSlotSelect + "\n";
-                line += "  profileSlotSelect1: " + status.profileSlotSelect1 + "\n";
-                line += "  outputEnable: " + status.outputEnable.toString() + "\n";
-                line += "  timeDurMs: " + status.timeDurMs + "\n";
-    
-                printLine(line);
-            }
-        }
+    private void logMotionProfileStatus(TalonFX talon) {
+        MotionProfileStatus status = new MotionProfileStatus();
+        talon.getMotionProfileStatus(status);
+        // status.topBufferRem
+        // status.topBufferCnt
+        // status.btmBufferCnt
+        // status.hasUnderrun
+        // status.isUnderrun
+        // status.activePointValid
+        // status.isLast
+        // status.profileSlotSelect
+        // status.profileSlotSelect1
+        // status.outputEnable.toString()
+        // status.timeDurMs
     }    
 }
