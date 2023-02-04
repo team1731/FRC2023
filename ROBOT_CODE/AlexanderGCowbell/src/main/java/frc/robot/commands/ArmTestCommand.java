@@ -14,7 +14,6 @@ public class ArmTestCommand extends CommandBase {
 
     @Override
 	public void initialize() {
-        armSubsystem.initialize();
         armSubsystem.initializeArmMovement(new MotionProfile[]{
             TestProfile.getProfile(), 
             TestProfile.getProfile()

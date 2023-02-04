@@ -9,6 +9,12 @@ import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motion.*;
 import com.ctre.phoenix.ErrorCode;
+
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.Timer;
 import frc.robot.state.arm.ArmInput;
@@ -29,8 +35,13 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private BufferedTrajectoryPointStream proximalBufferedStream;
     private BufferedTrajectoryPointStream distalBufferedStream;
 
-    // motor for the wrist/hand motors
-    // TODO implement
+    // motors for the wrist/hand
+    private static final int deviceID = 1;
+    private CANSparkMax wristMotor;
+    private CANSparkMax handMotor;
+    private SparkMaxPIDController wristPIDController;
+    private RelativeEncoder wristEncoder;
+    public double kP, kI, kD, kIz, kFF, kMaxOutput, kMinOutput, maxRPM, maxVel, minVel, maxAcc, allowedErr;
 
     // state tracking
     private boolean proximalMotorRunning = false;
@@ -39,6 +50,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
 
     public ArmSubsystem() {
+        // setup motor and motion profiling members
         proximalMotor = new WPI_TalonFX(ArmConstants.proximalCancoderId, "canivore1");
         proximalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
         distalMotor = new WPI_TalonFX(ArmConstants.distalCancoderId, "canivore1");
@@ -46,16 +58,21 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         talonConfig = new TalonFXConfiguration(); // factory default settings
         proximalBufferedStream = new BufferedTrajectoryPointStream();
         distalBufferedStream = new BufferedTrajectoryPointStream();
-    }
 
-    public void initialize() {
+        // setup wrist/hand motor members
+        wristMotor = new CANSparkMax(ArmConstants.wristCancoderId, MotorType.kBrushless);
+        handMotor = new CANSparkMax(ArmConstants.handCancoderId, MotorType.kBrushless);
+
+        // kick off initializations
         initializeArm();
+        initializeHand();
     }
 
     /*
      * METHODS FOR INITIALIZING AND MOVING THE ARM
      */
 
+    // configures the arm motors, should be called 
     private void initializeArm() {
         // TODO clean up configuration code
 
@@ -179,10 +196,74 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         return proximalMotorRunning || distalMotorRunning;
     }
 
+    /*
+     * METHODS FOR INITIALIZING AND MOVING THE HAND/WRIST
+     */
+    public void initializeHand() {
+        // initialize motor
+        wristMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
+        wristMotor.restoreFactoryDefaults();
+
+        // initialze PID controller and encoder objects
+        wristPIDController = wristMotor.getPIDController();
+        wristEncoder = wristMotor.getEncoder();
+
+        // PID coefficients
+        kP = 5e-5; 
+        kI = 1e-6;
+        kD = 0; 
+        kIz = 0; 
+        kFF = 0.000156; 
+        kMaxOutput = 1; 
+        kMinOutput = -1;
+        maxRPM = 5700;
+
+        // Smart Motion Coefficients
+        maxVel = 2000; // rpm
+        maxAcc = 1500;
+
+        // set PID coefficients
+        wristPIDController.setP(kP);
+        wristPIDController.setI(kI);
+        wristPIDController.setD(kD);
+        wristPIDController.setIZone(kIz);
+        wristPIDController.setFF(kFF);
+        wristPIDController.setOutputRange(kMinOutput, kMaxOutput);
+
+        /**
+         * Smart Motion coefficients are set on a SparkMaxPIDController object
+         * 
+         * - setSmartMotionMaxVelocity() will limit the velocity in RPM of
+         * the pid controller in Smart Motion mode
+         * - setSmartMotionMinOutputVelocity() will put a lower bound in
+         * RPM of the pid controller in Smart Motion mode
+         * - setSmartMotionMaxAccel() will limit the acceleration in RPM^2
+         * of the pid controller in Smart Motion mode
+         * - setSmartMotionAllowedClosedLoopError() will set the max allowed
+         * error for the pid controller in Smart Motion mode
+         */
+        int smartMotionSlot = 0;
+        wristPIDController.setSmartMotionMaxVelocity(maxVel, smartMotionSlot);
+        wristPIDController.setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
+        wristPIDController.setSmartMotionMaxAccel(maxAcc, smartMotionSlot);
+        wristPIDController.setSmartMotionAllowedClosedLoopError(allowedErr, smartMotionSlot);
+
+        //wristPIDController.setReference(0, CANSparkMax.ControlType.kVelocity);
+        
+    }
+
+
+    /*
+     * PERIODIC LOGIC
+     */
+
     @Override
     public void periodic() {
-        stateMachine.periodic(); // prompt the state machine to process any periodic tasks
         boolean isArmMovingAtPeriodicStart = isArmMoving();
+
+        if(stateMachine != null) {
+            stateMachine.periodic(); // prompt the state machine to process any periodic tasks
+        }
 
         if(proximalMotorRunning && proximalMotor.isMotionProfileFinished()) {
             proximalMotor.set(0);
@@ -244,9 +325,11 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     }
 
     private void notifyStateMachine(ResultCode resultCode, String resultMessage) {
-        ArmInput input = resultCode == ResultCode.SUCCESS? ArmInput.SUCCESS : ArmInput.FAILED;
-        StateChangeResult result = new StateChangeResult(resultCode, resultMessage, Timer.getFPGATimestamp());
-        stateMachine.transition(input, result);
+        if(stateMachine != null) {
+            ArmInput input = resultCode == ResultCode.SUCCESS? ArmInput.SUCCESS : ArmInput.FAILED;
+            StateChangeResult result = new StateChangeResult(resultCode, resultMessage, Timer.getFPGATimestamp());
+            stateMachine.transition(input, result);
+        }
     }
 
 
