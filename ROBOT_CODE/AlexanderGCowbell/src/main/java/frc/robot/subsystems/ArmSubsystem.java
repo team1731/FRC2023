@@ -200,7 +200,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     /*
      * METHODS FOR INITIALIZING AND MOVING THE HAND/WRIST
      */
-    /*
     public void initializeHand() {
         // initialize motor
         wristMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
@@ -253,7 +252,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         //wristPIDController.setReference(0, CANSparkMax.ControlType.kVelocity);
         
     }
-    */
 
 
     /*
