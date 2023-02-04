@@ -41,9 +41,8 @@ public class StateMachineCommandsTest {
         // simulate resolving wait condition from a parallel process
         stateMachine.resolveWaitCondition(ArmWait.UNTIL_LINED_UP_FOR_SCORING);
 
-        // call execute, its called repeatedly while command is scheduled, every ~20ms
-        // calls state machine periodic() in turn, which will see the wait condition is resolved and restart
-        stateMachineCommand.execute();
+        // continue the process to the end
+        stateMachine.periodic();
 
         // sequence should be finished
         assertEquals(Status.FINISHED, stateMachine.getStatus(), "Status should be FINISHED");

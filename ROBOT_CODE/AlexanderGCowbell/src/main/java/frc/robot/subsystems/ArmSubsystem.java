@@ -65,7 +65,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         // kick off initializations
         initializeArm();
-        initializeHand();
+        //initializeHand();
     }
 
     /*
@@ -199,6 +199,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     /*
      * METHODS FOR INITIALIZING AND MOVING THE HAND/WRIST
      */
+    /*
     public void initializeHand() {
         // initialize motor
         wristMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
@@ -230,18 +231,18 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         wristPIDController.setFF(kFF);
         wristPIDController.setOutputRange(kMinOutput, kMaxOutput);
 
-        /**
-         * Smart Motion coefficients are set on a SparkMaxPIDController object
-         * 
-         * - setSmartMotionMaxVelocity() will limit the velocity in RPM of
-         * the pid controller in Smart Motion mode
-         * - setSmartMotionMinOutputVelocity() will put a lower bound in
-         * RPM of the pid controller in Smart Motion mode
-         * - setSmartMotionMaxAccel() will limit the acceleration in RPM^2
-         * of the pid controller in Smart Motion mode
-         * - setSmartMotionAllowedClosedLoopError() will set the max allowed
-         * error for the pid controller in Smart Motion mode
-         */
+        //
+         // Smart Motion coefficients are set on a SparkMaxPIDController object
+         // 
+         // - setSmartMotionMaxVelocity() will limit the velocity in RPM of
+         // the pid controller in Smart Motion mode
+         // - setSmartMotionMinOutputVelocity() will put a lower bound in
+         // RPM of the pid controller in Smart Motion mode
+         // - setSmartMotionMaxAccel() will limit the acceleration in RPM^2
+         // of the pid controller in Smart Motion mode
+         // - setSmartMotionAllowedClosedLoopError() will set the max allowed
+         // error for the pid controller in Smart Motion mode
+        //
         int smartMotionSlot = 0;
         wristPIDController.setSmartMotionMaxVelocity(maxVel, smartMotionSlot);
         wristPIDController.setSmartMotionMinOutputVelocity(minVel, smartMotionSlot);
@@ -251,6 +252,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         //wristPIDController.setReference(0, CANSparkMax.ControlType.kVelocity);
         
     }
+    */
 
 
     /*
