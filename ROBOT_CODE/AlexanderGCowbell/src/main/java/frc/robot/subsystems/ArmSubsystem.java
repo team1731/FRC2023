@@ -91,6 +91,10 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         proximalMotor.configAllSettings(talonConfig);
         distalMotor.configAllSettings(talonConfig);
 
+        /* pick the sensor phase and desired direction */
+        proximalMotor.setInverted(TalonFXInvertType.CounterClockwise);
+        distalMotor.setInverted(TalonFXInvertType.CounterClockwise);
+
         /*
         proximalMotor.configSelectedFeedbackSensor(
 			TalonFXFeedbackDevice.IntegratedSensor, // Sensor Type
@@ -136,9 +140,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         proximalMotor.setSelectedSensorPosition(0, OpConstants.kPIDLoopIdx, 0);
 		distalMotor.setSelectedSensorPosition(0, OpConstants.kPIDLoopIdx, 0);
         */
-
-        /* pick the sensor phase and desired direction */
-        proximalMotor.setInverted(TalonFXInvertType.CounterClockwise);
     }
 
     public void initializeArmMovement(MotionProfile[] profiles) {
@@ -382,6 +383,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     }
 
     private void logMotionProfileStatus(TalonFX talon) {
+        // TODO implement logging, do so at reasonable intervals
         MotionProfileStatus status = new MotionProfileStatus();
         talon.getMotionProfileStatus(status);
         // status.topBufferRem
