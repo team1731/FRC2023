@@ -40,8 +40,6 @@ public class StateMachineCommand extends CommandBase {
         var smStatus = stateMachine.getStatus();
 		if(smStatus == Status.INTERRUPTED || smStatus == Status.FINISHED || smStatus == Status.INVALID) {
             finished = true;
-        } else {
-            stateMachine.periodic();
         }
 	}
 
