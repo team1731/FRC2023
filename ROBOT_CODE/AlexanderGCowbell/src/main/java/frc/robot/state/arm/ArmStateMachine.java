@@ -79,7 +79,7 @@ public class ArmStateMachine extends StateMachine {
       }
 
       // Add current step we interrupted to the processed steps list
-      var change = new StateChange(previouState, state, currentStep);
+      var change = new StateChange(status, previouState, state, currentStep);
       change.interrupted = true;
       change.interruptedTimestamp = Timer.getFPGATimestamp();
       processedSteps.add(change);

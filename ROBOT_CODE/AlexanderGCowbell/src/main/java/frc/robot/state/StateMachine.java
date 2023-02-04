@@ -128,7 +128,7 @@ public abstract class StateMachine {
       return; // something went wrong w/transition
     }
     
-    processedSteps.add(new StateChange(previouState, state, currentStep, result));
+    processedSteps.add(new StateChange(status, previouState, state, currentStep, result));
 
     // if state handler was successful move forward, otherwise, let subclass handle failure condition
     if(result.code == ResultCode.SUCCESS) {
@@ -191,7 +191,7 @@ public abstract class StateMachine {
     }
 
     currentStep.timestamp = Timer.getFPGATimestamp();
-    processedSteps.add(new StateChange(previouState, state, currentStep));
+    processedSteps.add(new StateChange(status, previouState, state, currentStep));
 
     // if pinging we won't call the subsystem yet, periodic will ping subsystem
     if(status != Status.PINGING) {
