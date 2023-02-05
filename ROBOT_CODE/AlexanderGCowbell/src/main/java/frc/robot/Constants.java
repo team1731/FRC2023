@@ -272,8 +272,8 @@ public final class Constants {
     }
 
     public static final class ArmConstants {
-        public final static int proximalCancoderId = 10;
-        public final static int distalCancoderId = 11;
+        public final static int proximalCancoderId = 11;
+        public final static int distalCancoderId = 10;
         public final static int wristCancoderId = 12;
         public final static int handCancoderId = 13;
 
