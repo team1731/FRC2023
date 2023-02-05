@@ -206,7 +206,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         ErrorCode code;
         proximalMotorRunning = true;
-        proximalMotor.set(0.5);
         code = proximalMotor.startMotionProfile(proximalBufferedStream, 10, TalonFXControlMode.MotionProfile.toControlMode());
         if(code != ErrorCode.OK) {
             notifyStateMachine(ResultCode.ARM_MOTION_START_FAILED, "Failed to start proximal motion profile");
@@ -214,7 +213,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         }
 
         distalMotorRunning = true;
-        distalMotor.set(0.5);
         code = distalMotor.startMotionProfile(distalBufferedStream, 10, TalonFXControlMode.MotionProfile.toControlMode());
         if(code != ErrorCode.OK) {
             notifyStateMachine(ResultCode.ARM_MOTION_START_FAILED, "Failed to start distal motion profile");
@@ -314,7 +312,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         if(proximalMotorRunning && proximalMotor.isMotionProfileFinished()) {
             double position = proximalMotor.getSelectedSensorPosition(0) / 2048;
-            proximalMotor.set(TalonFXControlMode.Position.toControlMode(), position);
+            System.out.println("Proximal position: " + proximalMotor.getSelectedSensorPosition(0) + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            //proximalMotor.set(TalonFXControlMode.Position.toControlMode(), position);
             proximalMotorRunning = false;
         } else if(proximalMotorRunning) {
             logMotionProfileStatus(proximalMotor);
@@ -322,7 +321,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         if(distalMotorRunning && distalMotor.isMotionProfileFinished()) {
             double position = distalMotor.getSelectedSensorPosition(0) / 2048;
-            distalMotor.set(TalonFXControlMode.Position.toControlMode(), position);
+            System.out.println("Distal position: " + distalMotor.getSelectedSensorPosition(0) + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            //distalMotor.set(TalonFXControlMode.Position.toControlMode(), position);
             distalMotorRunning = false;
         } else if(distalMotorRunning) {
             logMotionProfileStatus(distalMotor);
