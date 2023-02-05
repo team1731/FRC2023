@@ -11,6 +11,7 @@ import java.util.Scanner;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.util.datalog.DoubleArrayLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -39,6 +40,7 @@ public class Robot extends TimedRobot {
   private NetworkTable keypad;
   private boolean isRedAlliance = true;
   private int stationNumber = 0;
+  private DoubleArrayLogEntry autoLog;
   public static long millis = System.currentTimeMillis();
 
   /**
@@ -266,7 +268,8 @@ public class Robot extends TimedRobot {
 		DataLogManager.log("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand.getClass().getSimpleName() + " <----------");
 		m_robotContainer.zeroHeading();
 		m_autonomousCommand.schedule();
-	}		
+	}
+	autoLog = new DoubleArrayLogEntry(DataLogManager.getLog(), "autolog", "pose, rotation, blah");
 	DataLogManager.log("autonomousInit: End");
   }
 
@@ -279,6 +282,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousPeriodic() {
 	if(doSD()){ DataLogManager.log("AUTO PERIODIC");}
+	autoLog.append(new double[]{0, 1, 2, 3, 4, 5});
   }
 
 

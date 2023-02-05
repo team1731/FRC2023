@@ -22,7 +22,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
 
-
 	private double driveSpeedScaler = 1.0;
     private boolean headingOverride = true;
 	private boolean visionHeadingOverride = false;
@@ -35,14 +34,13 @@ public class Swerve extends SubsystemBase {
         new TrapezoidProfile.Constraints(VisionConstants.kMaxTurnVelocity, VisionConstants.kMaxTurnAcceleration));
 
     public SwerveModule[] mSwerveMods;
-  //  public PigeonIMU gyro;
+//  public PigeonIMU gyro;
     private final AHRS m_gyro = new AHRS(SPI.Port.kMXP, (byte) 200); // NavX connected over MXP
 
 
     public Swerve() {
 
         zeroGyro();
-
 
         mSwerveMods = new SwerveModule[] {
             new SwerveModule(0, Constants.Swerve.Mod0.constants),
@@ -57,7 +55,7 @@ public class Swerve extends SubsystemBase {
 
         boolean useLockHeadingCode = false;
 
-        if(useLockHeadingCode){
+        if(useLockHeadingCode){ //TODO FIXME: debug this block!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             double xSpeedAdjusted = translation.getX();
             double ySpeedAdjusted = translation.getY();
     
@@ -74,7 +72,7 @@ public class Swerve extends SubsystemBase {
             ySpeedAdjusted *= this.driveSpeedScaler;
     
     
-            // If the right stick is neutral - this code should lock on the last known
+            // If the right stick is neutral - this code should lock onto the last known
             // heading
             if (Math.abs(rotationalOutput) < 0.11) {
                 headingOverride = true;
@@ -169,32 +167,28 @@ public class Swerve extends SubsystemBase {
 	}
 
     public void zeroGyro(){
-
         m_gyro.zeroYaw();
- 
     }
 
     public void adjustWheelEncoders(){
-              for(SwerveModule mod : mSwerveMods){
+        for(SwerveModule mod : mSwerveMods){
             mod.resetToAbsolute();
             DataLogManager.log("Adjusting Wheel Encoders!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         }  
     }
 
     public Rotation2d getYaw() {
-    if (m_gyro.isMagnetometerCalibrated()) {
-      // We will only get valid fused headings if the magnetometer is calibrated
-      return Rotation2d.fromDegrees(m_gyro.getFusedHeading());
-    }
+        if (m_gyro.isMagnetometerCalibrated()) {
+        // We will only get valid fused headings if the magnetometer is calibrated
+        return Rotation2d.fromDegrees(m_gyro.getFusedHeading());
+        }
 
-    // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
-    return Rotation2d.fromDegrees(360.0 - m_gyro.getYaw());
+        // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
+        return Rotation2d.fromDegrees(360.0 - m_gyro.getYaw());
     }
 
     @Override
     public void periodic(){
-
- 
         if (Robot.doSD()) {
             for(SwerveModule mod : mSwerveMods){
                 SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
