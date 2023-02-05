@@ -97,33 +97,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         // pick the sensor phase and desired direction
         proximalMotor.setInverted(TalonFXInvertType.CounterClockwise);
-
-        /*
-        NOTE: this is motor config from last year's climber
-
-        proximalMotor.configSelectedFeedbackSensor(
-			TalonFXFeedbackDevice.IntegratedSensor, // Sensor Type
-			OpConstants.kPIDLoopIdx, // PID Index
-			OpConstants.kTimeoutMs); // Config Timeout
-        
-        proximalMotor.configNeutralDeadband(0.001, OpConstants.kTimeoutMs);
-
-		proximalMotor.setSensorPhase(true);
-		proximalMotor.setInverted(false);
-
-		proximalMotor.configNominalOutputForward(0, OpConstants.kTimeoutMs);
-		proximalMotor.configNominalOutputReverse(0, OpConstants.kTimeoutMs);
-		proximalMotor.configPeakOutputForward(1, OpConstants.kTimeoutMs);
-		proximalMotor.configPeakOutputReverse(-1, OpConstants.kTimeoutMs);
-
-		proximalMotor.selectProfileSlot(OpConstants.SLOT_0, OpConstants.kPIDLoopIdx);
-		proximalMotor.config_kP(OpConstants.SLOT_0, ClimbConstants.kP, OpConstants.kTimeoutMs);
-		proximalMotor.config_kI(OpConstants.SLOT_0, ClimbConstants.kI, OpConstants.kTimeoutMs);
-		proximalMotor.config_kD(OpConstants.SLOT_0, ClimbConstants.kD, OpConstants.kTimeoutMs);
-		proximalMotor.config_kF(OpConstants.SLOT_0, ClimbConstants.kFF, OpConstants.kTimeoutMs);
-
-        proximalMotor.setSelectedSensorPosition(0, OpConstants.kPIDLoopIdx, 0);
-        */
     }
 
     private void initializeDistalMotor() {
@@ -144,33 +117,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         // pick the sensor phase and desired direction
         distalMotor.setInverted(TalonFXInvertType.CounterClockwise);
-
-        /*
-        NOTE: this is motor config from last year's climber
-
-		distalMotor.configSelectedFeedbackSensor(
-			TalonFXFeedbackDevice.IntegratedSensor, // Sensor Type
-			OpConstants.kPIDLoopIdx, // PID Index
-			OpConstants.kTimeoutMs); // Config Timeout
-        
-		distalMotor.configNeutralDeadband(0.001, OpConstants.kTimeoutMs);
-        
-		distalMotor.setSensorPhase(true);
-		distalMotor.setInverted(false);
-
-		distalMotor.configNominalOutputForward(0, OpConstants.kTimeoutMs);
-		distalMotor.configNominalOutputReverse(0, OpConstants.kTimeoutMs);
-		distalMotor.configPeakOutputForward(1, OpConstants.kTimeoutMs);
-		distalMotor.configPeakOutputReverse(-1, OpConstants.kTimeoutMs);
-
-		distalMotor.selectProfileSlot(OpConstants.SLOT_0, OpConstants.kPIDLoopIdx);
-		distalMotor.config_kP(OpConstants.SLOT_0, ClimbConstants.kP, OpConstants.kTimeoutMs);
-		distalMotor.config_kI(OpConstants.SLOT_0, ClimbConstants.kI, OpConstants.kTimeoutMs);
-		distalMotor.config_kD(OpConstants.SLOT_0, ClimbConstants.kD, OpConstants.kTimeoutMs);
-		distalMotor.config_kF(OpConstants.SLOT_0, ClimbConstants.kFF, OpConstants.kTimeoutMs);
-
-		distalMotor.setSelectedSensorPosition(0, OpConstants.kPIDLoopIdx, 0);
-        */
     }
 
     public void initializeArmMovement(MotionProfile[] profiles) {
