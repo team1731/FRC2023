@@ -69,8 +69,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         // kick off initializations
         initializeProximalMotor();
         initializeDistalMotor();
-        initializeWrist();
-        initializeHand();
+        //initializeWrist();
+        //initializeHand();
     }
 
     /*
@@ -313,14 +313,16 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         }
 
         if(proximalMotorRunning && proximalMotor.isMotionProfileFinished()) {
-            proximalMotor.set(0);
+            double position = proximalMotor.getSelectedSensorPosition(0) / 2048;
+            proximalMotor.set(TalonFXControlMode.Position.toControlMode(), position);
             proximalMotorRunning = false;
         } else if(proximalMotorRunning) {
             logMotionProfileStatus(proximalMotor);
         }
 
         if(distalMotorRunning && distalMotor.isMotionProfileFinished()) {
-            distalMotor.set(0);
+            double position = distalMotor.getSelectedSensorPosition(0) / 2048;
+            distalMotor.set(TalonFXControlMode.Position.toControlMode(), position);
             distalMotorRunning = false;
         } else if(distalMotorRunning) {
             logMotionProfileStatus(distalMotor);
