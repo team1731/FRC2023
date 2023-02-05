@@ -3,6 +3,7 @@ package frc.robot.state;
 import java.util.ArrayList; 
 import java.util.Iterator;  
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import frc.robot.Constants.StateConstants;
 import frc.robot.Constants.StateConstants.StateMachineWaitCondition;
@@ -82,7 +83,7 @@ public abstract class StateMachine {
       sequence = sequenceList.iterator();
     } catch(StateMachineInitializationException ie) {
       status = Status.FAILED_INIT;
-      System.out.println("ERROR: " + id + " failed to initialize");
+      DataLogManager.log("ERROR: " + id + " failed to initialize");
       throw ie;
     }
   }

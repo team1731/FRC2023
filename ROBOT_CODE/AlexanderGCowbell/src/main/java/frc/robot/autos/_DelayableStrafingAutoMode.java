@@ -237,7 +237,7 @@ public class _DelayableStrafingAutoMode {
 		// 	@Override
 		// 	public void end(boolean interrupted) {
 		// 		super.end(interrupted);
-		// 		System.out.println("at end of swerve command, interrupted=" + interrupted);
+		// 		DataLogManager.log("at end of swerve command, interrupted=" + interrupted);
 		// 	}
 		// };
 	}
@@ -265,7 +265,7 @@ public class _DelayableStrafingAutoMode {
 		// 	@Override
 		// 	public void end(boolean interrupted) {
 		// 		super.end(interrupted);
-		// 		System.out.println("at end of swerve command, interrupted=" + interrupted);
+		// 		DataLogManager.log("at end of swerve command, interrupted=" + interrupted);
 		// 	}
 		// };
 	}

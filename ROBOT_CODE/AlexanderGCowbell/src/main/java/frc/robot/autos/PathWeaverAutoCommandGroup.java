@@ -19,6 +19,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.math.trajectory.TrajectoryUtil;
 import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -49,7 +50,7 @@ public class PathWeaverAutoCommandGroup extends SequentialCommandGroup {
                 if(!tP.contains("output")){
                     trajectoryPath = new File(tP.replace("paths", "paths" + File.separator + "output")).toPath();
                 }
-                System.out.println(trajectoryPath.toAbsolutePath());
+                DataLogManager.log(trajectoryPath.toAbsolutePath().toString());
                 trajectories[i] = TrajectoryUtil.fromPathweaverJson(trajectoryPath);
             } catch (IOException ex) {
                 DriverStation.reportError("Unable to open trajectory: " + trajectoryPaths[i], ex.getStackTrace());

@@ -6,11 +6,14 @@ package frc.robot;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.sql.Driver;
 import java.util.Scanner;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
@@ -45,6 +48,10 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+	// Starts recording to data log
+	DataLogManager.start();
+	
+	DataLogManager.log("\n\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  EVENT: " + DriverStation.getEventName() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 	LiveWindow.disableAllTelemetry();
     ctreConfigs = new CTREConfigs();
 
@@ -99,26 +106,11 @@ public class Robot extends TimedRobot {
   }
   
   private boolean isRedAlliance(){
-	fieldInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
-	if(fieldInfo != null){
-		return Boolean.valueOf(fieldInfo.getEntry("IsRedAlliance").getString("true"));
-	}
-	else{
-		System.out.println("\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  ERROR: CAN'T TELL IF WE ARE RED ALLIANCE OR BLUE ALLIANCE  !!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n");
-	}
-	return isRedAlliance;
+	return DriverStation.getAlliance().equals(DriverStation.Alliance.Red);
   }
 
   private int getStationNumber(){
-	int stationNumber = 1;
-	fieldInfo = NetworkTableInstance.getDefault().getTable("FMSInfo");
-	if(fieldInfo != null){
-		stationNumber = (int)fieldInfo.getEntry("StationNumber").getInteger(0);
-	}
-	else{
-		System.out.println("\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  ERROR: CAN'T TELL WHAT OUR STATION NUMBER IS  !!!!!!!!!!!!!!!!!!!!!!!!!!!\n\n\n");
-	}
-	return stationNumber;
+	return DriverStation.getLocation();
   }
 
   private void autoInitPreload() {
@@ -126,22 +118,22 @@ public class Robot extends TimedRobot {
 
 	String useCode = autoChooser.getSelected();
 
-	System.out.println("\nPreloading AUTO CODE --> " + useCode);
+	DataLogManager.log("\nPreloading AUTO CODE --> " + useCode);
 	if(useCode == null) {
-		System.out.println("\nNULL AUTO CODE : DEFAULTING TO " + AutoConstants.kDefault);
+		DataLogManager.log("\nNULL AUTO CODE : DEFAULTING TO " + AutoConstants.kDefault);
 		autoCode = AutoConstants.kDefault;
 	}
 	else{
 		m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);
 		if(m_autonomousCommand != null){
 			autoCode = useCode;
-			System.out.println("\n=====>>> PRELOADED AUTONOMOUS ROUTINE: " + m_autonomousCommand.getClass().getName() + " " + (isRedAlliance?"RED":"BLUE") + " <<<=====");
+			DataLogManager.log("\n=====>>> PRELOADED AUTONOMOUS ROUTINE: " + m_autonomousCommand.getClass().getName() + " " + (isRedAlliance?"RED":"BLUE") + " <<<=====");
 		}
 		else{
-			System.out.println("\nAUTO CODE " + useCode + " IS NOT IMPLEMENTED -- STAYING WITH AUTO CODE " + autoCode);
+			DataLogManager.log("\nAUTO CODE " + useCode + " IS NOT IMPLEMENTED -- STAYING WITH AUTO CODE " + autoCode);
 		}
 	}
-	System.out.println("\nAUTO CODE being used by the software --> " + autoCode + "\n\n\n");
+	DataLogManager.log("\nAUTO CODE being used by the software --> " + autoCode + "\n");
   }
 
   private void initSubsystems() {
@@ -168,7 +160,7 @@ public class Robot extends TimedRobot {
 	//
 	String newKeypadEntry = keypad.getEntry("driver entry").getString(oldKeypadEntry);
 	if (!newKeypadEntry.equals(oldKeypadEntry)){
-		System.out.println(".\n.\n.\nDRIVER ENTRY ==========================>>>>>>>> " + newKeypadEntry + "\n.\n.\n.");
+		DataLogManager.log(".\n.\n.\nDRIVER ENTRY ==========================>>>>>>>> " + newKeypadEntry + "\n.\n.\n.");
 		oldKeypadEntry = newKeypadEntry;
 		SmartDashboard.putString("keypadCommand", newKeypadEntry);
 	}
@@ -192,21 +184,21 @@ public class Robot extends TimedRobot {
 
 	String newCode = autoChooser.getSelected();
 	if(!newCode.equals(autoCode)) {
-		System.out.println("New Auto Code read from dashboard. OLD: " + autoCode + ", NEW: " + newCode);
+		DataLogManager.log("New Auto Code read from dashboard. OLD: " + autoCode + ", NEW: " + newCode);
 		autoInitPreload();
 	}
 
 	boolean isRedAlliance = isRedAlliance();
 	if(this.isRedAlliance != isRedAlliance){
 		this.isRedAlliance = isRedAlliance;
-		System.out.println("\n===============>>>>>>>>>>>>>>  WE ARE " + (isRedAlliance?"RED":"BLUE") + " ALLIANCE  <<<<<<<<<<<<=========================\n");
+		DataLogManager.log("\n\n===============>>>>>>>>>>>>>>  WE ARE " + (isRedAlliance?"RED":"BLUE") + " ALLIANCE  <<<<<<<<<<<<=========================");
 		this.autoInitPreload();
 	}
 
 	int stationNumber = getStationNumber();
 	if(this.stationNumber != stationNumber){
 		this.stationNumber = stationNumber;
-		System.out.println("\n===============>>>>>>>>>>>>>>  WE ARE STATION NUMBER " + stationNumber + "  <<<<<<<<<<<<=========================\n");
+		DataLogManager.log("===============>>>>>>>>>>>>>>  WE ARE STATION NUMBER " + stationNumber + "  <<<<<<<<<<<<=========================\n");
 	}
 
   }
@@ -214,24 +206,28 @@ public class Robot extends TimedRobot {
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
   public void autonomousInit() {
+	DataLogManager.log("AUTO INIT");
 	CommandScheduler.getInstance().cancelAll();
 
 	if(m_autonomousCommand == null) {
 		System.err.println("SOMETHING WENT WRONG - UNABLE TO RUN AUTONOMOUS! CHECK SOFTWARE!");
 	} else {
-		System.out.println("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand.getClass().getSimpleName() + " <----------");
+		DataLogManager.log("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand.getClass().getSimpleName() + " <----------");
 		m_robotContainer.zeroHeading();
 		m_autonomousCommand.schedule();
 	}		
-	System.out.println("autonomousInit: End");
+	DataLogManager.log("autonomousInit: End");
   }
 
   /** This function is called periodically during autonomous. */
   @Override
-  public void autonomousPeriodic() {}
+  public void autonomousPeriodic() {
+	if(doSD()){ DataLogManager.log("AUTO PERIODIC");}
+  }
 
   @Override
   public void teleopInit() {
+	DataLogManager.log("TELEOP INIT");
 	CommandScheduler.getInstance().cancelAll();
 	initSubsystems();
     // This makes sure that the autonomous stops running when
@@ -250,7 +246,7 @@ public class Robot extends TimedRobot {
 
   public static boolean doSD() {
 	  long now = System.currentTimeMillis();
-	  if (now - millis > 300) {
+	  if (now - millis > 1000) {
 		  millis = now;
 		  return true;
 	  }
@@ -261,6 +257,7 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during operator control. */
   @Override
   public void teleopPeriodic() {
+	if(doSD()){ DataLogManager.log("TELEOP PERIODIC");}
     String newKeypadCommand = SmartDashboard.getString("keypadCommand", currentKeypadCommand);
 	if(!newKeypadCommand.equals(currentKeypadCommand)){
 		// FEED FSM
