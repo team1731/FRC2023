@@ -92,7 +92,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         // proximalTalonConfig.slot0.maxIntegralAccumulator; // left default for this example
         // proximalTalonConfig.slot0.closedLoopPeriod; // left default for this example
         proximalMotor.configAllSettings(proximalTalonConfig);
-        proximalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 10.0, 10.0, 0.1));
+        //proximalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 10.0, 10.0, 0.1));
         
 
         // pick the sensor phase and desired direction
@@ -140,7 +140,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         // proximalTalonConfig.slot0.maxIntegralAccumulator; // left default for this example
         // proximalTalonConfig.slot0.closedLoopPeriod; // left default for this example
         distalMotor.configAllSettings(distalTalonConfig);
-        distalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 10.0, 10.0, 0.1));
+        //distalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 10.0, 10.0, 0.1));
 
         // pick the sensor phase and desired direction
         distalMotor.setInverted(TalonFXInvertType.CounterClockwise);
