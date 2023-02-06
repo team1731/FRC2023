@@ -31,10 +31,17 @@ public class RobotContainer {
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
   private final int rotationAxis = XboxController.Axis.kRightX.value;
 
+
   /* Driver Buttons */
   private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
   private final JoystickButton adjustWheelEncoders = new JoystickButton(driver, XboxController.Button.kX.value);
   private final JoystickButton runMotor = new JoystickButton(driver, XboxController.Button.kB.value);
+  private final JoystickButton intake = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+  private final JoystickButton eject = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
+  private final JoystickButton wristPos1 = new JoystickButton(driver,XboxController.Button.kA.value);
+  private final JoystickButton wristPos2 = new JoystickButton(driver, XboxController.Button.kStart.value);
+  
+
 
   /* Subsystems */
 
@@ -67,6 +74,15 @@ public class RobotContainer {
     }));
     adjustWheelEncoders.whenPressed(new InstantCommand(() -> s_Swerve.adjustWheelEncoders()));
     runMotor.whenPressed(new ArmTestCommand(s_armSubSystem));
+
+  eject.onTrue(new InstantCommand(() -> s_armSubSystem.eject()));
+  eject.onFalse(new InstantCommand(() -> s_armSubSystem.stopIntake()));
+  intake.onTrue(new InstantCommand(() -> s_armSubSystem.intake()));
+  intake.onFalse(new InstantCommand(() -> s_armSubSystem.stopIntake()));
+  wristPos1.onTrue(new InstantCommand(() -> s_armSubSystem.moveWrist(0.2)));
+  wristPos2.onTrue(new InstantCommand(() -> s_armSubSystem.moveWrist(0.5)));
+  
+
   }
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
@@ -86,6 +102,7 @@ public class RobotContainer {
 
 
 	public void resetEncoders() {
+    s_armSubSystem.resetArmEncoders();
 	}
 
 

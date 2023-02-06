@@ -275,26 +275,38 @@ public final class Constants {
         public final static int proximalCancoderId = 11;
         public final static int distalCancoderId = 10;
         public final static int wristCancoderId = 12;
-        public final static int handCancoderId = 13;
+        public final static int intakeCancoderId = 13;
+
+        public final static double proximalRelativeTicsPerAbsoluteTick = 14;
+        public final static int proximalAbsoluteTicsCenter = 2000;
+        public final static double distalRelativeTicsPerAbsoluteTick = 10.5;
+        public final static int distalAbsoluteTicsCenter = 2000;
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;
 
-        // Wrist/Hand PID coefficients
-        public final static double handP = 5e-5; 
-        public final static double handI = 1e-6;
-        public final static double handD = 0; 
-        public final static double handIz = 0; 
-        public final static double handFF = 0.000156; 
-        public final static double handMaxOutput = 1; 
-        public final static double handMinOutput = -1;
-        public final static double handMaxRPM = 5700;
+        // Wrist PID coefficients
+        public final static double wristP = 5e-5; 
+        public final static double wristI = 1e-6;
+        public final static double wristD = 0; 
+        public final static double wristIz = 0; 
+        public final static double wristFF = 0.000156; 
+        public final static double wristMaxOutput = 1; 
+        public final static double wristMinOutput = -1;
+        public final static double wristMaxRPM = 5700;
 
-        // Wrist/Hand Smart Motion Coefficients
-        public final static double handMaxVel = 2000; // rpm
-        public final static double handMinVel = 0;
-        public final static double handMaxAcc = 1500;
-        public final static double handAllowedErr = 0;
+        // Wrist Smart Motion Coefficients
+        public final static double wristMaxVel = 2000; // rpm
+        public final static double wristMinVel = 0;
+        public final static double wristMaxAcc = 1500;
+        public final static double wristAllowedErr = 0;
+
+         // Hand limits
+        static final int INTAKE_CURRENT_LIMIT_A = 25;
+        static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
+        static final double INTAKE_OUTPUT_POWER = 1.0;
+        static final double INTAKE_HOLD_POWER = 0.07;
+
 
         /**
          * How many sensor units per rotation.

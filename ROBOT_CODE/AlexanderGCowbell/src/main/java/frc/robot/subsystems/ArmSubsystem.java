@@ -12,11 +12,16 @@ import com.ctre.phoenix.ErrorCode;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.state.arm.ArmInput;
 import frc.robot.state.*;
 import frc.robot.Constants.StateConstants.ResultCode;
@@ -31,20 +36,23 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private WPI_TalonFX distalMotor;
     private TalonFXConfiguration proximalTalonConfig;
     private TalonFXConfiguration distalTalonConfig;
+    private AnalogInput distalAbsolute;
+    private AnalogInput proximalAbsolute;
+
 
     // motion profiles/buffers for arm proximal and distal motors
     private BufferedTrajectoryPointStream proximalBufferedStream;
     private BufferedTrajectoryPointStream distalBufferedStream;
 
-    // motors for the wrist/hand
+    // motors for the wrist/intake
     private static final int deviceID = 1;
     private CANSparkMax wristMotor;
-    private CANSparkMax handMotor;
+    private CANSparkMax intakeMotor;
     private SparkMaxPIDController wristPIDController;
-    private SparkMaxPIDController handPIDController;
-    private RelativeEncoder wristEncoder;
-    private RelativeEncoder handEncoder;
+  
+    private AbsoluteEncoder wristEncoder;
 
+    
     // state tracking
     private boolean proximalMotorRunning = false;
     private boolean distalMotorRunning = false;
@@ -53,24 +61,28 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
     public ArmSubsystem() {
         // setup motor and motion profiling members
-        proximalMotor = new WPI_TalonFX(ArmConstants.proximalCancoderId, "canivore1");
-        proximalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
-        distalMotor = new WPI_TalonFX(ArmConstants.distalCancoderId, "canivore1");
-        distalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
+        proximalMotor = new WPI_TalonFX(15, "canivore1");
+      //  proximalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
+        distalMotor = new WPI_TalonFX(16, "canivore1");
+      //  distalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
         proximalTalonConfig = new TalonFXConfiguration(); // factory default settings
         distalTalonConfig = new TalonFXConfiguration(); // factory default settings
         proximalBufferedStream = new BufferedTrajectoryPointStream();
         distalBufferedStream = new BufferedTrajectoryPointStream();
 
+
+
         // setup wrist/hand motor members
         wristMotor = new CANSparkMax(ArmConstants.wristCancoderId, MotorType.kBrushless);
-        handMotor = new CANSparkMax(ArmConstants.handCancoderId, MotorType.kBrushless);
+        intakeMotor = new CANSparkMax(ArmConstants.intakeCancoderId, MotorType.kBrushless);
 
         // kick off initializations
         initializeProximalMotor();
         initializeDistalMotor();
-        //initializeWrist();
-        //initializeHand();
+        initializeWrist();
+        initializeIntake();
+        distalAbsolute = new AnalogInput(0);
+        proximalAbsolute = new AnalogInput(1);
     }
 
     /*
@@ -178,7 +190,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     }
 
     /*
-     * METHODS FOR INITIALIZING THE HAND/WRIST
+     * METHODS FOR INITIALIZING THE Intake/WRIST
      */
     public void initializeWrist() {
         // initialize motors
@@ -187,64 +199,57 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         // initialze PID controller and encoder objects
         wristPIDController = wristMotor.getPIDController();
-        wristEncoder = wristMotor.getEncoder();
+        wristEncoder = wristMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
         // set PID coefficients
-        wristPIDController.setP(ArmConstants.handP);
-        wristPIDController.setI(ArmConstants.handI);
-        wristPIDController.setD(ArmConstants.handD);
-        wristPIDController.setIZone(ArmConstants.handIz);
-        wristPIDController.setFF(ArmConstants.handFF);
-        wristPIDController.setOutputRange(ArmConstants.handMinOutput, ArmConstants.handMaxOutput);
+        wristPIDController.setP(ArmConstants.wristP);
+        wristPIDController.setI(ArmConstants.wristI);
+        wristPIDController.setD(ArmConstants.wristD);
+        wristPIDController.setIZone(ArmConstants.wristIz);
+        wristPIDController.setFF(ArmConstants.wristFF);
+        wristPIDController.setOutputRange(ArmConstants.wristMinOutput, ArmConstants.wristMaxOutput);
+        wristPIDController.setFeedbackDevice(wristEncoder);
 
         // set smart motion coefficients
         int smartMotionSlot = 0;
-        wristPIDController.setSmartMotionMaxVelocity(ArmConstants.handMaxVel, smartMotionSlot);
-        wristPIDController.setSmartMotionMinOutputVelocity(ArmConstants.handMinVel, smartMotionSlot);
-        wristPIDController.setSmartMotionMaxAccel(ArmConstants.handMaxAcc, smartMotionSlot);
-        wristPIDController.setSmartMotionAllowedClosedLoopError(ArmConstants.handAllowedErr, smartMotionSlot);
+        wristPIDController.setSmartMotionMaxVelocity(ArmConstants.wristMaxVel, smartMotionSlot);
+        wristPIDController.setSmartMotionMinOutputVelocity(ArmConstants.wristMinVel, smartMotionSlot);
+        wristPIDController.setSmartMotionMaxAccel(ArmConstants.wristMaxAcc, smartMotionSlot);
+        wristPIDController.setSmartMotionAllowedClosedLoopError(ArmConstants.wristAllowedErr, smartMotionSlot);
     }
 
-    public void initializeHand() {
+    public void initializeIntake() {
         // initialize motors
-        handMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
-        handMotor.restoreFactoryDefaults();
+        intakeMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
+        intakeMotor.restoreFactoryDefaults();
+        intakeMotor.setInverted(false);
+        intakeMotor.setIdleMode(IdleMode.kBrake);
+    
 
-        // initialze PID controller and encoder objects
-        handPIDController = handMotor.getPIDController();
-        handEncoder = handMotor.getEncoder();
-        
-
-        // set PID coefficients
-        handPIDController.setP(ArmConstants.handP);
-        handPIDController.setI(ArmConstants.handI);
-        handPIDController.setD(ArmConstants.handD);
-        handPIDController.setIZone(ArmConstants.handIz);
-        handPIDController.setFF(ArmConstants.handFF);
-        handPIDController.setOutputRange(ArmConstants.handMinOutput, ArmConstants.handMaxOutput);
-
-        // set smart motion coefficients
-        int smartMotionSlot = 0;
-        handPIDController.setSmartMotionMaxVelocity(ArmConstants.handMaxVel, smartMotionSlot);
-        handPIDController.setSmartMotionMinOutputVelocity(ArmConstants.handMinVel, smartMotionSlot);
-        handPIDController.setSmartMotionMaxAccel(ArmConstants.handMaxAcc, smartMotionSlot);
-        handPIDController.setSmartMotionAllowedClosedLoopError(ArmConstants.handAllowedErr, smartMotionSlot);
+ 
     }
 
     public void moveWrist(double rotations) {
         // TODO handle errors
+    
         wristPIDController.setReference(rotations, CANSparkMax.ControlType.kSmartMotion);
         System.out.println("Wrist position " + wristEncoder.getPosition());
     }
 
-    public void moveHand(double rotations) {
-        // TODO handle errors
-        handPIDController.setReference(rotations, CANSparkMax.ControlType.kSmartMotion);
-        System.out.println("Hand position " + handEncoder.getPosition());
+    public void intake() {
+        intakeMotor.set(1.0);
+    }
+
+    public void eject() {
+        intakeMotor.set(-1.0);
+    }
+
+    public void stopIntake() {
+        intakeMotor.set (0);
     }
 
 
-    /*
+    /*-
      * PERIODIC LOGIC
      */
 
@@ -282,6 +287,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
             // TODO any checking to ensure we are where we expect to be?
             notifyStateMachine(ResultCode.SUCCESS, "Completed arm movement");
         }
+        doSD();
     }
 
 
@@ -387,5 +393,21 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         // status.profileSlotSelect1
         // status.outputEnable.toString()
         // status.timeDurMs
-    }    
+    } 
+    
+    public void doSD() {
+        SmartDashboard.putNumber("DistalArm Absolute  ",distalAbsolute.getAverageValue());
+        SmartDashboard.putNumber("ProximalArm Absolute  ",proximalAbsolute.getAverageValue());
+        SmartDashboard.putNumber("DistalArm Relative  ",distalMotor.getSelectedSensorPosition(0));
+        SmartDashboard.putNumber("ProximalArm Relative  ",proximalMotor.getSelectedSensorPosition(0));
+    }
+
+    public void resetArmEncoders() {
+        proximalMotor.setSelectedSensorPosition((proximalAbsolute.getAverageValue()- ArmConstants.proximalAbsoluteTicsCenter) * ArmConstants.proximalRelativeTicsPerAbsoluteTick);
+        distalMotor.setSelectedSensorPosition((distalAbsolute.getAverageValue()- ArmConstants.distalAbsoluteTicsCenter) * ArmConstants.distalRelativeTicsPerAbsoluteTick);
+
+    }
+    public void resetTrajectories () {
+
+    }
 }
