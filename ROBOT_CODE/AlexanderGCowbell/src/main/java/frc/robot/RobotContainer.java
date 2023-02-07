@@ -101,4 +101,5 @@ public class RobotContainer {
 			DataLogManager.log("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
 		}
 	}
+
 }

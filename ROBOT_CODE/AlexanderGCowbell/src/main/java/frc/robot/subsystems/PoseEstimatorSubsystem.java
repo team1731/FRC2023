@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.util.PoseEstimatorLog;
 
 
 class CameraTransform {
@@ -42,7 +43,8 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   private final SwerveDrivePoseEstimator poseEstimator;
   private AprilTagFieldLayout aprilTagFieldLayout;
   private final Field2d field2d = new Field2d();
-
+  private final PoseEstimatorLog poseEstimatorLog;
+  
   // Camera configuration
   private HashMap<String, CameraTransform> cameraMap = new HashMap<String, CameraTransform>();
   private final PhotonCamera photonCamera1 = new PhotonCamera(VisionConstants.kCameraMount1Id);
@@ -56,6 +58,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   public PoseEstimatorSubsystem( Swerve m_swerve) {
     this.m_swerve = m_swerve;
     poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, m_swerve.getYaw(), m_swerve.getPositions(), new Pose2d());
+    poseEstimatorLog = new PoseEstimatorLog();
 
     // Configure and map cameras using camera names and location on the robot
     if(photonCamera1 != null) {
@@ -121,7 +124,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       // Update pose estimator with drivetrain sensors
       poseEstimator.updateWithTime(Timer.getFPGATimestamp(), m_swerve.getYaw(), m_swerve.getPositions());
       field2d.setRobotPose(getCurrentPose());
+
     }
+    poseEstimatorLog.append(getCurrentPose().getX(), getCurrentPose().getY(), getCurrentPose().getRotation().getDegrees());
   }
 
   private String getFomattedPose() {

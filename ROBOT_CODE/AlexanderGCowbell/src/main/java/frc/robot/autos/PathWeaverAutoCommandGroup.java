@@ -112,5 +112,7 @@ public class PathWeaverAutoCommandGroup extends SequentialCommandGroup {
         };
     
     }
-
+    public void log(){
+        
+    }
 }
