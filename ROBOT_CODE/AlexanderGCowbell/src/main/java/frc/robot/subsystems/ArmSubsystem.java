@@ -395,6 +395,36 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         // status.outputEnable.toString()
         // status.timeDurMs
     } 
+
+    private double armExtension(double proximalTicks, double distalTicks){
+        //Calculates how far the arm is extended using trigonometry and angles derived from data from motors 
+        double distalDistance = (ArmConstants.distalArmLength * java.lang.Math.cos(3)) * java.lang.Math.sin(distalTicks * ArmConstants.distalTicksPerDegree); 
+        double proximalDistance = ArmConstants.proximalArmLength * java.lang.Math.sin(proximalTicks * ArmConstants.proximalTicksPerDegree);
+        return distalDistance + proximalDistance; 
+    }
+    private double armExtension(){
+        return armExtension(proximalMotor.getSelectedSensorPosition(0), distalMotor.getSelectedSensorPosition(0));
+    }
+    private double distalArmExtension(double distalTicks){
+        //Calculates how far the arm is extended using trigonometry and angles derived from data from motors 
+        double distalDistance = (ArmConstants.distalArmLength * java.lang.Math.cos(3)) * java.lang.Math.sin(distalTicks * ArmConstants.distalTicksPerDegree); 
+        return distalDistance; 
+    }
+    private double distalArmExtension(){
+        return distalArmExtension(distalMotor.getSelectedSensorPosition(0));
+    }
+    private double getArbitraryFeedForwardForProximalArm(double proximalTicks, double distalTicks){
+        return ArmConstants.ThrottleAtFullExtension * (armExtension(proximalTicks, distalTicks) / ArmConstants.FullExtensionDistance);
+    }
+    private double getArbitraryFeedForwardForProximalArm(){
+        return getArbitraryFeedForwardForProximalArm(proximalMotor.getSelectedSensorPosition(0), distalMotor.getSelectedSensorPosition(0));
+    }
+    private double getArbitraryFeedForwardForDistalArm(double distalTicks){
+        return ArmConstants.ThrottleAtFullExtension * (distalArmExtension(distalTicks) / ArmConstants.distalArmLength);
+    }
+    private double getArbitraryFeedForwardForDistalArm(){
+        return getArbitraryFeedForwardForDistalArm(distalMotor.getSelectedSensorPosition(0));
+    }
     
     public void doSD() {
         SmartDashboard.putNumber("DistalArm Absolute  ",distalAbsolute.getAverageValue());
