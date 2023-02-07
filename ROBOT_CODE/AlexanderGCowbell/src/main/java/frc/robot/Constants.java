@@ -307,6 +307,15 @@ public final class Constants {
         static final double INTAKE_OUTPUT_POWER = 1.0;
         static final double INTAKE_HOLD_POWER = 0.07;
 
+        //Geometry Constants
+        public final static double proximalArmLength = 34.0; //inches
+        public final static double distalArmLength = 28.0; //inches
+        public final static double proximalTicksPerDegree = 286720.0/360.0;
+        public final static double distalTicksPerDegree = 512.0; 
+        public final static double ThrottleAtFullExtension = 0.5; //TBD empirically
+        public final static double FullExtensionDistance = 38.0; //TBD empirically
+        
+
 
         /**
          * How many sensor units per rotation.

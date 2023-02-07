@@ -433,8 +433,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         SmartDashboard.putNumber("ProximalArm Relative  ",proximalMotor.getSelectedSensorPosition(0));
         SmartDashboard.putNumber("Proximal Motor percent", proximalMotor.getMotorOutputPercent());
         SmartDashboard.putNumber("Distal Motor Perennt Output", distalMotor.getMotorOutputPercent());
-        SmartDashboard.putNumber("Davids Distall Calc", 
-        SmartDashboard.putNumber
+        SmartDashboard.putNumber("Davids Distall Calc", getArbitraryFeedForwardForDistalArm());
+        SmartDashboard.putNumber("Ddavids Proximal Calc", getArbitraryFeedForwardForProximalArm());
 
     }
 
