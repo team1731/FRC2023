@@ -275,7 +275,7 @@ public final class Constants {
         public final static int proximalCancoderId = 11;
         public final static int distalCancoderId = 10;
         public final static int wristCancoderId = 12;
-        public final static int handCancoderId = 13;
+        public final static int intakeCancoderId = 13;
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;

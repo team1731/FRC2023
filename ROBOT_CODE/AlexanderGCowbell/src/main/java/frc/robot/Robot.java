@@ -18,7 +18,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
 import frc.robot.Constants.AutoConstants;
+import frc.robot.subsystems.*;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -39,6 +41,10 @@ public class Robot extends TimedRobot {
   private boolean isRedAlliance = true;
   private int stationNumber = 0;
 
+  private Swerve s_Swerve;
+  private PoseEstimatorSubsystem s_poseEstimatorSubsystem;
+  private ArmSubsystem s_armSubSystem;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -48,9 +54,14 @@ public class Robot extends TimedRobot {
 	LiveWindow.disableAllTelemetry();
     ctreConfigs = new CTREConfigs();
 
+	s_Swerve = new Swerve();
+  	s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);
+  	s_armSubSystem = new ArmSubsystem();
+	s_armSubSystem.reset();
+
 	// Instantiate our robot container. This will perform all of our button bindings,
 	// and put our autonomous chooser on the dashboard
-	m_robotContainer = new RobotContainer();
+	m_robotContainer = new RobotContainer(s_Swerve, s_poseEstimatorSubsystem, s_armSubSystem);
 	
 	initSubsystems();
 
@@ -179,6 +190,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
 	keypad.putValue("driver entry", NetworkTableValue.makeString(""));
+	s_armSubSystem.reset();
   }
 
   @Override
