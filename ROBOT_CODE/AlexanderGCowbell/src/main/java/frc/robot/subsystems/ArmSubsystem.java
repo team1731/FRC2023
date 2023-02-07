@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motion.*;
 import com.ctre.phoenix.ErrorCode;
@@ -400,6 +401,11 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         SmartDashboard.putNumber("ProximalArm Absolute  ",proximalAbsolute.getAverageValue());
         SmartDashboard.putNumber("DistalArm Relative  ",distalMotor.getSelectedSensorPosition(0));
         SmartDashboard.putNumber("ProximalArm Relative  ",proximalMotor.getSelectedSensorPosition(0));
+        SmartDashboard.putNumber("Proximal Motor percent", proximalMotor.getMotorOutputPercent());
+        SmartDashboard.putNumber("Distal Motor Perennt Output", distalMotor.getMotorOutputPercent());
+        SmartDashboard.putNumber("Davids Distall Calc", 
+        SmartDashboard.putNumber
+
     }
 
     public void resetArmEncoders() {
@@ -409,5 +415,10 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     }
     public void resetTrajectories () {
 
+    }
+
+    public void setArmMotors(double pAxis, double dAxis) {
+        proximalMotor.set(ControlMode.PercentOutput, pAxis);
+        distalMotor.set(ControlMode.PercentOutput, dAxis);
     }
 }
