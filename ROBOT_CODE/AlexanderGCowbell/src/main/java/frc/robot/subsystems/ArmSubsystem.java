@@ -28,6 +28,8 @@ import frc.robot.state.*;
 import frc.robot.Constants.StateConstants.ResultCode;
 import frc.robot.Constants.ArmConstants;
 import frc.data.mp.*;
+import frc.data.mp.ArmPath.ArmMotor;
+import frc.data.mp.ArmPath.Direction;
 
 public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private StateMachine stateMachine;
@@ -37,7 +39,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private WPI_TalonFX distalMotor;
     private AnalogInput distalAbsolute;
     private AnalogInput proximalAbsolute;
-
 
     // motion profiles/buffers for arm proximal and distal motors
     private BufferedTrajectoryPointStream proximalBufferedStream;
@@ -51,6 +52,9 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
     
     // state tracking
+    private ArmPath currentPath = null;
+    private Direction currentDirection = null;
+    private double pathStartedTime = 0;
     private boolean proximalMotorRunning = false;
     private boolean distalMotorRunning = false;
 
@@ -65,11 +69,9 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private void initializeArmMotors() {
         proximalMotor = new WPI_TalonFX(ArmConstants.proximalCancoderId, "canivore1");
         initializeTalonMotor(proximalMotor, TalonFXInvertType.CounterClockwise);
-        proximalBufferedStream = new BufferedTrajectoryPointStream();
 
         distalMotor = new WPI_TalonFX(ArmConstants.distalCancoderId, "canivore1");
         initializeTalonMotor(distalMotor, TalonFXInvertType.CounterClockwise);
-        distalBufferedStream = new BufferedTrajectoryPointStream();
 
         wristMotor = new CANSparkMax(ArmConstants.wristCancoderId, MotorType.kBrushless);
         intakeMotor = new CANSparkMax(ArmConstants.intakeCancoderId, MotorType.kBrushless);
@@ -112,27 +114,56 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         distalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Disable.value);
     }
 
-    public void initializeArmMovement(MotionProfile[] profiles) {
-        if(isArmMoving()) {
-            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: attempt to initialize when arm is already moving");
+    public void startArmMovement(ArmPath armPath) {
+        if(currentPath != null) {
+            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: cannot initialize new movement until current path is complete");
             return;
         }
 
         // init motion profile buffers for proximal/distal motors
-
-        String errorMessage;
-        errorMessage = initBuffer(profiles[0], proximalBufferedStream);
-        if(errorMessage != null) {
-            notifyStateMachine(ResultCode.ARM_BUFFERING_FAILED, "Proximal buffer failed to initialize with message: " + errorMessage);
-            return;
-        }
-        errorMessage = initBuffer(profiles[1], distalBufferedStream);
-        if(errorMessage != null) {
-            notifyStateMachine(ResultCode.ARM_BUFFERING_FAILED, "Distal buffer failed to initialize with message: " + errorMessage);
-            return;
-        }
+        currentDirection = Direction.FORWARD;
+        proximalBufferedStream = armPath.getInitializedBuffer(ArmMotor.PROXIMAL, 0, currentDirection);
+        distalBufferedStream = armPath.getInitializedBuffer(ArmMotor.DISTAL, 0, currentDirection);
 
         notifyStateMachine(ResultCode.SUCCESS, "Successfully initialized arm profile buffers");
+
+        // start arm movement
+        pathStartedTime = Timer.getFPGATimestamp();
+        moveArm();
+    }
+
+    public void reverseArmMovment() {
+        if(currentPath == null || currentDirection == Direction.REVERSE) {
+            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: cannot be reversed, either retracted or already reversing");
+            return;
+        }
+
+        boolean completedPath = !isArmMoving();
+
+        // update profile buffers with a reverse path
+
+        int startPosition = 0;
+        int pointsLastIndex = currentPath.getNumberOfPoints()-1;
+        if(completedPath) { 
+            // not moving, we finished our path, run the whole thing back
+            startPosition = pointsLastIndex;
+        } else { 
+            // we are still in the middle of our path, first stop current movement
+            stopArm();
+            
+            // now, see how far along and run back from where we stopped
+            double elapsedTimeMS = (Timer.getFPGATimestamp() - pathStartedTime) * 1000;
+            startPosition = (int)(elapsedTimeMS / 10);
+            // make sure we don't end up in array out of bounds exception
+            startPosition = startPosition > pointsLastIndex? pointsLastIndex : startPosition;
+        }
+
+        currentDirection = Direction.REVERSE;
+        proximalBufferedStream = currentPath.getInitializedBuffer(ArmMotor.PROXIMAL, startPosition, currentDirection);
+        distalBufferedStream = currentPath.getInitializedBuffer(ArmMotor.DISTAL, startPosition, currentDirection);
+
+        // restart arm movement
+        moveArm();
     }
 
     public void moveArm() {
@@ -142,8 +173,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         }
 
         // start motion profile for proximal/distal motors
-
         ErrorCode code;
+
         proximalMotorRunning = true;
         // Note: if disabled, the start call will automatically move the MP state to enabled
         code = proximalMotor.startMotionProfile(proximalBufferedStream, 10, TalonFXControlMode.MotionProfile.toControlMode());
@@ -163,8 +194,17 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         notifyStateMachine(ResultCode.SUCCESS, "Successfully started arm movement");
     }
 
+    public void stopArm() {
+        proximalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Hold.value);
+        distalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Hold.value);
+    }
+
     public boolean isArmMoving() {
         return proximalMotorRunning || distalMotorRunning;
+    }
+
+    public boolean completedArmPathForward() {
+        return pathStartedTime > 0 && !isArmMoving();
     }
 
     /*
@@ -255,13 +295,14 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
             logMotionProfileStatus(distalMotor);
         }
 
-        if(isArmMoving()) { // arm is still moving
-            // TODO implement, check for issues? timeout?
-        }
-
         if(isArmMovingAtPeriodicStart && !isArmMoving()) { // arm was moving, but has now stopped
-            // TODO any checking to ensure we are where we expect to be?
             notifyStateMachine(ResultCode.SUCCESS, "Completed arm movement");
+
+            if(currentDirection == Direction.REVERSE) { // we completed retracting
+                currentPath = null;
+                currentDirection = null;
+                pathStartedTime = 0;
+            } 
         }
         doSD();
     }
@@ -280,11 +321,11 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         switch(ai) {
             case EXTEND_INIT:
             case RETRACT_INIT:
-                initializeArmMovement((MotionProfile[])data);
+                //initializeArmMovement((MotionProfile[])data);
                 break;
             case EXTEND_MOVE:
             case RETRACT_MOVE:
-                moveArm();
+                //moveArm();
                 break;
             case INTAKE:
             case RELEASE:
@@ -313,46 +354,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     /*
      * Helper methods for buffer handling and logging
      */
-
-    private String initBuffer(MotionProfile profile, BufferedTrajectoryPointStream bufferedStream) {
-        int numberOfPoints = profile.numberOfPoints;
-        double[][] points = profile.points;
-        TrajectoryPoint point = new TrajectoryPoint(); 
-        ErrorCode code;
-
-        // clear the buffer, it may have been used before
-        code = bufferedStream.Clear();
-        if(code != ErrorCode.OK) {
-            return "buffer failed to clear";
-        }
-
-        // Insert points into the buffer
-        for (int i = 0; i < numberOfPoints; ++i) {
-            double positionRot = points[i][0];
-            double velocityRPM = points[i][1];
-            int durationMilliseconds = (int) points[i][2];
-            int direction = profile.forward? +1 : -1;
-
-            // populate point values
-            point.timeDur = durationMilliseconds;
-            point.position = direction * positionRot * ArmConstants.kSensorUnitsPerRotation; // Convert Revolutions to Units
-            point.velocity = direction * velocityRPM * ArmConstants.kSensorUnitsPerRotation / 600.0; // Convert RPM to Units/100ms
-            point.auxiliaryPos = 0;
-            point.auxiliaryVel = 0;
-            point.profileSlotSelect0 = ArmConstants.kPrimaryPIDSlot; // set of gains you would like to use
-            point.profileSlotSelect1 = 0; // auxiliary PID [0,1], leave zero
-            point.zeroPos = (i == 0); // set this to true on the first point
-            point.isLastPoint = ((i + 1) == numberOfPoints); // set this to true on the last point
-            point.arbFeedFwd = 0; // you can add a constant offset to add to PID[0] output here - TODO implement
-
-            code = bufferedStream.Write(point);
-            if(code != ErrorCode.OK) {
-                return "buffer failed to write point at index: " + i;
-            }
-        }
-
-        return null;
-    }
 
     private void logMotionProfileStatus(TalonFX motor) {
         // TODO implement logging, do so at reasonable intervals
