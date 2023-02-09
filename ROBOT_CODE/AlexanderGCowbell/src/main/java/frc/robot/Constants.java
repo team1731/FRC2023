@@ -312,7 +312,8 @@ public final class Constants {
         public final static double distalArmLength = 28.0; //inches
         public final static double proximalTicksPerDegree = 286720.0/360.0;
         public final static double distalTicksPerDegree = 512.0; 
-        public final static double ThrottleAtFullExtension = 0.5; //TBD empirically
+        public final static double ThrottleAtFullExtensionDistalAndProximal = 0.5; //TBD empirically
+        public final static double ThrottleAtFullExtensionDistal = 0.5; //TBD empirically
         public final static double FullExtensionDistance = 38.0; //TBD empirically
         
 

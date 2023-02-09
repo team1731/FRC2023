@@ -62,9 +62,11 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
     public ArmSubsystem() {
         // setup motor and motion profiling members
-        proximalMotor = new WPI_TalonFX(15, "canivore1");
+        //proximalMotor = new WPI_TalonFX(15, "canivore1");
+        proximalMotor = new WPI_TalonFX(ArmConstants.proximalCancoderId, "canivore1");
       //  proximalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
-        distalMotor = new WPI_TalonFX(16, "canivore1");
+       // distalMotor = new WPI_TalonFX(16, "canivore1");
+       distalMotor = new WPI_TalonFX(ArmConstants.distalCancoderId, "canivore1");
       //  distalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
         proximalTalonConfig = new TalonFXConfiguration(); // factory default settings
         distalTalonConfig = new TalonFXConfiguration(); // factory default settings
@@ -195,7 +197,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
      */
     public void initializeWrist() {
         // initialize motors
-        wristMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
+      //  wristMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
         wristMotor.restoreFactoryDefaults();
 
         // initialze PID controller and encoder objects
@@ -221,7 +223,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
     public void initializeIntake() {
         // initialize motors
-        intakeMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
+    //    intakeMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
         intakeMotor.restoreFactoryDefaults();
         intakeMotor.setInverted(false);
         intakeMotor.setIdleMode(IdleMode.kBrake);
@@ -414,13 +416,13 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         return distalArmExtension(distalMotor.getSelectedSensorPosition(0));
     }
     private double getArbitraryFeedForwardForProximalArm(double proximalTicks, double distalTicks){
-        return ArmConstants.ThrottleAtFullExtension * (armExtension(proximalTicks, distalTicks) / ArmConstants.FullExtensionDistance);
+        return ArmConstants.ThrottleAtFullExtensionDistalAndProximal * (armExtension(proximalTicks, distalTicks) / ArmConstants.FullExtensionDistance);
     }
     private double getArbitraryFeedForwardForProximalArm(){
         return getArbitraryFeedForwardForProximalArm(proximalMotor.getSelectedSensorPosition(0), distalMotor.getSelectedSensorPosition(0));
     }
     private double getArbitraryFeedForwardForDistalArm(double distalTicks){
-        return ArmConstants.ThrottleAtFullExtension * (distalArmExtension(distalTicks) / ArmConstants.distalArmLength);
+        return ArmConstants.ThrottleAtFullExtensionDistal * (distalArmExtension(distalTicks) / ArmConstants.distalArmLength);
     }
     private double getArbitraryFeedForwardForDistalArm(){
         return getArbitraryFeedForwardForDistalArm(distalMotor.getSelectedSensorPosition(0));
