@@ -16,14 +16,21 @@ public class ArmTestCommand extends CommandBase {
 	public void initialize() {
         armSubsystem.initializeArmMovement(new MotionProfile[]{
             ProximalTestProfile.getProfile(), 
-            DistalTestProfile.getProfile()
+            DistalTestProfile.getProfile(),
+         
         });
         armSubsystem.moveArm();   
         started = true;     
 	}
 
     @Override
+    public void end(boolean interupted) {
+    
+    }
+
+    @Override
     public boolean isFinished() {
+        
         return started && !armSubsystem.isArmMoving();
     }
 }

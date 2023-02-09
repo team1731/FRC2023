@@ -287,7 +287,7 @@ public final class Constants {
 
         // Wrist PID coefficients
         public final static double wristP = 5e-5; 
-        public final static double wristI = 1e-6;
+        public final static double wristI = 0;
         public final static double wristD = 0; 
         public final static double wristIz = 0; 
         public final static double wristFF = 0.000156; 
@@ -296,9 +296,9 @@ public final class Constants {
         public final static double wristMaxRPM = 5700;
 
         // Wrist Smart Motion Coefficients
-        public final static double wristMaxVel = 2000; // rpm
+        public final static double wristMaxVel = 500; // rpm was 2000
         public final static double wristMinVel = 0;
-        public final static double wristMaxAcc = 1500;
+        public final static double wristMaxAcc = 500;  // was 1500
         public final static double wristAllowedErr = 0;
 
          // Hand limits

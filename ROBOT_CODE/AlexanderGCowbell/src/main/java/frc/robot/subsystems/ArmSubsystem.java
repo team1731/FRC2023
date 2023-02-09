@@ -35,8 +35,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     // motors for the arm
     private WPI_TalonFX proximalMotor;
     private WPI_TalonFX distalMotor;
-    private TalonFXConfiguration proximalTalonConfig;
-    private TalonFXConfiguration distalTalonConfig;
     private AnalogInput distalAbsolute;
     private AnalogInput proximalAbsolute;
 
@@ -46,12 +44,9 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private BufferedTrajectoryPointStream distalBufferedStream;
 
     // motors for the wrist/intake
-    private static final int deviceID = 1;
     private CANSparkMax wristMotor;
     private CANSparkMax intakeMotor;
-    private CANSparkMax intakeMotor;
-    private SparkMaxPIDController wristPIDController;
-  
+    private SparkMaxPIDController wristPIDController; 
     private AbsoluteEncoder wristEncoder;
 
     
@@ -62,32 +57,27 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
 
     public ArmSubsystem() {
-        // setup motor and motion profiling members
-        //proximalMotor = new WPI_TalonFX(15, "canivore1");
-        proximalMotor = new WPI_TalonFX(ArmConstants.proximalCancoderId, "canivore1");
-      //  proximalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
-       // distalMotor = new WPI_TalonFX(16, "canivore1");
-       distalMotor = new WPI_TalonFX(ArmConstants.distalCancoderId, "canivore1");
-      //  distalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
-        proximalTalonConfig = new TalonFXConfiguration(); // factory default settings
-        distalTalonConfig = new TalonFXConfiguration(); // factory default settings
-        proximalBufferedStream = new BufferedTrajectoryPointStream();
-        distalBufferedStream = new BufferedTrajectoryPointStream();
-
-
-
-        // setup wrist/hand motor members
-        wristMotor = new CANSparkMax(ArmConstants.wristCancoderId, MotorType.kBrushless);
-        intakeMotor = new CANSparkMax(ArmConstants.intakeCancoderId, MotorType.kBrushless);
-
-        // kick off initializations
-        initializeProximalMotor();
-        initializeDistalMotor();
-        initializeWrist();
-        initializeIntake();
+        initializeArmMotors();
         distalAbsolute = new AnalogInput(0);
         proximalAbsolute = new AnalogInput(1);
     }
+    
+    private void initializeArmMotors() {
+        proximalMotor = new WPI_TalonFX(ArmConstants.proximalCancoderId, "canivore1");
+        initializeTalonMotor(proximalMotor, TalonFXInvertType.CounterClockwise);
+        proximalBufferedStream = new BufferedTrajectoryPointStream();
+
+        distalMotor = new WPI_TalonFX(ArmConstants.distalCancoderId, "canivore1");
+        initializeTalonMotor(distalMotor, TalonFXInvertType.CounterClockwise);
+        distalBufferedStream = new BufferedTrajectoryPointStream();
+
+        wristMotor = new CANSparkMax(ArmConstants.wristCancoderId, MotorType.kBrushless);
+        intakeMotor = new CANSparkMax(ArmConstants.intakeCancoderId, MotorType.kBrushless);
+
+        initializeWrist();
+        initializeIntake();
+    }
+
 
     private void initializeTalonMotor(WPI_TalonFX motor, TalonFXInvertType invertType) {
         TalonFXConfiguration talonConfig = new TalonFXConfiguration(); // factory default settings
@@ -105,6 +95,21 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         motor.configAllSettings(talonConfig);
         motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
         motor.setInverted(invertType);
+    }
+
+        // home for any logic needed to reset, especially when robot moves to disabled state
+    // ensures the motors are stopped and motion profiles are cleared/disabled, 
+    // so motor doesn't try to process last profile when re-enabled
+    public void reset() {
+        // ensure motors are stopped
+        proximalMotor.set(TalonFXControlMode.PercentOutput, 0);
+        distalMotor.set(TalonFXControlMode.PercentOutput, 0);
+
+        // reset to disabled state w/ no motion profiles
+        proximalMotor.clearMotionProfileTrajectories();
+        proximalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Disable.value);
+        distalMotor.clearMotionProfileTrajectories();
+        distalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Disable.value);
     }
 
     public void initializeArmMovement(MotionProfile[] profiles) {
@@ -162,12 +167,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         return proximalMotorRunning || distalMotorRunning;
     }
 
-    public void resetSensorPosition() {
-        proximalMotor.setSelectedSensorPosition(0);
-        distalMotor.setSelectedSensorPosition(0);
-    }
-
-
     /*
      * METHODS FOR INITIALIZING THE Intake/WRIST
      */
@@ -175,6 +174,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         // initialize motors
       //  wristMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
         wristMotor.restoreFactoryDefaults();
+    }
 
     public void initializeWristMotor() {
         wristMotor = new CANSparkMax(ArmConstants.wristCancoderId, MotorType.kBrushless);
@@ -213,7 +213,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         // TODO handle errors
     
         wristPIDController.setReference(rotations, CANSparkMax.ControlType.kSmartMotion);
-        System.out.println("Wrist position " + wristEncoder.getPosition());
+        
     }
 
     public void intake() {
@@ -413,6 +413,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         SmartDashboard.putNumber("Distal Motor Perennt Output", distalMotor.getMotorOutputPercent());
         SmartDashboard.putNumber("Davids Distall Calc", getArbitraryFeedForwardForDistalArm());
         SmartDashboard.putNumber("Ddavids Proximal Calc", getArbitraryFeedForwardForProximalArm());
+        SmartDashboard.putNumber("Absolute wrist Encoder", wristEncoder.getPosition());
 
     }
 
@@ -421,9 +422,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         distalMotor.setSelectedSensorPosition((distalAbsolute.getAverageValue()- ArmConstants.distalAbsoluteTicsCenter) * ArmConstants.distalRelativeTicsPerAbsoluteTick);
 
     }
-    public void resetTrajectories () {
 
-    }
 
     public void setArmMotors(double pAxis, double dAxis) {
         proximalMotor.set(ControlMode.PercentOutput, pAxis);

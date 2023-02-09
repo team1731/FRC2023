@@ -36,7 +36,7 @@ public class RobotContainer {
 
   /* Driver Buttons */
   private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
-  private final JoystickButton adjustWheelEncoders = new JoystickButton(driver, XboxController.Button.kX.value);
+  private final JoystickButton adjustAllEncoders = new JoystickButton(driver, XboxController.Button.kX.value);
   private final JoystickButton runMotor = new JoystickButton(driver, XboxController.Button.kB.value);
   private final JoystickButton intake = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
   private final JoystickButton eject = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
@@ -78,14 +78,14 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    /* Driver Buttons */
-    zeroGyro.whenPressed(new InstantCommand(() -> {
-      s_Swerve.zeroGyro();
-      s_armSubSystem.resetSensorPosition();
-    }));
-    adjustWheelEncoders.whenPressed(new InstantCommand(() -> s_Swerve.adjustWheelEncoders()));
-    runMotor.whenPressed(new ArmTestCommand(s_armSubSystem));
 
+    
+
+    /* Driver Buttons */
+
+  zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+  runMotor.onTrue(new ArmTestCommand(s_armSubSystem));
+  adjustAllEncoders.onTrue(new InstantCommand(() -> {s_Swerve.adjustWheelEncoders(); s_armSubSystem.resetArmEncoders();}));
   eject.onTrue(new InstantCommand(() -> s_armSubSystem.eject()));
   eject.onFalse(new InstantCommand(() -> s_armSubSystem.stopIntake()));
   intake.onTrue(new InstantCommand(() -> s_armSubSystem.intake()));
@@ -93,7 +93,6 @@ public class RobotContainer {
   wristPos1.onTrue(new InstantCommand(() -> s_armSubSystem.moveWrist(0.2)));
   wristPos2.onTrue(new InstantCommand(() -> s_armSubSystem.moveWrist(0.5)));
   
-
   }
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
