@@ -6,7 +6,6 @@ import frc.data.mp.*;
 
 public class ArmTestCommand extends CommandBase {
     private ArmSubsystem armSubsystem;
-    private boolean started = false;
 
     public ArmTestCommand(ArmSubsystem armSubsystem) {
         this.armSubsystem = armSubsystem;
@@ -14,23 +13,16 @@ public class ArmTestCommand extends CommandBase {
 
     @Override
 	public void initialize() {
-        armSubsystem.initializeArmMovement(new MotionProfile[]{
-            ProximalTestProfile.getProfile(), 
-            DistalTestProfile.getProfile(),
-         
-        });
-        armSubsystem.moveArm();   
-        started = true;     
+        int numberOfPoints = 0;
+        double[][] proximalPoints = new double[][]{};
+        double[][] distalPoints = new double[][]{};
+        double[][] wristPoints = new double[][]{};
+        ArmPath path = new ArmPath(numberOfPoints, proximalPoints, distalPoints, wristPoints);
+        armSubsystem.startArmMovement(path); 
 	}
 
     @Override
-    public void end(boolean interupted) {
-    
-    }
-
-    @Override
-    public boolean isFinished() {
-        
-        return started && !armSubsystem.isArmMoving();
+    public void end(boolean interrupted) {
+        armSubsystem.reverseArmMovment();
     }
 }
