@@ -76,6 +76,9 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         initializeWrist();
         initializeIntake();
+        wristPIDController.setReference(0.63, CANSparkMax.ControlType.kSmartMotion);
+        distalMotor.set(ControlMode.MotionMagic,1700);
+        proximalMotor.set(ControlMode.MotionMagic, 1500);
     }
 
 
@@ -89,6 +92,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         talonConfig.slot0.kD = ArmConstants.kGains_MotProf.kD;
         talonConfig.slot0.integralZone = (int) ArmConstants.kGains_MotProf.kIzone;
         talonConfig.slot0.closedLoopPeakOutput = ArmConstants.kGains_MotProf.kPeakOutput;
+        motor.configMotionCruiseVelocity(15000, 30);
+		motor.configMotionAcceleration(6000, 30);
         // talonConfig.slot0.allowableClosedloopError // left default for this example
         // talonConfig.slot0.maxIntegralAccumulator; // left default for this example
         // talonConfig.slot0.closedLoopPeriod; // left default for this example
@@ -170,14 +175,11 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     /*
      * METHODS FOR INITIALIZING THE Intake/WRIST
      */
-    public void initializeWrist() {
-        // initialize motors
-      //  wristMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
-        wristMotor.restoreFactoryDefaults();
-    }
 
-    public void initializeWristMotor() {
-        wristMotor = new CANSparkMax(ArmConstants.wristCancoderId, MotorType.kBrushless);
+
+    public void initializeWrist() {
+        wristMotor.restoreFactoryDefaults();
+        intakeMotor.setSmartCurrentLimit(30);
         wristPIDController = wristMotor.getPIDController();
         wristEncoder = wristMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
@@ -202,6 +204,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         // initialize motors
     //    intakeMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
         intakeMotor.restoreFactoryDefaults();
+        intakeMotor.setSmartCurrentLimit(30);
         intakeMotor.setInverted(false);
         intakeMotor.setIdleMode(IdleMode.kBrake);
     
@@ -215,6 +218,14 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         wristPIDController.setReference(rotations, CANSparkMax.ControlType.kSmartMotion);
         
     }
+
+    public void stopWrist() {
+        // TODO handle errors
+    
+        wristPIDController.setReference(0.0, CANSparkMax.ControlType.kVoltage);
+        
+    }
+
 
     public void intake() {
         intakeMotor.set(1.0);
@@ -392,7 +403,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         return distalArmExtension(distalMotor.getSelectedSensorPosition(0));
     }
     private double getArbitraryFeedForwardForProximalArm(double proximalTicks, double distalTicks){
-        return ArmConstants.ThrottleAtFullExtensionDistalAndProximal * (armExtension(proximalTicks, distalTicks) / ArmConstants.FullExtensionDistance);
+        return ArmConstants.ThrottleAtFullExtensionDistalAndProximal * (armExtension(proximalTicks, distalTicks) / ArmConstants.armFullExtensionDistance);
     }
     private double getArbitraryFeedForwardForProximalArm(){
         return getArbitraryFeedForwardForProximalArm(proximalMotor.getSelectedSensorPosition(0), distalMotor.getSelectedSensorPosition(0));
