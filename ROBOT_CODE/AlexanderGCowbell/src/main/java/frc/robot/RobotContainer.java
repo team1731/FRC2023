@@ -47,16 +47,25 @@ public class RobotContainer {
 
   /* Subsystems */
 
-  private final Swerve s_Swerve = new Swerve();
-  private final PoseEstimatorSubsystem s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);
-  private final ArmSubsystem s_armSubSystem = new ArmSubsystem();
+  private Swerve s_Swerve = new Swerve();
+  private PoseEstimatorSubsystem s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);
+  private ArmSubsystem s_armSubSystem = new ArmSubsystem();
 
   // The container for the robot. Contains subsystems, OI devices, and commands. 
-  public RobotContainer() {
-	boolean fieldRelative = true;
+  public RobotContainer(
+          Swerve swerve,
+          PoseEstimatorSubsystem poseEstimatorSubsystem,
+          ArmSubsystem armSubsystem) {
+    
+	  boolean fieldRelative = true;
     boolean openLoop = true;
+    s_Swerve = swerve;
+    s_armSubSystem = armSubsystem;
+    s_poseEstimatorSubsystem = poseEstimatorSubsystem;
   //  s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
-    s_armSubSystem.setDefaultCommand(new TestArm(s_armSubSystem, driver, translationAxis, distalAxis));
+    s_armSubSystem.setDefaultCommand(new TestArm(s_armSubSystem, driver, translationAxis, distalAxis));    s_poseEstimatorSubsystem = poseEstimatorSubsystem;
+ 
+
     // Configure the button bindings
     configureButtonBindings();
   }

@@ -49,6 +49,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private static final int deviceID = 1;
     private CANSparkMax wristMotor;
     private CANSparkMax intakeMotor;
+    private CANSparkMax intakeMotor;
     private SparkMaxPIDController wristPIDController;
   
     private AbsoluteEncoder wristEncoder;
@@ -88,50 +89,22 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         proximalAbsolute = new AnalogInput(1);
     }
 
-    /*
-     * METHODS FOR INITIALIZING AND MOVING THE ARM
-     */
-
-    // configures the arm motors, should be called 
-    private void initializeProximalMotor() {
-        // TODO clean up configuration code
-        proximalTalonConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice();
-        proximalTalonConfig.neutralDeadband = ArmConstants.kNeutralDeadband; /* 0.1 % super small for best low-speed control */
-        proximalTalonConfig.slot0.kF = ArmConstants.kGains_MotProf.kF;
-        proximalTalonConfig.slot0.kP = ArmConstants.kGains_MotProf.kP;
-        proximalTalonConfig.slot0.kI = ArmConstants.kGains_MotProf.kI;
-        proximalTalonConfig.slot0.kD = ArmConstants.kGains_MotProf.kD;
-        proximalTalonConfig.slot0.integralZone = (int) ArmConstants.kGains_MotProf.kIzone;
-        proximalTalonConfig.slot0.closedLoopPeakOutput = ArmConstants.kGains_MotProf.kPeakOutput;
-        // proximalTalonConfig.slot0.allowableClosedloopError // left default for this example
-        // proximalTalonConfig.slot0.maxIntegralAccumulator; // left default for this example
-        // proximalTalonConfig.slot0.closedLoopPeriod; // left default for this example
-        proximalMotor.configAllSettings(proximalTalonConfig);
-        //proximalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 10.0, 10.0, 0.1));
-        
-
-        // pick the sensor phase and desired direction
-        proximalMotor.setInverted(TalonFXInvertType.CounterClockwise);
-    }
-
-    private void initializeDistalMotor() {
-        // TODO clean up configuration code
-        distalTalonConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice();
-        distalTalonConfig.neutralDeadband = ArmConstants.kNeutralDeadband; /* 0.1 % super small for best low-speed control */
-        distalTalonConfig.slot0.kF = ArmConstants.kGains_MotProf.kF;
-        distalTalonConfig.slot0.kP = ArmConstants.kGains_MotProf.kP;
-        distalTalonConfig.slot0.kI = ArmConstants.kGains_MotProf.kI;
-        distalTalonConfig.slot0.kD = ArmConstants.kGains_MotProf.kD;
-        distalTalonConfig.slot0.integralZone = (int) ArmConstants.kGains_MotProf.kIzone;
-        distalTalonConfig.slot0.closedLoopPeakOutput = ArmConstants.kGains_MotProf.kPeakOutput;
-        // proximalTalonConfig.slot0.allowableClosedloopError // left default for this example
-        // proximalTalonConfig.slot0.maxIntegralAccumulator; // left default for this example
-        // proximalTalonConfig.slot0.closedLoopPeriod; // left default for this example
-        distalMotor.configAllSettings(distalTalonConfig);
-        //distalMotor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 10.0, 10.0, 0.1));
-
-        // pick the sensor phase and desired direction
-        distalMotor.setInverted(TalonFXInvertType.CounterClockwise);
+    private void initializeTalonMotor(WPI_TalonFX motor, TalonFXInvertType invertType) {
+        TalonFXConfiguration talonConfig = new TalonFXConfiguration(); // factory default settings
+        talonConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice();
+        talonConfig.neutralDeadband = ArmConstants.kNeutralDeadband; /* 0.1 % super small for best low-speed control */
+        talonConfig.slot0.kF = ArmConstants.kGains_MotProf.kF;
+        talonConfig.slot0.kP = ArmConstants.kGains_MotProf.kP;
+        talonConfig.slot0.kI = ArmConstants.kGains_MotProf.kI;
+        talonConfig.slot0.kD = ArmConstants.kGains_MotProf.kD;
+        talonConfig.slot0.integralZone = (int) ArmConstants.kGains_MotProf.kIzone;
+        talonConfig.slot0.closedLoopPeakOutput = ArmConstants.kGains_MotProf.kPeakOutput;
+        // talonConfig.slot0.allowableClosedloopError // left default for this example
+        // talonConfig.slot0.maxIntegralAccumulator; // left default for this example
+        // talonConfig.slot0.closedLoopPeriod; // left default for this example
+        motor.configAllSettings(talonConfig);
+        motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
+        motor.setInverted(invertType);
     }
 
     public void initializeArmMovement(MotionProfile[] profiles) {
@@ -167,6 +140,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         ErrorCode code;
         proximalMotorRunning = true;
+        // Note: if disabled, the start call will automatically move the MP state to enabled
         code = proximalMotor.startMotionProfile(proximalBufferedStream, 10, TalonFXControlMode.MotionProfile.toControlMode());
         if(code != ErrorCode.OK) {
             notifyStateMachine(ResultCode.ARM_MOTION_START_FAILED, "Failed to start proximal motion profile");
@@ -174,6 +148,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         }
 
         distalMotorRunning = true;
+        // Note: if disabled, the start call will automatically move the MP state to enabled
         code = distalMotor.startMotionProfile(distalBufferedStream, 10, TalonFXControlMode.MotionProfile.toControlMode());
         if(code != ErrorCode.OK) {
             notifyStateMachine(ResultCode.ARM_MOTION_START_FAILED, "Failed to start distal motion profile");
@@ -192,6 +167,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         distalMotor.setSelectedSensorPosition(0);
     }
 
+
     /*
      * METHODS FOR INITIALIZING THE Intake/WRIST
      */
@@ -200,7 +176,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
       //  wristMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
         wristMotor.restoreFactoryDefaults();
 
-        // initialze PID controller and encoder objects
+    public void initializeWristMotor() {
+        wristMotor = new CANSparkMax(ArmConstants.wristCancoderId, MotorType.kBrushless);
         wristPIDController = wristMotor.getPIDController();
         wristEncoder = wristMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
@@ -265,25 +242,21 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         }
 
         if(proximalMotorRunning && proximalMotor.isMotionProfileFinished()) {
-            double position = proximalMotor.getSelectedSensorPosition(0) / 2048;
-            System.out.println("Proximal position: " + proximalMotor.getSelectedSensorPosition(0) + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            //proximalMotor.set(TalonFXControlMode.Position.toControlMode(), position);
+            // Note: when motion profile is finished it should be automatically set to HOLD state and will attempt to maintain final position
             proximalMotorRunning = false;
         } else if(proximalMotorRunning) {
             logMotionProfileStatus(proximalMotor);
         }
 
         if(distalMotorRunning && distalMotor.isMotionProfileFinished()) {
-            double position = distalMotor.getSelectedSensorPosition(0) / 2048;
-            System.out.println("Distal position: " + distalMotor.getSelectedSensorPosition(0) + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            //distalMotor.set(TalonFXControlMode.Position.toControlMode(), position);
+            // Note: when motion profile is finished it should be automatically set to HOLD state and will attempt to maintain final position
             distalMotorRunning = false;
         } else if(distalMotorRunning) {
             logMotionProfileStatus(distalMotor);
         }
 
         if(isArmMoving()) { // arm is still moving
-            // TODO implement, check for issues?
+            // TODO implement, check for issues? timeout?
         }
 
         if(isArmMovingAtPeriodicStart && !isArmMoving()) { // arm was moving, but has now stopped
@@ -381,10 +354,13 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         return null;
     }
 
-    private void logMotionProfileStatus(TalonFX talon) {
+    private void logMotionProfileStatus(TalonFX motor) {
         // TODO implement logging, do so at reasonable intervals
         MotionProfileStatus status = new MotionProfileStatus();
-        talon.getMotionProfileStatus(status);
+        motor.getMotionProfileStatus(status);
+
+        // pos = motor.getActiveTrajectoryPosition();
+        // vel = motor.getActiveTrajectoryVelocity();
         // status.topBufferRem
         // status.topBufferCnt
         // status.btmBufferCnt
