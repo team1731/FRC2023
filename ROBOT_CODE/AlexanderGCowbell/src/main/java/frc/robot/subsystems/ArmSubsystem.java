@@ -132,7 +132,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         distalBufferedStream = armPath.getInitializedBuffer(ArmMotor.DISTAL, 0, currentDirection);
 
         // start arm movement
-        pathStartedTime = Timer.getFPGATimestamp();
         moveArm();
     }
 
@@ -159,12 +158,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         } else { 
             // we are still in the middle of our path, first stop current movement
             stopArm();
-            
             // now, see how far along and run back from where we stopped
-            double elapsedTimeMS = (Timer.getFPGATimestamp() - pathStartedTime) * 1000;
-            startPosition = (int)(elapsedTimeMS / ArmConstants.pointDurationMS);
-            // make sure we don't end up with an array out of bounds exception
-            startPosition = startPosition > pointsLastIndex? pointsLastIndex : startPosition;
+            startPosition = getPathIndex();
         }
 
         currentDirection = Direction.REVERSE;
@@ -195,6 +190,9 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
             return;
         }
 
+        // start path timer
+        pathStartedTime = Timer.getFPGATimestamp();
+
         notifyStateMachine(ResultCode.SUCCESS, "Successfully started arm movement");
     }
 
@@ -205,6 +203,14 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
     public boolean isArmMoving() {
         return proximalMotorRunning || distalMotorRunning;
+    }
+
+    private int getPathIndex() {
+        int pointsLastIndex = currentPath.getNumberOfPoints()-1;
+        double elapsedTimeMS = (Timer.getFPGATimestamp() - pathStartedTime) * 1000;
+        int position = (int)(elapsedTimeMS / ArmConstants.pointDurationMS);
+        // make sure we don't end up with an array out of bounds exception
+        return position > pointsLastIndex? pointsLastIndex : position;
     }
 
     /*
@@ -295,6 +301,12 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         if(distalMotorRunning && distalMotor.isMotionProfileFinished()) {
             // Note: when motion profile is finished it should be automatically set to HOLD state and will attempt to maintain final position
             distalMotorRunning = false;
+        }
+
+        if(isArmMoving()) {
+            int currentIndex = getPathIndex();
+            double currentWristPosition = currentPath.getWristAtIndex(currentIndex);
+            wristPIDController.setReference(currentWristPosition, CANSparkMax.ControlType.kSmartMotion);
         }
 
         if(isArmMovingAtPeriodicStart && !isArmMoving()) { // arm was moving, but has now stopped
