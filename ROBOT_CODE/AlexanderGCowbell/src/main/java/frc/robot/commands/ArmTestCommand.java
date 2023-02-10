@@ -13,7 +13,7 @@ public class ArmTestCommand extends CommandBase {
 
     @Override
 	public void initialize() {
-        ArmPath path = ShelfIntakePath.getArmPath();
+        ArmPath path = ShelfIntake.getArmPath();
         armSubsystem.startArmMovement(path); 
 	}
 
