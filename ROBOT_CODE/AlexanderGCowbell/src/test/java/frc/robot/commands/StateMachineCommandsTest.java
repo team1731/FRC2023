@@ -20,7 +20,7 @@ public class StateMachineCommandsTest {
     @BeforeEach // this method will run before each test
     void setup() {
         mockSubsystem = new MockStateSubsystem();
-        stateMachine = StateMachineFactory.getInstance().getArmStateMachine(mockSubsystem);
+        stateMachine = (ArmStateMachine)mockSubsystem.getStateMachine();
     }
 
     @AfterEach // this method will run after each test

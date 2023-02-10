@@ -1,18 +1,23 @@
 package frc.robot.testsupport.mock;
 
-import frc.robot.state.*;
-import frc.robot.state.arm.ArmInput;
-import frc.robot.Constants.StateConstants.ResultCode;
 import edu.wpi.first.wpilibj.Timer;
+
+import frc.robot.state.*;
+import frc.robot.state.arm.*;
+import frc.robot.Constants.StateConstants;
+import frc.robot.Constants.StateConstants.ResultCode;
 
 public class MockStateSubsystem implements StateHandler {
     private StateMachine stateMachine;
     public boolean wasInterrupted = false;
     public boolean shouldFail = false;
 
-    public void registerStateMachine(StateMachine stateMachine) {
-      this.stateMachine = stateMachine;
-    }
+    public StateMachine getStateMachine() {
+      if(stateMachine == null) {
+          stateMachine = new ArmStateMachine(StateConstants.kArmStateMachineId, this);
+      }
+      return stateMachine;
+  }
 
     public void changeState(Input input, Object data) {
       if(shouldFail && input != ArmInput.RECOVER) {

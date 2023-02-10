@@ -24,7 +24,9 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.state.arm.ArmInput;
+import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.state.*;
+import frc.robot.Constants.StateConstants;
 import frc.robot.Constants.StateConstants.ResultCode;
 import frc.robot.Constants.ArmConstants;
 import frc.data.mp.*;
@@ -33,7 +35,7 @@ import frc.data.mp.ArmPath.Direction;
 import frc.robot.util.ArbitraryFeedForward;
 
 public class ArmSubsystem extends SubsystemBase implements StateHandler {
-    private StateMachine stateMachine;
+    private ArmStateMachine stateMachine;
 
     // motors for the arm
     private WPI_TalonFX proximalMotor;
@@ -64,6 +66,13 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         initializeArmMotors();
         distalAbsolute = new AnalogInput(0);
         proximalAbsolute = new AnalogInput(1);
+    }
+
+    public StateMachine getStateMachine() {
+        if(stateMachine == null) {
+            stateMachine = new ArmStateMachine(StateConstants.kArmStateMachineId, this);
+        }
+        return stateMachine;
     }
     
     private void initializeArmMotors() {
@@ -325,10 +334,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     /*
      * STATE HANDLER INTERFACE
      */
-
-    public void registerStateMachine(StateMachine stateMachine) {
-        this.stateMachine = stateMachine;
-    }
 
     public void changeState(Input input, Object data) {
         ArmInput ai = (ArmInput)input;

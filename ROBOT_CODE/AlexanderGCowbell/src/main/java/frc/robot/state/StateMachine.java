@@ -27,7 +27,6 @@ public abstract class StateMachine {
   public StateMachine(String id, StateHandler stateHandler) {
     this.id = id;
     this.stateHandler = stateHandler;
-    stateHandler.registerStateMachine(this);
   }
   
   public String getId() {

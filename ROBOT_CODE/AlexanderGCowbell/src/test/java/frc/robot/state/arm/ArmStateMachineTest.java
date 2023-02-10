@@ -23,7 +23,7 @@ class ArmStateMachineTest {
   @BeforeEach // this method will run before each test
   void setup() {
     mockSubsystem = new MockStateSubsystem();
-    stateMachine = StateMachineFactory.getInstance().getArmStateMachine(mockSubsystem);
+    stateMachine = (ArmStateMachine)mockSubsystem.getStateMachine();
   }
 
   @AfterEach // this method will run after each test
@@ -251,7 +251,7 @@ class ArmStateMachineTest {
     try {
       // recreate the subsystem and state machine instances for this to test interruption
       mockSubsystem = new MockStateSubsystem();
-      stateMachine = new ArmStateMachine(StateConstants.kArmStateMachineId, mockSubsystem);
+      stateMachine = (ArmStateMachine)mockSubsystem.getStateMachine();
       stateMachine.initialize(ArmSequence.SCORE_TEST);
     } catch(StateMachineInitializationException ste) {
       ste.printStackTrace();
@@ -329,7 +329,7 @@ class ArmStateMachineTest {
       // recreate the subsystem and state machine instances for this test to force a failure
       mockSubsystem = new MockStateSubsystem();
       mockSubsystem.shouldFail = true;
-      stateMachine = new ArmStateMachine(StateConstants.kArmStateMachineId, mockSubsystem);
+      stateMachine = (ArmStateMachine)mockSubsystem.getStateMachine();
       stateMachine.initialize(ArmSequence.SCORE_TEST);
     } catch(StateMachineInitializationException ste) {
       ste.printStackTrace();
