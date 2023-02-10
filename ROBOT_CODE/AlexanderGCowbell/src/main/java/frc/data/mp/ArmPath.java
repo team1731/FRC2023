@@ -63,7 +63,7 @@ public class ArmPath {
 
     private void populateBufferPoint(ArmMotor motor, BufferedTrajectoryPointStream bufferedStream, TrajectoryPoint point, int index, boolean isLastPoint) {
         double proximalPosition = proximalPoints[index][0];
-        double distalPosition = proximalPoints[index][0];
+        double distalPosition = distalPoints[index][0];
         double position = (motor == ArmMotor.PROXIMAL)? proximalPosition : distalPosition;
         double velocityRPM = (motor == ArmMotor.PROXIMAL)? proximalPoints[index][1] : distalPoints[index][1];
         int durationMilliseconds = ArmConstants.pointDurationMS;
