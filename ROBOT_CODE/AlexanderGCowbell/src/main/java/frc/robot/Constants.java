@@ -281,6 +281,8 @@ public final class Constants {
         public final static int proximalAbsoluteTicsCenter = 1383;
         public final static double distalRelativeTicsPerAbsoluteTick = 10.5;
         public final static int distalAbsoluteTicsCenter = 1801;
+        public final static double pointDurationMS = 10;
+        public final static int minBufferedPoints = 10;
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;

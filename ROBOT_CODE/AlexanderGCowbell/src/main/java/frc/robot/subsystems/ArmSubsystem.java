@@ -126,11 +126,10 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         }
 
         // init motion profile buffers for proximal/distal motors
+        currentPath = armPath;
         currentDirection = Direction.FORWARD;
         proximalBufferedStream = armPath.getInitializedBuffer(ArmMotor.PROXIMAL, 0, currentDirection);
         distalBufferedStream = armPath.getInitializedBuffer(ArmMotor.DISTAL, 0, currentDirection);
-
-        notifyStateMachine(ResultCode.SUCCESS, "Successfully initialized arm profile buffers");
 
         // start arm movement
         pathStartedTime = Timer.getFPGATimestamp();
@@ -138,8 +137,13 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     }
 
     public void reverseArmMovment() {
-        if(currentPath == null || currentDirection == Direction.REVERSE) {
-            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: cannot be reversed, either retracted or already reversing");
+        if(currentPath == null) {
+            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: cannot be reversed, not currently running a path");
+            return;
+        }
+
+        if(currentDirection == Direction.REVERSE) {
+            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: cannot be reversed, already reversing current path");
             return;
         }
 
@@ -158,8 +162,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
             
             // now, see how far along and run back from where we stopped
             double elapsedTimeMS = (Timer.getFPGATimestamp() - pathStartedTime) * 1000;
-            startPosition = (int)(elapsedTimeMS / 10);
-            // make sure we don't end up in array out of bounds exception
+            startPosition = (int)(elapsedTimeMS / ArmConstants.pointDurationMS);
+            // make sure we don't end up with an array out of bounds exception
             startPosition = startPosition > pointsLastIndex? pointsLastIndex : startPosition;
         }
 
@@ -171,18 +175,13 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         moveArm();
     }
 
-    public void moveArm() {
-        if(isArmMoving()) {
-            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: attempt to start new movement when arm is already moving");
-            return;
-        }
-
+    private void moveArm() {
         // start motion profile for proximal/distal motors
         ErrorCode code;
 
         proximalMotorRunning = true;
         // Note: if disabled, the start call will automatically move the MP state to enabled
-        code = proximalMotor.startMotionProfile(proximalBufferedStream, 10, TalonFXControlMode.MotionProfile.toControlMode());
+        code = proximalMotor.startMotionProfile(proximalBufferedStream, ArmConstants.minBufferedPoints, TalonFXControlMode.MotionProfile.toControlMode());
         if(code != ErrorCode.OK) {
             notifyStateMachine(ResultCode.ARM_MOTION_START_FAILED, "Failed to start proximal motion profile");
             return;
@@ -190,7 +189,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         distalMotorRunning = true;
         // Note: if disabled, the start call will automatically move the MP state to enabled
-        code = distalMotor.startMotionProfile(distalBufferedStream, 10, TalonFXControlMode.MotionProfile.toControlMode());
+        code = distalMotor.startMotionProfile(distalBufferedStream, ArmConstants.minBufferedPoints, TalonFXControlMode.MotionProfile.toControlMode());
         if(code != ErrorCode.OK) {
             notifyStateMachine(ResultCode.ARM_MOTION_START_FAILED, "Failed to start distal motion profile");
             return;
@@ -206,10 +205,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
     public boolean isArmMoving() {
         return proximalMotorRunning || distalMotorRunning;
-    }
-
-    public boolean completedArmPathForward() {
-        return pathStartedTime > 0 && !isArmMoving();
     }
 
     /*
@@ -295,19 +290,15 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         if(proximalMotorRunning && proximalMotor.isMotionProfileFinished()) {
             // Note: when motion profile is finished it should be automatically set to HOLD state and will attempt to maintain final position
             proximalMotorRunning = false;
-        } else if(proximalMotorRunning) {
-            logMotionProfileStatus(proximalMotor);
         }
 
         if(distalMotorRunning && distalMotor.isMotionProfileFinished()) {
             // Note: when motion profile is finished it should be automatically set to HOLD state and will attempt to maintain final position
             distalMotorRunning = false;
-        } else if(distalMotorRunning) {
-            logMotionProfileStatus(distalMotor);
         }
 
         if(isArmMovingAtPeriodicStart && !isArmMoving()) { // arm was moving, but has now stopped
-            notifyStateMachine(ResultCode.SUCCESS, "Completed arm movement");
+            notifyStateMachine(ResultCode.SUCCESS, "Completed arm movement: " + currentDirection);
 
             if(currentDirection == Direction.REVERSE) { // we completed retracting
                 currentPath = null;
@@ -330,15 +321,17 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     public void changeState(Input input, Object data) {
         ArmInput ai = (ArmInput)input;
         switch(ai) {
-            case EXTEND_INIT:
-            case RETRACT_INIT:
-                //initializeArmMovement((MotionProfile[])data);
-                break;
             case EXTEND_MOVE:
+                startArmMovement((ArmPath)data);
+                break;
             case RETRACT_MOVE:
-                //moveArm();
+            case RECOVER:
+                reverseArmMovment();
                 break;
             case INTAKE:
+                // TODO implement, for the moment just send back success to keep the state process moving
+                notifyStateMachine(ResultCode.SUCCESS, "TEST: sending success code for unimplemented step");
+                break;
             case RELEASE:
                 // TODO implement, for the moment just send back success to keep the state process moving
                 notifyStateMachine(ResultCode.SUCCESS, "TEST: sending success code for unimplemented step");
@@ -350,7 +343,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     }
 
     public void interruptStateChange() {
-        // TODO implement
+        stopArm();
     }
 
     private void notifyStateMachine(ResultCode resultCode, String resultMessage) {
@@ -365,27 +358,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     /*
      * Helper methods for buffer handling and logging
      */
-
-    private void logMotionProfileStatus(TalonFX motor) {
-        // TODO implement logging, do so at reasonable intervals
-        MotionProfileStatus status = new MotionProfileStatus();
-        motor.getMotionProfileStatus(status);
-
-        // pos = motor.getActiveTrajectoryPosition();
-        // vel = motor.getActiveTrajectoryVelocity();
-        // status.topBufferRem
-        // status.topBufferCnt
-        // status.btmBufferCnt
-        // status.hasUnderrun
-        // status.isUnderrun
-        // status.activePointValid
-        // status.isLast
-        // status.profileSlotSelect
-        // status.profileSlotSelect1
-        // status.outputEnable.toString()
-        // status.timeDurMs
-    } 
-
     
     private double armExtension() {
         return ArbitraryFeedForward.armExtension(proximalMotor.getSelectedSensorPosition(0), distalMotor.getSelectedSensorPosition(0));
