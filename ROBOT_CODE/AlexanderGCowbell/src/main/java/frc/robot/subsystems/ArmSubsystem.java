@@ -60,6 +60,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private double pathStartedTime = 0;
     private boolean proximalMotorRunning = false;
     private boolean distalMotorRunning = false;
+    private boolean armHome = true;
 
 
     public ArmSubsystem() {
@@ -87,9 +88,9 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         initializeWrist();
         initializeIntake();
-        wristPIDController.setReference(0.63, CANSparkMax.ControlType.kSmartMotion);
-        distalMotor.set(ControlMode.MotionMagic,1700);
-        proximalMotor.set(ControlMode.MotionMagic, 1500);
+        wristPIDController.setReference(0.59, CANSparkMax.ControlType.kSmartMotion);
+        distalMotor.set(ControlMode.MotionMagic,-1328);
+        proximalMotor.set(ControlMode.MotionMagic, 2000);
     }
 
 
@@ -109,7 +110,11 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         // talonConfig.slot0.maxIntegralAccumulator; // left default for this example
         // talonConfig.slot0.closedLoopPeriod; // left default for this example
         motor.configAllSettings(talonConfig);
-        motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 25, 30, 0.2));
+        motor.configNominalOutputForward(0, 30);
+		motor.configNominalOutputReverse(0, 30);
+		motor.configPeakOutputForward(0.5, 30);
+		motor.configPeakOutputReverse(-0.5, 30);
+      //  motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30, 30, 0.2));
         motor.setInverted(invertType);
     }
 
@@ -118,14 +123,16 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     // so motor doesn't try to process last profile when re-enabled
     public void reset() {
         // ensure motors are stopped
-        proximalMotor.set(TalonFXControlMode.PercentOutput, 0);
-        distalMotor.set(TalonFXControlMode.PercentOutput, 0);
-
+       // proximalMotor.set(TalonFXControlMode.PercentOutput, 0);
+       // distalMotor.set(TalonFXControlMode.PercentOutput, 0);
+       wristPIDController.setReference(0.59, CANSparkMax.ControlType.kSmartMotion);
+       distalMotor.set(ControlMode.MotionMagic,-1328);
+       proximalMotor.set(ControlMode.MotionMagic, 2000);
         // reset to disabled state w/ no motion profiles
-        proximalMotor.clearMotionProfileTrajectories();
-        proximalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Disable.value);
-        distalMotor.clearMotionProfileTrajectories();
-        distalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Disable.value);
+     //   proximalMotor.clearMotionProfileTrajectories();
+     //   proximalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Disable.value);
+    //    distalMotor.clearMotionProfileTrajectories();
+     //   distalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Disable.value);
     }
 
     public void startArmMovement(ArmPath armPath) {
@@ -296,6 +303,13 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
     @Override
     public void periodic() {
+
+        if (armHome)  {
+            wristPIDController.setReference(0.59, CANSparkMax.ControlType.kSmartMotion);
+            distalMotor.set(ControlMode.MotionMagic,-1328);
+            proximalMotor.set(ControlMode.MotionMagic, 2000);
+        }
+        
         boolean isArmMovingAtPeriodicStart = isArmMoving();
 
         if(stateMachine != null) {
