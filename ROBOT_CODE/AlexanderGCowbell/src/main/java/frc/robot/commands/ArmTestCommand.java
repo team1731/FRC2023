@@ -13,11 +13,7 @@ public class ArmTestCommand extends CommandBase {
 
     @Override
 	public void initialize() {
-        int numberOfPoints = 0;
-        double[][] proximalPoints = new double[][]{};
-        double[][] distalPoints = new double[][]{};
-        double[][] wristPoints = new double[][]{};
-        ArmPath path = new ArmPath(numberOfPoints, proximalPoints, distalPoints, wristPoints);
+        ArmPath path = ShelfIntakePath.getArmPath();
         armSubsystem.startArmMovement(path); 
 	}
 

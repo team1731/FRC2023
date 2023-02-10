@@ -262,7 +262,7 @@ public final class Constants {
             new StateChangeRequest(ArmInput.INTAKE),
             new StateChangeRequest(ArmInput.RETRACT_INIT),
             new StateChangeRequest(ArmInput.RETRACT_MOVE),
-            new StateChangeRequest(ArmInput.RETRACT_PING, DistalTestProfile.getProfile())
+            new StateChangeRequest(ArmInput.RETRACT_PING)
         };
         
         public static final StateChangeRequest[] kTestInvalid = new StateChangeRequest[]{
@@ -281,7 +281,7 @@ public final class Constants {
         public final static int proximalAbsoluteTicsCenter = 1383;
         public final static double distalRelativeTicsPerAbsoluteTick = 10.5;
         public final static int distalAbsoluteTicsCenter = 1801;
-        public final static double pointDurationMS = 10;
+        public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
 
         // Arm PID constants

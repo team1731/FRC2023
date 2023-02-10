@@ -7,9 +7,9 @@ import frc.robot.util.ArbitraryFeedForward;
 
 public class ArmPath {
     private int numberOfPoints;
-    private double [][]proximalPoints;
-    private double [][]distalPoints;
-    private double [][]wristPoints;
+    private double[][] proximalPoints;
+    private double[][] distalPoints;
+    private double[] wristPoints;
     private BufferedTrajectoryPointStream proximalBufferedStream;
     private BufferedTrajectoryPointStream distalBufferedStream;
 
@@ -21,7 +21,7 @@ public class ArmPath {
         FORWARD, REVERSE
     }
 
-    public ArmPath(int numberOfPoints, double [][]proximalPoints,double [][]distalPoints, double [][]wristPoints) {
+    public ArmPath(int numberOfPoints, double[][] proximalPoints, double[][] distalPoints, double[] wristPoints) {
         this.numberOfPoints = numberOfPoints;
         this.proximalPoints = proximalPoints;
         this.distalPoints = distalPoints;
@@ -57,7 +57,7 @@ public class ArmPath {
         return bufferedStream;
     }
 
-    public double[] getWristAtIndex(int index) {
+    public double getWristAtIndex(int index) {
         return wristPoints[index];
     }
 
@@ -66,7 +66,7 @@ public class ArmPath {
         double distalPosition = proximalPoints[index][0];
         double position = (motor == ArmMotor.PROXIMAL)? proximalPosition : distalPosition;
         double velocityRPM = (motor == ArmMotor.PROXIMAL)? proximalPoints[index][1] : distalPoints[index][1];
-        int durationMilliseconds = (motor == ArmMotor.PROXIMAL)? (int)proximalPoints[index][2] : (int)distalPoints[index][2];
+        int durationMilliseconds = ArmConstants.pointDurationMS;
         double arbFeedFwd = (motor == ArmMotor.PROXIMAL)? 
                 ArbitraryFeedForward.getArbitraryFeedForwardForProximalArm(proximalPosition, distalPosition) : 
                 ArbitraryFeedForward.getArbitraryFeedForwardForDistalArm(distalPosition);
