@@ -278,9 +278,9 @@ public final class Constants {
         public final static int intakeCancoderId = 13;
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 14;
-        public final static int proximalAbsoluteTicsCenter = 1383;
+        public final static int proximalAbsoluteTicsCenter = 1303;
         public final static double distalRelativeTicsPerAbsoluteTick = 10.5;
-        public final static int distalAbsoluteTicsCenter = 1801;
+        public final static int distalAbsoluteTicsCenter = 1686;
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;

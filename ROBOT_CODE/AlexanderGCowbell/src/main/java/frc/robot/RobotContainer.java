@@ -41,7 +41,7 @@ public class RobotContainer {
   private final JoystickButton intake = new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
   private final JoystickButton eject = new JoystickButton(driver, XboxController.Button.kRightBumper.value);
   private final JoystickButton wristPos1 = new JoystickButton(driver,XboxController.Button.kA.value);
-  private final JoystickButton wristPos2 = new JoystickButton(driver, XboxController.Button.kStart.value);
+  //private final JoystickButton wristPos2 = new JoystickButton(driver, XboxController.Button.kStart.value);
   
 
 
