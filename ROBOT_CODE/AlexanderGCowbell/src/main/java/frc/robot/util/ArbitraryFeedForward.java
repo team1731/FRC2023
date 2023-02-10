@@ -17,7 +17,7 @@ public class ArbitraryFeedForward {
     }
 
     public static double getArbitraryFeedForwardForProximalArm(double proximalTicks, double distalTicks){
-        return ArmConstants.ThrottleAtFullExtensionDistalAndProximal * (armExtension(proximalTicks, distalTicks) / ArmConstants.FullExtensionDistance);
+        return ArmConstants.ThrottleAtFullExtensionDistalAndProximal * (armExtension(proximalTicks, distalTicks) / ArmConstants.armFullExtensionDistance);
     }
 
     public static double getArbitraryFeedForwardForDistalArm(double distalTicks){

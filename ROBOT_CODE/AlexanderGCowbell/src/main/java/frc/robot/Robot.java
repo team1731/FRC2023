@@ -191,10 +191,12 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
 	keypad.putValue("driver entry", NetworkTableValue.makeString(""));
 	s_armSubSystem.reset();
+	s_armSubSystem.resetArmEncoders();
   }
 
   @Override
   public void disabledPeriodic() {
+	s_armSubSystem.resetArmEncoders();
     if (System.currentTimeMillis() % 5000 == 0) {
 		// SmartDashboard.putBoolean("LowSensor", m_sequencer.lowSensorHasBall());
 		// SmartDashboard.putBoolean("MidSensor", m_sequencer.midSensorHasBall());

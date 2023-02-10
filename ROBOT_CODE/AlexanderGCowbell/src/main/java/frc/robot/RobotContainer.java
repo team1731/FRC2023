@@ -47,9 +47,9 @@ public class RobotContainer {
 
   /* Subsystems */
 
-  private Swerve s_Swerve = new Swerve();
-  private PoseEstimatorSubsystem s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);
-  private ArmSubsystem s_armSubSystem = new ArmSubsystem();
+  private Swerve s_Swerve;
+  private PoseEstimatorSubsystem s_poseEstimatorSubsystem ;
+  private ArmSubsystem s_armSubSystem ;
 
   // The container for the robot. Contains subsystems, OI devices, and commands. 
   public RobotContainer(
@@ -90,8 +90,8 @@ public class RobotContainer {
   eject.onFalse(new InstantCommand(() -> s_armSubSystem.stopIntake()));
   intake.onTrue(new InstantCommand(() -> s_armSubSystem.intake()));
   intake.onFalse(new InstantCommand(() -> s_armSubSystem.stopIntake()));
-  wristPos1.onTrue(new InstantCommand(() -> s_armSubSystem.moveWrist(0.2)));
-  wristPos2.onTrue(new InstantCommand(() -> s_armSubSystem.moveWrist(0.5)));
+  wristPos1.onTrue(new InstantCommand(() -> s_armSubSystem.moveWrist(0.63)));
+  wristPos1.onFalse(new InstantCommand(() -> s_armSubSystem.stopWrist()));
   
   }
 

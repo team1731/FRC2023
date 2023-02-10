@@ -278,27 +278,27 @@ public final class Constants {
         public final static int intakeCancoderId = 13;
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 14;
-        public final static int proximalAbsoluteTicsCenter = 2000;
+        public final static int proximalAbsoluteTicsCenter = 1383;
         public final static double distalRelativeTicsPerAbsoluteTick = 10.5;
-        public final static int distalAbsoluteTicsCenter = 2000;
+        public final static int distalAbsoluteTicsCenter = 1801;
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;
 
         // Wrist PID coefficients
-        public final static double wristP = 5e-5; 
+        public final static double wristP = 5e-4;
         public final static double wristI = 0;
         public final static double wristD = 0; 
         public final static double wristIz = 0; 
-        public final static double wristFF = 0.000156; 
-        public final static double wristMaxOutput = 1; 
-        public final static double wristMinOutput = -1;
+        public final static double wristFF = 0.000356; //.000156
+        public final static double wristMaxOutput = 1.0; 
+        public final static double wristMinOutput = -1.0;
         public final static double wristMaxRPM = 5700;
 
         // Wrist Smart Motion Coefficients
-        public final static double wristMaxVel = 500; // rpm was 2000
+        public final static double wristMaxVel = 2000; // rpm was 2000
         public final static double wristMinVel = 0;
-        public final static double wristMaxAcc = 500;  // was 1500
+        public final static double wristMaxAcc = 1500;  // was 1500
         public final static double wristAllowedErr = 0;
 
          // Hand limits
@@ -308,13 +308,15 @@ public final class Constants {
         static final double INTAKE_HOLD_POWER = 0.07;
 
         //Geometry Constants
-        public final static double proximalArmLength = 34.0; //inches
-        public final static double distalArmLength = 28.0; //inches
+        public final static double proximalArmLength = 35.75; //inches
+        public final static double distalArmLength = 32; //inches
         public final static double proximalTicksPerDegree = 286720.0/360.0;
         public final static double distalTicksPerDegree = 512.0; 
-        public final static double ThrottleAtFullExtensionDistalAndProximal = 0.5; //TBD empirically
-        public final static double ThrottleAtFullExtensionDistal = 0.5; //TBD empirically
-        public final static double FullExtensionDistance = 38.0; //TBD empirically
+        public final static double ThrottleAtFullExtensionDistalAndProximal = 0.02639; //TBD empirically
+        public final static double ThrottleAtFullExtensionDistal = .03225; //TBD empirically
+        public final static double distalFullExtensionDistance =33.0; //TBD empirically
+        public final static double armFullExtensionDistance = 56.25;
+        
         
 
 
@@ -333,7 +335,7 @@ public final class Constants {
         /**
          * PID Gains may have to be adjusted based on the responsiveness of control loop
          * 	                                    			  kP   kI    kD     kF             Iz    PeakOut */
-        public final static Gains kGains_MotProf = new Gains( 1.0, 0.0,  0.0, 1023.0/6800.0,  400,  1.00 ); /* measured 6800 velocity units at full motor output */
+        public final static Gains kGains_MotProf = new Gains( 0.01, 0.0,  0.0, 1023.0/6800.0,  400,  1.00 ); /* measured 6800 velocity units at full motor output */
         public final static int kPrimaryPIDSlot = 0; // any slot [0,3]
     }
 
