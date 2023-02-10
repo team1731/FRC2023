@@ -24,15 +24,18 @@ import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.state.arm.ArmInput;
+import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.state.*;
+import frc.robot.Constants.StateConstants;
 import frc.robot.Constants.StateConstants.ResultCode;
 import frc.robot.Constants.ArmConstants;
 import frc.data.mp.*;
 import frc.data.mp.ArmPath.ArmMotor;
 import frc.data.mp.ArmPath.Direction;
+import frc.robot.util.ArbitraryFeedForward;
 
 public class ArmSubsystem extends SubsystemBase implements StateHandler {
-    private StateMachine stateMachine;
+    private ArmStateMachine stateMachine;
 
     // motors for the arm
     private WPI_TalonFX proximalMotor;
@@ -59,11 +62,17 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private boolean distalMotorRunning = false;
 
 
-
     public ArmSubsystem() {
         initializeArmMotors();
         distalAbsolute = new AnalogInput(0);
         proximalAbsolute = new AnalogInput(1);
+    }
+
+    public StateMachine getStateMachine() {
+        if(stateMachine == null) {
+            stateMachine = new ArmStateMachine(StateConstants.kArmStateMachineId, this);
+        }
+        return stateMachine;
     }
     
     private void initializeArmMotors() {
@@ -126,20 +135,23 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         }
 
         // init motion profile buffers for proximal/distal motors
+        currentPath = armPath;
         currentDirection = Direction.FORWARD;
         proximalBufferedStream = armPath.getInitializedBuffer(ArmMotor.PROXIMAL, 0, currentDirection);
         distalBufferedStream = armPath.getInitializedBuffer(ArmMotor.DISTAL, 0, currentDirection);
 
-        notifyStateMachine(ResultCode.SUCCESS, "Successfully initialized arm profile buffers");
-
         // start arm movement
-        pathStartedTime = Timer.getFPGATimestamp();
         moveArm();
     }
 
     public void reverseArmMovment() {
-        if(currentPath == null || currentDirection == Direction.REVERSE) {
-            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: cannot be reversed, either retracted or already reversing");
+        if(currentPath == null) {
+            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: cannot be reversed, not currently running a path");
+            return;
+        }
+
+        if(currentDirection == Direction.REVERSE) {
+            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: cannot be reversed, already reversing current path");
             return;
         }
 
@@ -155,12 +167,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         } else { 
             // we are still in the middle of our path, first stop current movement
             stopArm();
-            
             // now, see how far along and run back from where we stopped
-            double elapsedTimeMS = (Timer.getFPGATimestamp() - pathStartedTime) * 1000;
-            startPosition = (int)(elapsedTimeMS / 10);
-            // make sure we don't end up in array out of bounds exception
-            startPosition = startPosition > pointsLastIndex? pointsLastIndex : startPosition;
+            startPosition = getPathIndex();
         }
 
         currentDirection = Direction.REVERSE;
@@ -171,18 +179,13 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         moveArm();
     }
 
-    public void moveArm() {
-        if(isArmMoving()) {
-            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: attempt to start new movement when arm is already moving");
-            return;
-        }
-
+    private void moveArm() {
         // start motion profile for proximal/distal motors
         ErrorCode code;
 
         proximalMotorRunning = true;
         // Note: if disabled, the start call will automatically move the MP state to enabled
-        code = proximalMotor.startMotionProfile(proximalBufferedStream, 10, TalonFXControlMode.MotionProfile.toControlMode());
+        code = proximalMotor.startMotionProfile(proximalBufferedStream, ArmConstants.minBufferedPoints, TalonFXControlMode.MotionProfile.toControlMode());
         if(code != ErrorCode.OK) {
             notifyStateMachine(ResultCode.ARM_MOTION_START_FAILED, "Failed to start proximal motion profile");
             return;
@@ -190,11 +193,14 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         distalMotorRunning = true;
         // Note: if disabled, the start call will automatically move the MP state to enabled
-        code = distalMotor.startMotionProfile(distalBufferedStream, 10, TalonFXControlMode.MotionProfile.toControlMode());
+        code = distalMotor.startMotionProfile(distalBufferedStream, ArmConstants.minBufferedPoints, TalonFXControlMode.MotionProfile.toControlMode());
         if(code != ErrorCode.OK) {
             notifyStateMachine(ResultCode.ARM_MOTION_START_FAILED, "Failed to start distal motion profile");
             return;
         }
+
+        // start path timer
+        pathStartedTime = Timer.getFPGATimestamp();
 
         notifyStateMachine(ResultCode.SUCCESS, "Successfully started arm movement");
     }
@@ -208,8 +214,12 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         return proximalMotorRunning || distalMotorRunning;
     }
 
-    public boolean completedArmPathForward() {
-        return pathStartedTime > 0 && !isArmMoving();
+    private int getPathIndex() {
+        int pointsLastIndex = currentPath.getNumberOfPoints()-1;
+        double elapsedTimeMS = (Timer.getFPGATimestamp() - pathStartedTime) * 1000;
+        int position = (int)(elapsedTimeMS / ArmConstants.pointDurationMS);
+        // make sure we don't end up with an array out of bounds exception
+        return position > pointsLastIndex? pointsLastIndex : position;
     }
 
     /*
@@ -295,19 +305,21 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         if(proximalMotorRunning && proximalMotor.isMotionProfileFinished()) {
             // Note: when motion profile is finished it should be automatically set to HOLD state and will attempt to maintain final position
             proximalMotorRunning = false;
-        } else if(proximalMotorRunning) {
-            logMotionProfileStatus(proximalMotor);
         }
 
         if(distalMotorRunning && distalMotor.isMotionProfileFinished()) {
             // Note: when motion profile is finished it should be automatically set to HOLD state and will attempt to maintain final position
             distalMotorRunning = false;
-        } else if(distalMotorRunning) {
-            logMotionProfileStatus(distalMotor);
+        }
+
+        if(isArmMoving()) {
+            int currentIndex = getPathIndex();
+            double currentWristPosition = currentPath.getWristAtIndex(currentIndex);
+            wristPIDController.setReference(currentWristPosition, CANSparkMax.ControlType.kSmartMotion);
         }
 
         if(isArmMovingAtPeriodicStart && !isArmMoving()) { // arm was moving, but has now stopped
-            notifyStateMachine(ResultCode.SUCCESS, "Completed arm movement");
+            notifyStateMachine(ResultCode.SUCCESS, "Completed arm movement: " + currentDirection);
 
             if(currentDirection == Direction.REVERSE) { // we completed retracting
                 currentPath = null;
@@ -323,22 +335,20 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
      * STATE HANDLER INTERFACE
      */
 
-    public void registerStateMachine(StateMachine stateMachine) {
-        this.stateMachine = stateMachine;
-    }
-
     public void changeState(Input input, Object data) {
         ArmInput ai = (ArmInput)input;
         switch(ai) {
-            case EXTEND_INIT:
-            case RETRACT_INIT:
-                //initializeArmMovement((MotionProfile[])data);
-                break;
             case EXTEND_MOVE:
+                startArmMovement((ArmPath)data);
+                break;
             case RETRACT_MOVE:
-                //moveArm();
+            case RECOVER:
+                reverseArmMovment();
                 break;
             case INTAKE:
+                // TODO implement, for the moment just send back success to keep the state process moving
+                notifyStateMachine(ResultCode.SUCCESS, "TEST: sending success code for unimplemented step");
+                break;
             case RELEASE:
                 // TODO implement, for the moment just send back success to keep the state process moving
                 notifyStateMachine(ResultCode.SUCCESS, "TEST: sending success code for unimplemented step");
@@ -350,7 +360,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     }
 
     public void interruptStateChange() {
-        // TODO implement
+        stopArm();
     }
 
     private void notifyStateMachine(ResultCode resultCode, String resultMessage) {
@@ -365,55 +375,21 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     /*
      * Helper methods for buffer handling and logging
      */
-
-    private void logMotionProfileStatus(TalonFX motor) {
-        // TODO implement logging, do so at reasonable intervals
-        MotionProfileStatus status = new MotionProfileStatus();
-        motor.getMotionProfileStatus(status);
-
-        // pos = motor.getActiveTrajectoryPosition();
-        // vel = motor.getActiveTrajectoryVelocity();
-        // status.topBufferRem
-        // status.topBufferCnt
-        // status.btmBufferCnt
-        // status.hasUnderrun
-        // status.isUnderrun
-        // status.activePointValid
-        // status.isLast
-        // status.profileSlotSelect
-        // status.profileSlotSelect1
-        // status.outputEnable.toString()
-        // status.timeDurMs
-    } 
-
-    private double armExtension(double proximalTicks, double distalTicks){
-        //Calculates how far the arm is extended using trigonometry and angles derived from data from motors 
-        double distalDistance = (ArmConstants.distalArmLength * java.lang.Math.cos(Math.toRadians(3)) * java.lang.Math.sin(Math.toRadians(distalTicks / ArmConstants.distalTicksPerDegree))); 
-        double proximalDistance = ArmConstants.proximalArmLength * java.lang.Math.sin(Math.toRadians(proximalTicks / ArmConstants.proximalTicksPerDegree));
-        return -(distalDistance + proximalDistance); 
+    
+    private double armExtension() {
+        return ArbitraryFeedForward.armExtension(proximalMotor.getSelectedSensorPosition(0), distalMotor.getSelectedSensorPosition(0));
     }
-    private double armExtension(){
-        return armExtension(proximalMotor.getSelectedSensorPosition(0), distalMotor.getSelectedSensorPosition(0));
-    }
-    private double distalArmExtension(double distalTicks){
-        //Calculates how far the arm is extended using trigonometry and angles derived from data from motors 
-        double distalDistance = ArmConstants.distalArmLength * java.lang.Math.cos(Math.toRadians(3)) * java.lang.Math.sin(Math.toRadians(distalTicks / ArmConstants.distalTicksPerDegree)); 
-        return distalDistance; 
-    }
+    
     private double distalArmExtension(){
-        return distalArmExtension(distalMotor.getSelectedSensorPosition(0));
+        return ArbitraryFeedForward.distalArmExtension(distalMotor.getSelectedSensorPosition(0));
     }
-    private double getArbitraryFeedForwardForProximalArm(double proximalTicks, double distalTicks){
-        return ArmConstants.ThrottleAtFullExtensionDistalAndProximal * (armExtension(proximalTicks, distalTicks) / ArmConstants.armFullExtensionDistance);
-    }
+
     private double getArbitraryFeedForwardForProximalArm(){
-        return getArbitraryFeedForwardForProximalArm(proximalMotor.getSelectedSensorPosition(0), distalMotor.getSelectedSensorPosition(0));
+        return ArbitraryFeedForward.getArbitraryFeedForwardForProximalArm(proximalMotor.getSelectedSensorPosition(0), distalMotor.getSelectedSensorPosition(0));
     }
-    private double getArbitraryFeedForwardForDistalArm(double distalTicks){
-        return ArmConstants.ThrottleAtFullExtensionDistal * (distalArmExtension(distalTicks) / ArmConstants.distalArmLength);
-    }
+
     private double getArbitraryFeedForwardForDistalArm(){
-        return getArbitraryFeedForwardForDistalArm(distalMotor.getSelectedSensorPosition(0));
+        return ArbitraryFeedForward.getArbitraryFeedForwardForDistalArm(distalMotor.getSelectedSensorPosition(0));
     }
     
     public void doSD() {
