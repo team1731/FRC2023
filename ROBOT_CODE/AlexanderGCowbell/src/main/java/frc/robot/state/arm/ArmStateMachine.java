@@ -38,7 +38,7 @@ public class ArmStateMachine extends StateMachine {
    * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
    */
   @Override
-  protected StateChangeRequest[] defineSequence(StateSequence selectedSequence) throws StateMachineInitializationException {
+  protected StateChangeRequest[] defineSequence(Sequence selectedSequence) throws StateMachineInitializationException {
     ArmSequence ss = (ArmSequence)selectedSequence;
     switch(ss) {
       case SCORE_TEST:
@@ -100,11 +100,8 @@ public class ArmStateMachine extends StateMachine {
   }
 
   private void recover() {
-    // calculate a recovery path for the arm
-    var data = generateRecoveryData();
-
     // redefine the state sequence w/recovery step
-    var step = new StateChangeRequest(ArmInput.RECOVER, data);
+    var step = new StateChangeRequest(ArmInput.RECOVER);
     var sequenceList = new ArrayList<StateChangeRequest>();
     sequenceList.add(step);
     sequence = sequenceList.iterator();
@@ -114,10 +111,5 @@ public class ArmStateMachine extends StateMachine {
 
     // restart processing to initiate recovery
     processCurrentSequenceStep();
-  }
-
-  private Object generateRecoveryData() {
-    // TODO, replace this, just passing some dummy data for the moment
-    return new double[]{ 11, 12, 13, 14, 15 };
   }
 }

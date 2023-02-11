@@ -8,11 +8,11 @@ import frc.robot.state.StateMachine.Status;
 
 public class StateMachineCommand extends CommandBase {
     private StateMachine stateMachine;
-    private StateSequence sequence;
+    private Sequence sequence;
     private boolean finished;
     private boolean reportExceptions = true; // should only be false during unit testing
 
-    public StateMachineCommand(StateMachine stateMachine, StateSequence sequence) {
+    public StateMachineCommand(StateMachine stateMachine, Sequence sequence) {
         this.stateMachine = stateMachine;
         this.sequence = sequence;
     }

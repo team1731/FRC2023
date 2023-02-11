@@ -1,5 +1,5 @@
 package frc.robot.state;
 
-public interface StateSequence {
+public interface Sequence {
   public String getDescription();
 }
