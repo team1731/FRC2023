@@ -42,11 +42,11 @@ public class ArmStateMachine extends StateMachine {
     ArmSequence ss = (ArmSequence)selectedSequence;
     switch(ss) {
       case SCORE_TEST:
-        return StateConstants.kTestSequenceScore;
+        return ArmSequenceBuilder.getSequenceByCode(ArmSequence.SCORE_TEST);
       case PICKUP_TEST:
-        return StateConstants.kTestSequencePickup;
+        return ArmSequenceBuilder.getSequenceByCode(ArmSequence.PICKUP_TEST);
       case INVALID_TEST:
-        return StateConstants.kTestInvalid;
+        return ArmSequenceBuilder.getSequenceByCode(ArmSequence.INVALID_TEST);
       default:
         throw new StateMachineInitializationException(getId(), "Sequence supplied is not supported " + selectedSequence);
     }
