@@ -279,8 +279,8 @@ public final class Constants {
         public final static int distalAbsoluteTicsCenter = 1631;
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
-        public final static double proximalHomePosition = 1500;
-        public final static double distalHomePosition = -1000;
+        public final static double proximalHomePosition = 1156;
+        public final static double distalHomePosition = 1515;
 
 
         // Arm PID constants

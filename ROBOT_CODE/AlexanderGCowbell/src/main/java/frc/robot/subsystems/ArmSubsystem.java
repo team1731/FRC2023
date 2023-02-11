@@ -58,6 +58,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private ArmPath currentPath = null;
     private Direction currentDirection = null;
     private double pathStartedTime = 0;
+    private int profileStartIndex = 0;
     private boolean proximalMotorRunning = false;
     private boolean distalMotorRunning = false;
 
@@ -137,6 +138,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         // init motion profile buffers for proximal/distal motors
         currentPath = armPath;
         currentDirection = Direction.FORWARD;
+        profileStartIndex = 0;
         proximalBufferedStream = armPath.getInitializedBuffer(ArmMotor.PROXIMAL, 0, currentDirection);
         distalBufferedStream = armPath.getInitializedBuffer(ArmMotor.DISTAL, 0, currentDirection);
 
@@ -172,6 +174,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         }
 
         currentDirection = Direction.REVERSE;
+        profileStartIndex = startPosition;
         proximalBufferedStream = currentPath.getInitializedBuffer(ArmMotor.PROXIMAL, startPosition, currentDirection);
         distalBufferedStream = currentPath.getInitializedBuffer(ArmMotor.DISTAL, startPosition, currentDirection);
 
@@ -217,9 +220,15 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private int getPathIndex() {
         int pointsLastIndex = currentPath.getNumberOfPoints()-1;
         double elapsedTimeMS = (Timer.getFPGATimestamp() - pathStartedTime) * 1000;
-        int position = (int)(elapsedTimeMS / ArmConstants.pointDurationMS);
+        int pointsProcessed = (int)(elapsedTimeMS / ArmConstants.pointDurationMS);
+        int position = (currentDirection == Direction.FORWARD)? profileStartIndex + pointsProcessed : profileStartIndex - pointsProcessed;
         // make sure we don't end up with an array out of bounds exception
-        return position > pointsLastIndex? pointsLastIndex : position;
+        if(position > pointsLastIndex) {
+            return pointsLastIndex;
+        } else if (position < 0) {
+            return 0;
+        }
+        return position;
     }
 
 
