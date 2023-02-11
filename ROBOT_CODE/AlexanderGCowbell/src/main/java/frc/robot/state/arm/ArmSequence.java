@@ -7,7 +7,26 @@ import frc.robot.state.*;
  * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
  */
 public enum ArmSequence implements Sequence {
-    SCORE_TEST, PICKUP_TEST, UNDEFINED_TEST, INVALID_TEST;
+    SCORE_TEST("ABC"), 
+    PICKUP_TEST("XYZ"), 
+    PICKUP("123"),
+    UNDEFINED_TEST(null), 
+    INVALID_TEST(null);
+
+    public final String code;
+
+    private ArmSequence(String code) {
+        this.code = code;
+    }
+
+    public static ArmSequence valueForCode(String code) {
+        for (ArmSequence as : values()) {
+            if (as.code.equals(code)) {
+                return as;
+            }
+        }
+        return null;
+    }
 
     public String getDescription() {
         return "ArmSequence: " + this.toString();
