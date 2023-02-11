@@ -59,7 +59,7 @@ public abstract class StateMachine {
   }
 
   // Called by a command to set up a state sequence and kick-off any pre-sequence checks
-  public void initialize(StateSequence selectedSequence) throws StateMachineInitializationException {
+  public void initialize(Sequence selectedSequence) throws StateMachineInitializationException {
     try {
       initializationChecks();
 
@@ -92,7 +92,7 @@ public abstract class StateMachine {
   }
 
   // Must override this method to construct the sequence iterator that the state machine will use
-  protected abstract StateChangeRequest[] defineSequence(StateSequence selectedSequence) throws StateMachineInitializationException;
+  protected abstract StateChangeRequest[] defineSequence(Sequence selectedSequence) throws StateMachineInitializationException;
 
   // Called by a command to begin a state sequence
   public void startSequence() {
@@ -192,7 +192,8 @@ public abstract class StateMachine {
     currentStep.timestamp = Timer.getFPGATimestamp();
     processedSteps.add(new StateChange(status, previouState, state, currentStep));
 
-    // if pinging we won't call the subsystem yet, periodic will ping subsystem
+    // if pinging we won't call the subsystem, we are waiting on subsystem
+    // which will ping its own internal systems and notify when it is done
     if(status != Status.PINGING) {
       // not pinging, go ahead and hand off to the subsystem
       stateHandler.changeState(input, currentStep.data);
