@@ -246,28 +246,24 @@ public final class Constants {
          * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
          */
         public static final StateChangeRequest[] kTestSequenceScore = new StateChangeRequest[]{
-            new StateChangeRequest(ArmInput.EXTEND_INIT),
-            new StateChangeRequest(ArmInput.EXTEND_MOVE),
+            new StateChangeRequest(ArmInput.EXTEND),
             new StateChangeRequest(ArmInput.EXTEND_PING),
             new StateChangeRequest(ArmInput.RELEASE, new StateWaitCondition(ArmWait.UNTIL_LINED_UP_FOR_SCORING, WaitType.PAUSE)),
-            new StateChangeRequest(ArmInput.RETRACT_INIT),
-            new StateChangeRequest(ArmInput.RETRACT_MOVE),
+            new StateChangeRequest(ArmInput.RETRACT),
             new StateChangeRequest(ArmInput.RETRACT_PING)
         };
 
         public static final StateChangeRequest[] kTestSequencePickup = new StateChangeRequest[]{
-            new StateChangeRequest(ArmInput.EXTEND_INIT),
-            new StateChangeRequest(ArmInput.EXTEND_MOVE),
+            new StateChangeRequest(ArmInput.EXTEND),
             new StateChangeRequest(ArmInput.EXTEND_PING),
-            new StateChangeRequest(ArmInput.INTAKE),
-            new StateChangeRequest(ArmInput.RETRACT_INIT),
-            new StateChangeRequest(ArmInput.RETRACT_MOVE),
+            new StateChangeRequest(ArmInput.RETRIEVE),
+            new StateChangeRequest(ArmInput.RETRACT),
             new StateChangeRequest(ArmInput.RETRACT_PING)
         };
         
         public static final StateChangeRequest[] kTestInvalid = new StateChangeRequest[]{
-            new StateChangeRequest(ArmInput.EXTEND_INIT),
-            new StateChangeRequest(ArmInput.EXTEND_INIT),
+            new StateChangeRequest(ArmInput.EXTEND),
+            new StateChangeRequest(ArmInput.EXTEND),
         };
     }
 

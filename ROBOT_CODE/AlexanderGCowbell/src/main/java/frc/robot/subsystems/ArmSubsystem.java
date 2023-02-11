@@ -348,14 +348,14 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     public void changeState(Input input, Object data) {
         ArmInput ai = (ArmInput)input;
         switch(ai) {
-            case EXTEND_MOVE:
+            case EXTEND_PING:
                 startArmMovement((ArmPath)data);
                 break;
-            case RETRACT_MOVE:
+            case RETRACT_PING:
             case RECOVER:
                 reverseArmMovment();
                 break;
-            case INTAKE:
+            case RETRIEVE:
                 // TODO implement, for the moment just send back success to keep the state process moving
                 notifyStateMachine(ResultCode.SUCCESS, "TEST: sending success code for unimplemented step");
                 break;

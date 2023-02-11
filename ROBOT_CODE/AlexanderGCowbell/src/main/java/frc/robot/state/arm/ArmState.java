@@ -11,7 +11,7 @@ public enum ArmState implements State {
       public State next(Input input) throws StateMachineInvalidTransitionException {
         ArmInput ai = (ArmInput)input;
         switch(ai) {
-          case EXTEND_INIT:
+          case EXTEND:
             return EXTEND_REQUESTED;
           default:
             handleInvalidTransition(this, input);
@@ -25,7 +25,7 @@ public enum ArmState implements State {
         ArmInput ai = (ArmInput)input;
         switch(ai) {
           case SUCCESS:
-            return EXTEND_INITIALIZED;
+            return EXTENDING;
           case FAILED:
           case INTERRUPT:
             return INTERRUPTED;
@@ -36,38 +36,7 @@ public enum ArmState implements State {
       }
     },
 
-    EXTEND_INITIALIZED {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case EXTEND_MOVE:
-            return EXTEND_MOVE_REQUESTED;
-          case INTERRUPT:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    EXTEND_MOVE_REQUESTED {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case SUCCESS:
-            return EXTEND_MOVING;
-          case FAILED:
-          case INTERRUPT:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    EXTEND_MOVING {
+    EXTENDING {
       public State next(Input input) throws StateMachineInvalidTransitionException {
         ArmInput ai = (ArmInput)input;
         switch(ai) {
@@ -102,7 +71,7 @@ public enum ArmState implements State {
       public State next(Input input) throws StateMachineInvalidTransitionException {
         ArmInput ai = (ArmInput)input;
         switch(ai) {
-          case INTAKE:
+          case RETRIEVE:
             return RETRIEVING;
           case RELEASE:
             return RELEASING;
@@ -135,7 +104,7 @@ public enum ArmState implements State {
       public State next(Input input) throws StateMachineInvalidTransitionException {
         ArmInput ai = (ArmInput)input;
         switch(ai) {
-          case RETRACT_INIT:
+          case RETRACT:
             return RETRACT_REQUESTED;
           case INTERRUPT:
             return INTERRUPTED;
@@ -166,7 +135,7 @@ public enum ArmState implements State {
       public State next(Input input) throws StateMachineInvalidTransitionException {
         ArmInput ai = (ArmInput)input;
         switch(ai) {
-          case RETRACT_INIT:
+          case RETRACT:
             return RETRACT_REQUESTED;
           case INTERRUPT:
             return INTERRUPTED;
@@ -182,7 +151,7 @@ public enum ArmState implements State {
         ArmInput ai = (ArmInput)input;
         switch(ai) {
           case SUCCESS:
-            return RETRACT_INITIALIZED;
+            return RETRACTING;
           case FAILED:
             return INTERRUPTED;
           default:
@@ -192,37 +161,7 @@ public enum ArmState implements State {
       }
     },
 
-    RETRACT_INITIALIZED {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case RETRACT_MOVE:
-            return RETRACT_MOVE_REQUESTED;
-          case FAILED:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    RETRACT_MOVE_REQUESTED {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case SUCCESS:
-            return RETRACT_MOVING;
-          case FAILED:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    RETRACT_MOVING {
+    RETRACTING {
       public State next(Input input) throws StateMachineInvalidTransitionException {
         ArmInput ai = (ArmInput)input;
         switch(ai) {
