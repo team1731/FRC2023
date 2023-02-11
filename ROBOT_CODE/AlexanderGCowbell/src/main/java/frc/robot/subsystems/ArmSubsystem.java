@@ -60,7 +60,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private double pathStartedTime = 0;
     private boolean proximalMotorRunning = false;
     private boolean distalMotorRunning = false;
-    private boolean armHome = true;
 
 
     public ArmSubsystem() {
@@ -88,13 +87,11 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         initializeWrist();
         initializeIntake();
-
     }
 
 
     private void initializeTalonMotor(WPI_TalonFX motor, TalonFXInvertType invertType) {
         TalonFXConfiguration talonConfig = new TalonFXConfiguration(); // factory default settings
-        talonConfig.primaryPID.selectedFeedbackSensor = TalonFXFeedbackDevice.IntegratedSensor.toFeedbackDevice();
         talonConfig.neutralDeadband = ArmConstants.kNeutralDeadband; /* 0.1 % super small for best low-speed control */
         talonConfig.slot0.kF = ArmConstants.kGains_MotProf.kF;
         talonConfig.slot0.kP = ArmConstants.kGains_MotProf.kP;
@@ -102,33 +99,33 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         talonConfig.slot0.kD = ArmConstants.kGains_MotProf.kD;
         talonConfig.slot0.integralZone = (int) ArmConstants.kGains_MotProf.kIzone;
         talonConfig.slot0.closedLoopPeakOutput = ArmConstants.kGains_MotProf.kPeakOutput;
-        motor.configMotionCruiseVelocity(15000, 30);
-		motor.configMotionAcceleration(6000, 30);
         // talonConfig.slot0.allowableClosedloopError // left default for this example
         // talonConfig.slot0.maxIntegralAccumulator; // left default for this example
         // talonConfig.slot0.closedLoopPeriod; // left default for this example
         motor.configAllSettings(talonConfig);
+
+        // Note: these two lines required for motion magic to work
+        motor.configMotionCruiseVelocity(15000, 30);
+		motor.configMotionAcceleration(6000, 30);
+
+        motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 30);
         motor.configNominalOutputForward(0, 30);
 		motor.configNominalOutputReverse(0, 30);
 		motor.configPeakOutputForward(0.5, 30);
 		motor.configPeakOutputReverse(-0.5, 30);
-      //  motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30, 30, 0.2));
+        // motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30, 30, 0.2));
         motor.setInverted(invertType);
     }
 
-        // home for any logic needed to reset, especially when robot moves to disabled state
-    // ensures the motors are stopped and motion profiles are cleared/disabled, 
-    // so motor doesn't try to process last profile when re-enabled
+    // home for any logic needed to reset, especially when robot moves to disabled state
+    // ensures motion profiles are cleared so motor doesn't try to process last profile when re-enabled
+    // moves the arm into a home (safe) position
     public void reset() {
-        // ensure motors are stopped
-       // proximalMotor.set(TalonFXControlMode.PercentOutput, 0);
-       // distalMotor.set(TalonFXControlMode.PercentOutput, 0);
-       armHome = true;
-        // reset to disabled state w/ no motion profiles
         proximalMotor.clearMotionProfileTrajectories();
-     //   proximalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Disable.value);
         distalMotor.clearMotionProfileTrajectories();
-     //   distalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Disable.value);
+        wristPIDController.setReference(0.59, CANSparkMax.ControlType.kSmartMotion);
+        proximalMotor.set(ControlMode.MotionMagic, ArmConstants.proximalHomePosition);
+        distalMotor.set(ControlMode.MotionMagic, ArmConstants.distalHomePosition);
     }
 
     public void startArmMovement(ArmPath armPath) {
@@ -225,10 +222,10 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         return position > pointsLastIndex? pointsLastIndex : position;
     }
 
+
     /*
      * METHODS FOR INITIALIZING THE Intake/WRIST
      */
-
 
     public void initializeWrist() {
         wristMotor.restoreFactoryDefaults();
@@ -254,29 +251,18 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     }
 
     public void initializeIntake() {
-        // initialize motors
-    //    intakeMotor = new CANSparkMax(deviceID, MotorType.kBrushless);
         intakeMotor.restoreFactoryDefaults();
         intakeMotor.setSmartCurrentLimit(30);
         intakeMotor.setInverted(false);
         intakeMotor.setIdleMode(IdleMode.kBrake);
-    
-
- 
     }
 
     public void moveWrist(double rotations) {
-        // TODO handle errors
-    
         wristPIDController.setReference(rotations, CANSparkMax.ControlType.kSmartMotion);
-        
     }
 
     public void stopWrist() {
-        // TODO handle errors
-    
         wristPIDController.setReference(0.0, CANSparkMax.ControlType.kVoltage);
-        
     }
 
 
@@ -299,13 +285,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
     @Override
     public void periodic() {
-
-        if (armHome)  {
-            wristPIDController.setReference(0.59, CANSparkMax.ControlType.kSmartMotion);
-            distalMotor.set(ControlMode.MotionMagic,-1000);
-            proximalMotor.set(ControlMode.MotionMagic, 1500);
-        }
-
         boolean isArmMovingAtPeriodicStart = isArmMoving();
 
         if(stateMachine != null) {
@@ -416,10 +395,10 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     }
 
     public void resetArmEncoders() {
-        proximalMotor.setSelectedSensorPosition((proximalAbsolute.getAverageValue()- ArmConstants.proximalAbsoluteTicsCenter) * ArmConstants.proximalRelativeTicsPerAbsoluteTick);
+        proximalMotor.setSelectedSensorPosition((proximalAbsolute.getAverageValue() - ArmConstants.proximalAbsoluteTicsCenter) * ArmConstants.proximalRelativeTicsPerAbsoluteTick);
         distalMotor.setSelectedSensorPosition((distalAbsolute.getAverageValue()- ArmConstants.distalAbsoluteTicsCenter) * ArmConstants.distalRelativeTicsPerAbsoluteTick);
         System.out.println("setting distal to " + (distalAbsolute.getAverageValue()- ArmConstants.distalAbsoluteTicsCenter) * ArmConstants.distalRelativeTicsPerAbsoluteTick);
-        System.out.println("setting proximal to " + (proximalAbsolute.getAverageValue()- ArmConstants.proximalAbsoluteTicsCenter) * ArmConstants.proximalRelativeTicsPerAbsoluteTick);
+        System.out.println("setting proximal to " + (proximalAbsolute.getAverageValue() - ArmConstants.proximalAbsoluteTicsCenter) * ArmConstants.proximalRelativeTicsPerAbsoluteTick);
     }
 
 

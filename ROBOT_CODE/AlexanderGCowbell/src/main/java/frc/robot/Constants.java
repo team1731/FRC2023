@@ -277,12 +277,15 @@ public final class Constants {
         public final static int wristCancoderId = 12;
         public final static int intakeCancoderId = 13;
 
-        public final static double proximalRelativeTicsPerAbsoluteTick = 14;
-        public final static int proximalAbsoluteTicsCenter = 2117;
-        public final static double distalRelativeTicsPerAbsoluteTick = 10.5;
+        public final static double proximalRelativeTicsPerAbsoluteTick = 140;
+        public final static int proximalAbsoluteTicsCenter = 975;
+        public final static double distalRelativeTicsPerAbsoluteTick = 105;
         public final static int distalAbsoluteTicsCenter = 1631;
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
+        public final static double proximalHomePosition = 1500;
+        public final static double distalHomePosition = -1000;
+
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;
