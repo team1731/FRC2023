@@ -88,9 +88,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         initializeWrist();
         initializeIntake();
-        wristPIDController.setReference(0.59, CANSparkMax.ControlType.kSmartMotion);
-        distalMotor.set(ControlMode.MotionMagic,-1328);
-        proximalMotor.set(ControlMode.MotionMagic, 2000);
+
     }
 
 
@@ -125,13 +123,11 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         // ensure motors are stopped
        // proximalMotor.set(TalonFXControlMode.PercentOutput, 0);
        // distalMotor.set(TalonFXControlMode.PercentOutput, 0);
-       wristPIDController.setReference(0.59, CANSparkMax.ControlType.kSmartMotion);
-       distalMotor.set(ControlMode.MotionMagic,-1328);
-       proximalMotor.set(ControlMode.MotionMagic, 2000);
+       armHome = true;
         // reset to disabled state w/ no motion profiles
-     //   proximalMotor.clearMotionProfileTrajectories();
+        proximalMotor.clearMotionProfileTrajectories();
      //   proximalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Disable.value);
-    //    distalMotor.clearMotionProfileTrajectories();
+        distalMotor.clearMotionProfileTrajectories();
      //   distalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Disable.value);
     }
 
@@ -306,10 +302,10 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         if (armHome)  {
             wristPIDController.setReference(0.59, CANSparkMax.ControlType.kSmartMotion);
-            distalMotor.set(ControlMode.MotionMagic,-1328);
-            proximalMotor.set(ControlMode.MotionMagic, 2000);
+            distalMotor.set(ControlMode.MotionMagic,-1000);
+            proximalMotor.set(ControlMode.MotionMagic, 1500);
         }
-        
+
         boolean isArmMovingAtPeriodicStart = isArmMoving();
 
         if(stateMachine != null) {
@@ -422,7 +418,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     public void resetArmEncoders() {
         proximalMotor.setSelectedSensorPosition((proximalAbsolute.getAverageValue()- ArmConstants.proximalAbsoluteTicsCenter) * ArmConstants.proximalRelativeTicsPerAbsoluteTick);
         distalMotor.setSelectedSensorPosition((distalAbsolute.getAverageValue()- ArmConstants.distalAbsoluteTicsCenter) * ArmConstants.distalRelativeTicsPerAbsoluteTick);
-
+        System.out.println("setting distal to " + (distalAbsolute.getAverageValue()- ArmConstants.distalAbsoluteTicsCenter) * ArmConstants.distalRelativeTicsPerAbsoluteTick);
+        System.out.println("setting proximal to " + (proximalAbsolute.getAverageValue()- ArmConstants.proximalAbsoluteTicsCenter) * ArmConstants.proximalRelativeTicsPerAbsoluteTick);
     }
 
 

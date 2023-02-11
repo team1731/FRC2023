@@ -298,9 +298,9 @@ public final class Constants {
         public final static double wristMaxRPM = 5700;
 
         // Wrist Smart Motion Coefficients
-        public final static double wristMaxVel = 2000; // rpm was 2000
+        public final static double wristMaxVel = 4000; // rpm was 2000
         public final static double wristMinVel = 0;
-        public final static double wristMaxAcc = 1500;  // was 1500
+        public final static double wristMaxAcc = 2500;  // was 1500
         public final static double wristAllowedErr = 0;
 
          // Hand limits
