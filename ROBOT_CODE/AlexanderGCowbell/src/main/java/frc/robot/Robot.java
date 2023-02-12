@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.*;
 
 /**
@@ -44,6 +45,16 @@ public class Robot extends TimedRobot {
   private Swerve s_Swerve;
   private PoseEstimatorSubsystem s_poseEstimatorSubsystem;
   private ArmSubsystem s_armSubSystem;
+
+  public Robot() {
+	if(ArmConstants.recordingArmPath) {
+		addPeriodic(() -> {
+			if (s_armSubSystem.isCSVWriterOpen()) {
+				s_armSubSystem.readEncoders(true);
+			}
+		}, ArmConstants.recordingPeriod, ArmConstants.recordingOffset);
+	}
+  }
 
   /**
    * This function is run when the robot is first started up and should be used for any

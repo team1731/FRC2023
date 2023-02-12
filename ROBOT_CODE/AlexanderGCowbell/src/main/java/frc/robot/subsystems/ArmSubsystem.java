@@ -33,6 +33,8 @@ import frc.data.mp.*;
 import frc.data.mp.ArmPath.ArmMotor;
 import frc.data.mp.ArmPath.Direction;
 import frc.robot.util.ArbitraryFeedForward;
+import frc.robot.util.ReflectingCSVWriter;
+import frc.lib.util.CSVCharacterization;
 
 public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private ArmStateMachine stateMachine;
@@ -53,6 +55,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private SparkMaxPIDController wristPIDController; 
     private AbsoluteEncoder wristEncoder;
 
+    // arm recording
+    ReflectingCSVWriter mCSVWriter;
     
     // state tracking
     private ArmPath currentPath = null;
@@ -61,12 +65,14 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private int profileStartIndex = 0;
     private boolean proximalMotorRunning = false;
     private boolean distalMotorRunning = false;
+    private boolean wristFlexed = false; // flexed is hand bent down (scoring/pickup), extended is hand bent up (home/carrying position)
 
 
     public ArmSubsystem() {
         initializeArmMotors();
         distalAbsolute = new AnalogInput(0);
         proximalAbsolute = new AnalogInput(1);
+        mCSVWriter = null;
     }
 
     public StateMachine getStateMachine() {
@@ -124,9 +130,19 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     public void reset() {
         proximalMotor.clearMotionProfileTrajectories();
         distalMotor.clearMotionProfileTrajectories();
-        wristPIDController.setReference(0.59, CANSparkMax.ControlType.kSmartMotion);
-        proximalMotor.set(ControlMode.MotionMagic, ArmConstants.proximalHomePosition);
-        distalMotor.set(ControlMode.MotionMagic, ArmConstants.distalHomePosition);
+
+        if(ArmConstants.recordingArmPath) {
+            // disengage the arm and wrist motors so both can be moved freely for recording
+            stopWrist();
+            proximalMotor.set(ControlMode.PercentOutput, 0);
+            distalMotor.set(ControlMode.PercentOutput, 0);
+        } else {
+            // move the arm into normal home (safe) position
+            moveWrist(ArmConstants.wristHomePosition);
+            wristFlexed = false;
+            proximalMotor.set(ControlMode.MotionMagic, ArmConstants.proximalHomePosition);
+            distalMotor.set(ControlMode.MotionMagic, ArmConstants.distalHomePosition);
+        }        
     }
 
     public void startArmMovement(ArmPath armPath) {
@@ -266,8 +282,8 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         intakeMotor.setIdleMode(IdleMode.kBrake);
     }
 
-    public void moveWrist(double rotations) {
-        wristPIDController.setReference(rotations, CANSparkMax.ControlType.kSmartMotion);
+    public void moveWrist(double position) {
+        wristPIDController.setReference(position, CANSparkMax.ControlType.kSmartMotion);
     }
 
     public void stopWrist() {
@@ -310,10 +326,18 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
             distalMotorRunning = false;
         }
 
-        if(isArmMoving()) {
+        if(!wristFlexed && isArmMoving() && currentDirection == Direction.FORWARD) {
             int currentIndex = getPathIndex();
-            double currentWristPosition = currentPath.getWristAtIndex(currentIndex);
-            wristPIDController.setReference(currentWristPosition, CANSparkMax.ControlType.kSmartMotion);
+            int wristFlexIndex = currentPath.getWristFlexIndex();
+            if(wristFlexIndex >= currentIndex) {
+                // move the wrist into the flexed position for this path
+                moveWrist(currentPath.getWristFlexPosition());
+                wristFlexed = true;
+            }
+        } else if(wristFlexed && isArmMoving() && currentDirection == Direction.REVERSE) {
+            // move the wrist back into extended (home) position
+            moveWrist(ArmConstants.wristHomePosition);
+            wristFlexed = false;
         }
 
         if(isArmMovingAtPeriodicStart && !isArmMoving()) { // arm was moving, but has now stopped
@@ -323,6 +347,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
                 currentPath = null;
                 currentDirection = null;
                 pathStartedTime = 0;
+                stopIntake();
             } 
         }
         doSD();
@@ -414,5 +439,42 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     public void setArmMotors(double pAxis, double dAxis) {
         proximalMotor.set(ControlMode.PercentOutput, pAxis);
         distalMotor.set(ControlMode.PercentOutput, dAxis);
+    }
+
+
+    /*
+     * Methods for recording arm movement
+     */
+    public void readEncoders(boolean write) {
+		/* Read the sensors */
+		double proximal_pos = proximalMotor.getSelectedSensorPosition();
+		double proximal_vel = proximalMotor.getSelectedSensorVelocity();
+		double distal_pos = distalMotor.getSelectedSensorPosition();
+		double distal_vel = distalMotor.getSelectedSensorVelocity();
+		double wrist_pos = wristEncoder.getPosition(); //_DistalMotor.getSelectedSensorPosition();
+		if (write && mCSVWriter != null) {
+			CSVCharacterization.ArmEncoderValues mPositions = new CSVCharacterization.ArmEncoderValues(
+				proximal_pos, proximal_vel, distal_pos, distal_vel, wrist_pos);
+			// write positions to csv file
+			mCSVWriter.add(mPositions);
+		}
+	}
+
+    public void openCSVWriter() {
+        System.out.println("\n ------------------- OPEN CSV WRITER ---------------------- \n");
+        mCSVWriter = new ReflectingCSVWriter<>(CSVCharacterization.ArmEncoderValues.class);
+    }
+
+    public void closeCSVWriter() {
+        System.out.println("\n ------------------- CLOSE CSV WRITER ---------------------- \n");
+        mCSVWriter.flush();
+        mCSVWriter = null;
+    }
+
+    public boolean isCSVWriterOpen() {
+        if (mCSVWriter != null) {
+            return true;
+        }
+        return false;
     }
 }
