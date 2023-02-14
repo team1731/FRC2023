@@ -193,41 +193,6 @@ public final class Constants {
 
     }
 
-    public static final class DriveConstants {
-
-		// Drive motor CAN IDs
-		public static final int kLeftFrontDriveMotorPort = 21;
-		public static final int kRightFrontDriveMotorPort = 22;
-		public static final int kLeftRearDriveMotorPort = 23;
-		public static final int kRightRearDriveMotorPort = 24;
-
-		// Turn motor CAN IDs
-		public static final int kLeftFrontTurningMotorPort = 11;
-		public static final int kRightFrontTurningMotorPort = 12;
-		public static final int kLeftRearTurningMotorPort = 13;
-		public static final int kRightRearTurningMotorPort = 14;
-
-		public static final double kTrackWidth = 0.7112;
-		// Distance between centers of right and left wheels on robot
-		public static final double kWheelBase = 0.7;
-		// Distance between front and back wheels on robot
-		public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics( // leftFront,
-																								// rightFront, leftRear,
-																								// rightRear
-				new Translation2d(kWheelBase / 2, kTrackWidth / 2), new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-				new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-				new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
-
-		public static final boolean kGyroReversed = true; // 09FEB false;
-
-		public static final double kMaxSpeedMetersPerSecond = 0.5; // disabled for testing = 3.5; // tune
-
-		public static final double kTurnP = 0.1; // was 0.05
-		public static final double kTurnI = 0;
-		public static final double kTurnD = 0;
-
-	}
-
     public static final class AutoConstants {
         public static final String kDefault                  = "Default_Auto";
         public static final String k_0_Example               = "0_Example_Auto";

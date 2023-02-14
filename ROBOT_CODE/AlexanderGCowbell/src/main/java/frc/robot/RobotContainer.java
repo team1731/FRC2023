@@ -56,12 +56,12 @@ public class RobotContainer {
           ArmSubsystem armSubsystem) {
     
 	  boolean fieldRelative = true;
-    boolean openLoop = true;
+    boolean openLoop = false;
     s_Swerve = swerve;
     s_armSubSystem = armSubsystem;
     s_poseEstimatorSubsystem = poseEstimatorSubsystem;
-  //  s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
-   // s_armSubSystem.setDefaultCommand(new TestArm(s_armSubSystem, driver, translationAxis, distalAxis));    s_poseEstimatorSubsystem = poseEstimatorSubsystem;
+    // s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
+    // s_armSubSystem.setDefaultCommand(new TestArm(s_armSubSystem, driver, translationAxis, distalAxis)); 
  
 
     // Configure the button bindings

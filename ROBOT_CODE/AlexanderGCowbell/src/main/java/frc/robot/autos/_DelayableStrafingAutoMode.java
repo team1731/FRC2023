@@ -12,7 +12,7 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.Swerve;
 import frc.robot.util.Utils;
 
 @Deprecated
@@ -139,12 +139,12 @@ public class _DelayableStrafingAutoMode {
 				return new TrajectoryConfig(AutoConstants.kMaxSpeedMetersPerSecond,
 						AutoConstants.kMaxAccelerationMetersPerSecondSquared)
 								// Add kinematics to ensure max speed is actually obeyed
-								.setKinematics(DriveConstants.kDriveKinematics).setReversed(false);
+								.setKinematics(Swerve.swerveKinematics).setReversed(false);
 			case REV:
 				return new TrajectoryConfig(AutoConstants.kMaxSpeedMetersPerSecond,
 						AutoConstants.kMaxAccelerationMetersPerSecondSquared)
 								// Add kinematics to ensure max speed is actually obeyed
-								.setKinematics(DriveConstants.kDriveKinematics).setReversed(true);
+								.setKinematics(Swerve.swerveKinematics).setReversed(true);
 		}
 		return null;
 	}
@@ -208,67 +208,4 @@ public class _DelayableStrafingAutoMode {
 		}
 		return convertedPoints;
 	}
-
-	/*
-	TODO DriveSubsystem is no longer in use, need to re-val this method, note: removed the _InstrumentedSwerveControllerCommand temporarily
-	public Command createSwerveCommand(DriveSubsystem m_robotDrive, String name, double endingHeading,
-			Trajectory trajectory, boolean trackTarget) {
-				return null;
-		// return new _InstrumentedSwerveControllerCommand(m_robotDrive, m_robotDrive.getCSVWriter(), trajectory, // trajectory
-		// 																										// was
-		// 																										// created
-		// 																										// by
-		// 																										// PathWeaver
-		// 																										// and
-		// 																										// read-in
-		// 																										// from
-		// 																										// a
-		// 																										// file
-		// 		endingHeading, // pass this value through
-		// 		m_robotDrive::getPose, // Functional interface to feed supplier
-		// 		DriveConstants.kDriveKinematics,
-
-		// 		// Position controllers
-		// 		new PIDController(AutoConstants.kPXController, 0, 0),
-		// 		new PIDController(AutoConstants.kPYController, 0, 0),
-		// 		new PIDController(AutoConstants.kPThetaController, 0, 0), trackTarget,
-
-		// 		m_robotDrive::setModuleStates, m_robotDrive) {
-		// 	@Override
-		// 	public void end(boolean interrupted) {
-		// 		super.end(interrupted);
-		// 		System.out.println("at end of swerve command, interrupted=" + interrupted);
-		// 	}
-		// };
-	}
-	*/
-
-	/*
-	 * TODO DriveSubsystem is no longer in use, need to re-val this method, note: removed the _InstrumentedSwerveControllerCommand temporarily
-	public _InstrumentedSwerveControllerCommand createSwerveCommand(DriveSubsystem m_robotDrive, String name,
-			TrajectoryDirection dir, TrajectoryHeading mode, double value, double[][] points, boolean trackTarget) {
-		if (mode == TrajectoryHeading.CONVERT_TO_METERS) {
-			points = convertPoints(points);
-		}
-		return null;
-		// return new _InstrumentedSwerveControllerCommand(m_robotDrive, m_robotDrive.getCSVWriter(),
-		// 		createTrajectory(name, dir, mode, value, points), m_robotDrive::getPose, // Functional interface to feed
-		// 																					// supplier
-		// 		DriveConstants.kDriveKinematics,
-
-		// 		// Position controllers
-		// 		new PIDController(AutoConstants.kPXController, 0, 0),
-		// 		new PIDController(AutoConstants.kPYController, 0, 0),
-		// 		new PIDController(AutoConstants.kPThetaController, 0, 0), trackTarget,
-
-		// 		m_robotDrive::setModuleStates, m_robotDrive) {
-		// 	@Override
-		// 	public void end(boolean interrupted) {
-		// 		super.end(interrupted);
-		// 		System.out.println("at end of swerve command, interrupted=" + interrupted);
-		// 	}
-		// };
-	}
-	*/
-
 }
