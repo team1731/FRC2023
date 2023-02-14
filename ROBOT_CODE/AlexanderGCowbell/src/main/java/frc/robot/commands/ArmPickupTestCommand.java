@@ -13,7 +13,7 @@ public class ArmPickupTestCommand extends CommandBase {
 
     @Override
 	public void initialize() {
-        ArmPath path = PickupTest.getArmPath();
+        ArmPath path = ShelfPickup.getArmPath();
         armSubsystem.startArmMovement(path); 
         armSubsystem.intake();
 	}
@@ -21,7 +21,7 @@ public class ArmPickupTestCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        armSubsystem.stopIntake();
+        armSubsystem.holdIntake();
         armSubsystem.reverseArmMovment();
     }
 }

@@ -13,7 +13,7 @@ public class ArmScoreTestCommand extends CommandBase {
 
     @Override
 	public void initialize() {
-        ArmPath path = ScoreTest.getArmPath();
+        ArmPath path = ScoreHigh.getArmPath();
         armSubsystem.startArmMovement(path);
 	}
 

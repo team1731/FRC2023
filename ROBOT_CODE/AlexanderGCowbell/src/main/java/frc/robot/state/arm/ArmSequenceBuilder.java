@@ -1,6 +1,6 @@
 package frc.robot.state.arm;
 import frc.data.mp.ArmPath;
-import frc.data.mp.ShelfIntake;
+import frc.data.mp.ShelfPickup;
 import frc.robot.state.StateChangeRequest;
 
 import frc.robot.state.StateWaitCondition;
@@ -54,7 +54,7 @@ public class ArmSequenceBuilder {
                 return getPickupTest();
 
             case PICKUP:
-                return getPickup(ShelfIntake.getArmPath());
+                return getPickup(ShelfPickup.getArmPath());
 
             case INVALID_TEST:
                 return getInvalidTest();

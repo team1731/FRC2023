@@ -37,7 +37,7 @@ public final class Constants {
          */
         public static final boolean loggingEnabled = false;     // note: must also turn on applicable loggers below
         public static final boolean logNetworkTables = false;   // only applicable when logMode = DATA_LOG
-        public static final LogMode logMode = LogMode.DATA_LOG;
+        public static final LogMode logMode = LogMode.CSV;
 
         // list of loggers and enabled status, note: must also enable logging above
         public static final Map<Log, Boolean> loggers = Map.of(
@@ -271,14 +271,14 @@ public final class Constants {
         public final static int intakeCancoderId = 13;
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
-        public final static int proximalAbsoluteTicsCenter = 1032;
+        public final static int proximalAbsoluteTicsCenter = 2437;
         public final static double distalRelativeTicsPerAbsoluteTick = 105;
-        public final static int distalAbsoluteTicsCenter = 1376;
+        public final static int distalAbsoluteTicsCenter = 1816;
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
-        public final static double proximalHomePosition = 2437;
-        public final static double distalHomePosition = 1839;
-        public final static double wristHomePosition = 0.59;
+        public final static double proximalHomePosition = -4388;
+        public final static double distalHomePosition = 10489;
+        public final static double wristHomePosition = 0.57;
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;
@@ -293,17 +293,20 @@ public final class Constants {
         public final static double wristMinOutput = -1.0;
         public final static double wristMaxRPM = 5700;
 
+        // Wrist limits
+        public static final int WRIST_CURRENT_LIMIT = 20;
+
         // Wrist Smart Motion Coefficients
-        public final static double wristMaxVel = 4000; // rpm was 2000
+        public final static double wristMaxVel = 2000;
         public final static double wristMinVel = 0;
-        public final static double wristMaxAcc = 2500;  // was 1500
+        public final static double wristMaxAcc = 1500; 
         public final static double wristAllowedErr = 0;
 
          // Hand limits
-        static final int INTAKE_CURRENT_LIMIT_A = 25;
-        static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
-        static final double INTAKE_OUTPUT_POWER = 1.0;
-        static final double INTAKE_HOLD_POWER = 0.07;
+        public static final int INTAKE_CURRENT_LIMIT_A = 30;
+        public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
+        public static final double INTAKE_OUTPUT_POWER = 1.0;
+        public static final double INTAKE_HOLD_POWER = 0.07;
 
         //Geometry Constants
         public final static double proximalArmLength = 35.75; //inches

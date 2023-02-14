@@ -55,6 +55,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private CANSparkMax wristMotor;
     private CANSparkMax intakeMotor;
     private SparkMaxPIDController wristPIDController; 
+    private SparkMaxPIDController intakePIDController;
     private AbsoluteEncoder wristEncoder;
 
     // arm recording
@@ -68,6 +69,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private boolean proximalMotorRunning = false;
     private boolean distalMotorRunning = false;
     private boolean wristFlexed = false; // flexed is hand bent down (scoring/pickup), extended is hand bent up (home/carrying position)
+    private boolean ejecting = false;
 
 
     public ArmSubsystem() {
@@ -135,11 +137,13 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
         if(LogWriter.isArmRecordingEnabled()) {
             // disengage the arm and wrist motors so both can be moved freely for recording
+            stopIntake();
             stopWrist();
             proximalMotor.set(ControlMode.PercentOutput, 0);
             distalMotor.set(ControlMode.PercentOutput, 0);
         } else {
             // move the arm into normal home (safe) position
+            stopIntake();
             moveWrist(ArmConstants.wristHomePosition);
             wristFlexed = false;
             proximalMotor.set(ControlMode.MotionMagic, ArmConstants.proximalHomePosition);
@@ -256,7 +260,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
     public void initializeWrist() {
         wristMotor.restoreFactoryDefaults();
-        intakeMotor.setSmartCurrentLimit(30);
+        wristMotor.setSmartCurrentLimit(ArmConstants.WRIST_CURRENT_LIMIT);
         wristPIDController = wristMotor.getPIDController();
         wristEncoder = wristMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
@@ -279,9 +283,11 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
     public void initializeIntake() {
         intakeMotor.restoreFactoryDefaults();
-        intakeMotor.setSmartCurrentLimit(30);
+        intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
         intakeMotor.setInverted(false);
         intakeMotor.setIdleMode(IdleMode.kBrake);
+        intakePIDController = intakeMotor.getPIDController();
+        intakePIDController.setReference(ArmConstants.INTAKE_OUTPUT_POWER, CANSparkMax.ControlType.kVoltage);
     }
 
     public void moveWrist(double position) {
@@ -298,11 +304,20 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     }
 
     public void eject() {
+        ejecting = true;
+        //intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
+        //intakePIDController.setReference(ArmConstants.INTAKE_OUTPUT_POWER, CANSparkMax.ControlType.kVoltage);
         intakeMotor.set(-1.0);
     }
 
+    public void holdIntake() {
+        //intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_HOLD_CURRENT_LIMIT_A);
+        //intakePIDController.setReference(ArmConstants.INTAKE_HOLD_POWER, CANSparkMax.ControlType.kVoltage);
+        intakeMotor.set(0);
+    }
+
     public void stopIntake() {
-        intakeMotor.set (0);
+        intakeMotor.set(0);
     }
 
 
@@ -331,15 +346,23 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         if(!wristFlexed && isArmMoving() && currentDirection == Direction.FORWARD) {
             int currentIndex = getPathIndex();
             int wristFlexIndex = currentPath.getWristFlexIndex();
-            if(wristFlexIndex >= currentIndex) {
+            if(currentIndex >= wristFlexIndex) {
                 // move the wrist into the flexed position for this path
                 moveWrist(currentPath.getWristFlexPosition());
                 wristFlexed = true;
             }
         } else if(wristFlexed && isArmMoving() && currentDirection == Direction.REVERSE) {
-            // move the wrist back into extended (home) position
-            moveWrist(ArmConstants.wristHomePosition);
-            wristFlexed = false;
+            int currentIndex = getPathIndex();
+            int wristExtendIndex = currentPath.getWristExtendIndex();
+            if(currentIndex <= wristExtendIndex) {
+                // move the wrist back into extended (home) position
+                moveWrist(ArmConstants.wristHomePosition);
+                wristFlexed = false;
+
+                if(ejecting) {
+                    stopIntake();
+                }
+            }
         }
 
         if(isArmMovingAtPeriodicStart && !isArmMoving()) { // arm was moving, but has now stopped
@@ -349,7 +372,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
                 currentPath = null;
                 currentDirection = null;
                 pathStartedTime = 0;
-                stopIntake();
             } 
         }
         doSD();
