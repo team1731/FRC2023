@@ -30,7 +30,7 @@ public class DataLogWriter<T> implements Logger {
 		
 		for(Field field : fields) {
             String fieldName = field.getName();
-            String topicField = "/" + topic + "/" + fieldName;
+            String topicField = topic + "/" + fieldName;
             Class<T> fieldType = (Class<T>)field.getType();
 
             DataLogEntry entry = null;
