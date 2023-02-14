@@ -6,15 +6,10 @@ import java.util.HashMap;
 import edu.wpi.first.util.datalog.DataLog;
 import edu.wpi.first.util.datalog.DataLogEntry;
 import edu.wpi.first.util.datalog.BooleanLogEntry;
-import edu.wpi.first.util.datalog.BooleanArrayLogEntry;
 import edu.wpi.first.util.datalog.IntegerLogEntry;
-import edu.wpi.first.util.datalog.IntegerArrayLogEntry;
 import edu.wpi.first.util.datalog.DoubleLogEntry;
-import edu.wpi.first.util.datalog.DoubleArrayLogEntry;
 import edu.wpi.first.util.datalog.FloatLogEntry;
-import edu.wpi.first.util.datalog.FloatArrayLogEntry;
 import edu.wpi.first.util.datalog.StringLogEntry;
-import edu.wpi.first.util.datalog.StringArrayLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 
 
@@ -41,24 +36,14 @@ public class DataLogWriter<T> implements Logger {
             DataLogEntry entry = null;
             if(fieldType.isAssignableFrom(Boolean.TYPE)) {
                 entry = new BooleanLogEntry(dataLog, topicField);
-            } else if(fieldType.isAssignableFrom(boolean[].class)) {
-                entry = new BooleanArrayLogEntry(dataLog, topicField);
-            } else if(fieldType.isAssignableFrom(Long.TYPE)) {
+            } else if(fieldType.isAssignableFrom(Integer.TYPE) || fieldType.isAssignableFrom(Long.TYPE)) {
                 entry = new IntegerLogEntry(dataLog, topicField);
-            } else if(fieldType.isAssignableFrom(long[].class)) {
-                entry = new IntegerArrayLogEntry(dataLog, topicField);
             } else if(fieldType.isAssignableFrom(Double.TYPE)) {
                 entry = new DoubleLogEntry(dataLog, topicField);
-            } else if(fieldType.isAssignableFrom(double[].class)) {
-                entry = new DoubleArrayLogEntry(dataLog, topicField);
             } else if(fieldType.isAssignableFrom(Float.TYPE)) {
                 entry = new FloatLogEntry(dataLog, topicField);
-            } else if(fieldType.isAssignableFrom(float[].class)) {
-                entry = new FloatArrayLogEntry(dataLog, topicField);
             } else if(fieldType.isAssignableFrom(String.class)) {
                 entry = new StringLogEntry(dataLog, topicField);
-            } else if(fieldType.isAssignableFrom(String[].class)) {
-                entry = new StringArrayLogEntry(dataLog, topicField);
             }
 
             loggers.put(fieldName, entry);
@@ -91,33 +76,18 @@ public class DataLogWriter<T> implements Logger {
                 if(entryLogger.getClass().isAssignableFrom(BooleanLogEntry.class)) {
                     boolean fieldValue = (boolean)field.get(entry);
                     ((BooleanLogEntry)entry).append(fieldValue);
-                } else if(entryLogger.getClass().isAssignableFrom(BooleanArrayLogEntry.class)) {
-                    boolean[] fieldValue = (boolean[])field.get(entry);
-                    ((BooleanArrayLogEntry)entry).append(fieldValue);
                 } else if(entryLogger.getClass().isAssignableFrom(IntegerLogEntry.class)) {
                     long fieldValue = (long)field.get(entry);
                     ((IntegerLogEntry)entry).append(fieldValue);
-                } else if(entryLogger.getClass().isAssignableFrom(IntegerArrayLogEntry.class)) {
-                    long[] fieldValue = (long[])field.get(entry);
-                    ((IntegerArrayLogEntry)entry).append(fieldValue);
                 } else if(entryLogger.getClass().isAssignableFrom(DoubleLogEntry.class)) {
                     double fieldValue = (double)field.get(entry);
                     ((DoubleLogEntry)entry).append(fieldValue);
-                } else if(entryLogger.getClass().isAssignableFrom(DoubleArrayLogEntry.class)) {
-                    double[] fieldValue = (double[])field.get(entry);
-                    ((DoubleArrayLogEntry)entry).append(fieldValue);
                 } else if(entryLogger.getClass().isAssignableFrom(FloatLogEntry.class)) {
                     float fieldValue = (float)field.get(entry);
                     ((FloatLogEntry)entry).append(fieldValue);
-                } else if(entryLogger.getClass().isAssignableFrom(FloatArrayLogEntry.class)) {
-                    float[] fieldValue = (float[])field.get(entry);
-                    ((FloatArrayLogEntry)entry).append(fieldValue);
                 } else if(entryLogger.getClass().isAssignableFrom(StringLogEntry.class)) {
                     String fieldValue = (String)field.get(entry);
                     ((StringLogEntry)entry).append(fieldValue);
-                } else if(entryLogger.getClass().isAssignableFrom(StringArrayLogEntry.class)) {
-                    String[] fieldValue = (String[])field.get(entry);
-                    ((StringArrayLogEntry)entry).append(fieldValue);
                 }
                 
             } catch (IllegalArgumentException e) {

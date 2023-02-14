@@ -3,6 +3,15 @@ package frc.robot.util.log;
 import edu.wpi.first.wpilibj.DataLogManager;
 import frc.robot.Constants.LogConstants;
 
+
+/*
+ * NOTE: LogWriter supports logging the following types
+ * boolean, int, long, double, float, String
+ * 
+ * DataLogManager also supports logging arrays of values, but to simplify things and 
+ * smooth out differences in the underlying loggers you should convert arrays of values
+ * to a String before sending it to the logger
+ */
 public class LogWriter {
     public enum Log {
         POSE_ESTIMATIONS, ARM_PATH_RECORDING
