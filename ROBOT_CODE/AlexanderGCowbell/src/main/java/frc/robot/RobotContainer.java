@@ -39,10 +39,8 @@ public class RobotContainer {
   private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
   private final JoystickButton adjustAllEncoders = new JoystickButton(driver, XboxController.Button.kX.value);
   private final JoystickButton wristPos1 = new JoystickButton(driver,XboxController.Button.kA.value);
-
-  // Button mappings for right and left bumper, used currently for testing, bind in configure button method
-  private JoystickButton leftBumper;
-  private JoystickButton rightBumper;
+  private JoystickButton leftBumper = new JoystickButton(driver,XboxController.Button.kLeftBumper.value);
+  private JoystickButton rightBumper = new JoystickButton(driver,XboxController.Button.kRightBumper.value);
 
 
   /* Subsystems */
