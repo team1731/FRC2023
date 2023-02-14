@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 /**
  * Writes data to a CSV file
  */
-public class ReflectingCSVWriter<T> {
+public class ReflectingCSVWriter<T> implements Logger {
 	ConcurrentLinkedDeque<String> mLinesToWrite = new ConcurrentLinkedDeque<>();
 	PrintWriter mOutput = null;
 	Field[] mFields;
@@ -69,8 +69,8 @@ public class ReflectingCSVWriter<T> {
 		}
 		writeLine(line.toString());
 	}
-
-	public void add(T value) {
+	
+	public void add(Object value) {
 		if (!suspended) {
 			StringBuffer line = new StringBuffer();
 			for (Field field : mFields) {

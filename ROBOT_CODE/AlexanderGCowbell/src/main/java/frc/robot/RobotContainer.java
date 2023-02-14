@@ -14,7 +14,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
-import frc.robot.Constants.ArmConstants;
+import frc.robot.util.log.LogWriter;
 import frc.robot.Constants.AutoConstants;
 
 /**
@@ -84,9 +84,9 @@ public class RobotContainer {
     wristPos1.onTrue(new InstantCommand(() -> s_armSubSystem.moveWrist(0.63)));
     wristPos1.onFalse(new InstantCommand(() -> s_armSubSystem.stopWrist()));
 
-    if(ArmConstants.recordingArmPath) {
-      leftBumper.onTrue(new InstantCommand(() -> s_armSubSystem.openCSVWriter()));
-      rightBumper.onTrue(new InstantCommand(() -> s_armSubSystem.closeCSVWriter()));
+    if(LogWriter.isArmRecordingEnabled()) {
+      leftBumper.onTrue(new InstantCommand(() -> s_armSubSystem.startRecordingArmPath()));
+      rightBumper.onTrue(new InstantCommand(() -> s_armSubSystem.stopRecordingArmPath()));
     } else {
       leftBumper.whileTrue(new ArmPickupTestCommand(s_armSubSystem));
       rightBumper.whileTrue(new ArmScoreTestCommand(s_armSubSystem));

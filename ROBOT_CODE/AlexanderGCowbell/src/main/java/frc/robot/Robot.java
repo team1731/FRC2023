@@ -20,7 +20,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
 import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.LogConstants;
+import frc.robot.util.log.LogWriter;
 import frc.robot.subsystems.*;
 
 /**
@@ -47,12 +48,12 @@ public class Robot extends TimedRobot {
   private ArmSubsystem s_armSubSystem;
 
   public Robot() {
-	if(ArmConstants.recordingArmPath) {
+	if(LogWriter.isArmRecordingEnabled()) {
 		addPeriodic(() -> {
-			if (s_armSubSystem.isCSVWriterOpen()) {
-				s_armSubSystem.readEncoders(true);
+			if(s_armSubSystem.isArmRecordingRunning()) {
+				s_armSubSystem.writeArmPathValues();
 			}
-		}, ArmConstants.recordingPeriod, ArmConstants.recordingOffset);
+		}, LogConstants.recordingPeriod, LogConstants.recordingOffset);
 	}
   }
 
@@ -64,6 +65,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
 	LiveWindow.disableAllTelemetry();
     ctreConfigs = new CTREConfigs();
+	LogWriter.setupLogging();
 
 	s_Swerve = new Swerve();
   	s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);

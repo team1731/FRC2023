@@ -33,8 +33,10 @@ import frc.data.mp.*;
 import frc.data.mp.ArmPath.ArmMotor;
 import frc.data.mp.ArmPath.Direction;
 import frc.robot.util.ArbitraryFeedForward;
-import frc.robot.util.ReflectingCSVWriter;
-import frc.lib.util.CSVCharacterization;
+import frc.robot.util.log.Logger;
+import frc.robot.util.log.LogWriter;
+import frc.robot.util.log.LogWriter.Log;
+import frc.robot.util.log.loggers.ArmPathRecording;
 
 public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private ArmStateMachine stateMachine;
@@ -56,7 +58,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private AbsoluteEncoder wristEncoder;
 
     // arm recording
-    ReflectingCSVWriter mCSVWriter;
+    Logger armPathLogger;
     
     // state tracking
     private ArmPath currentPath = null;
@@ -72,7 +74,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         initializeArmMotors();
         distalAbsolute = new AnalogInput(0);
         proximalAbsolute = new AnalogInput(1);
-        mCSVWriter = null;
+        armPathLogger = null;
     }
 
     public StateMachine getStateMachine() {
@@ -131,7 +133,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         proximalMotor.clearMotionProfileTrajectories();
         distalMotor.clearMotionProfileTrajectories();
 
-        if(ArmConstants.recordingArmPath) {
+        if(LogWriter.isArmRecordingEnabled()) {
             // disengage the arm and wrist motors so both can be moved freely for recording
             stopWrist();
             proximalMotor.set(ControlMode.PercentOutput, 0);
@@ -445,36 +447,33 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     /*
      * Methods for recording arm movement
      */
-    public void readEncoders(boolean write) {
+    public void startRecordingArmPath() {
+        System.out.println("\n ------------------- STARTED RECORDING ARM PATH ---------------------- \n");
+        armPathLogger = LogWriter.getLogger(Log.ARM_PATH_RECORDING, ArmPathRecording.class);
+    }
+
+    public void stopRecordingArmPath() {
+        System.out.println("\n ------------------- STOPPED RECORDING ARM PATH ---------------------- \n");
+        armPathLogger.flush();
+        armPathLogger = null;
+    }
+
+    public void writeArmPathValues() {
 		/* Read the sensors */
 		double proximal_pos = proximalMotor.getSelectedSensorPosition();
 		double proximal_vel = proximalMotor.getSelectedSensorVelocity();
 		double distal_pos = distalMotor.getSelectedSensorPosition();
 		double distal_vel = distalMotor.getSelectedSensorVelocity();
-		double wrist_pos = wristEncoder.getPosition(); //_DistalMotor.getSelectedSensorPosition();
-		if (write && mCSVWriter != null) {
-			CSVCharacterization.ArmEncoderValues mPositions = new CSVCharacterization.ArmEncoderValues(
+		double wrist_pos = wristEncoder.getPosition();
+		if(armPathLogger != null) {
+			ArmPathRecording positions = new ArmPathRecording(
 				proximal_pos, proximal_vel, distal_pos, distal_vel, wrist_pos);
 			// write positions to csv file
-			mCSVWriter.add(mPositions);
+			armPathLogger.add(positions);
 		}
 	}
 
-    public void openCSVWriter() {
-        System.out.println("\n ------------------- OPEN CSV WRITER ---------------------- \n");
-        mCSVWriter = new ReflectingCSVWriter<>(CSVCharacterization.ArmEncoderValues.class);
-    }
-
-    public void closeCSVWriter() {
-        System.out.println("\n ------------------- CLOSE CSV WRITER ---------------------- \n");
-        mCSVWriter.flush();
-        mCSVWriter = null;
-    }
-
-    public boolean isCSVWriterOpen() {
-        if (mCSVWriter != null) {
-            return true;
-        }
-        return false;
+    public boolean isArmRecordingRunning() {
+        return (armPathLogger != null);
     }
 }

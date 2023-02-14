@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.Map;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.apriltag.AprilTag;
@@ -16,17 +18,37 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.SwerveModuleConstants;
-import frc.robot.state.StateChangeRequest;
-import frc.robot.state.StateWaitCondition;
-import frc.robot.state.StateWaitCondition.WaitType;
-import frc.robot.state.arm.ArmInput;
-import frc.robot.state.arm.ArmWait;
 import frc.robot.util.Gains;
-import frc.data.mp.*;
+import frc.robot.util.log.LogWriter.Log;
+import frc.robot.util.log.LogWriter.LogMode;
+
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
 	public static final int kTICKS = 33024; // 16.125 * 2048;
+    
+
+    public static final class LogConstants {
+        /*
+         * To write to a log you must:
+         * 1. Set loggingEnabled = true
+         * 2. Set the desired logMode (CSV, DATA_LOG)
+         * 2. Set the desired loggers below = true
+         */
+        public static final boolean loggingEnabled = false;     // note: must also turn on applicable loggers below
+        public static final boolean logNetworkTables = false;   // only applicable when logMode = DATA_LOG
+        public static final LogMode logMode = LogMode.DATA_LOG;
+
+        // list of loggers and enabled status, note: must also enable logging above
+        public static final Map<Log, Boolean> loggers = Map.of(
+            Log.ARM_PATH_RECORDING, false,
+            Log.POSE_ESTIMATIONS, false
+        );
+
+        // Arm path recording constants
+        public final static double recordingPeriod = 0.01; // seconds
+        public final static double recordingOffset = 0.005; // seconds 
+    }
 
     public static final class FieldConstants {
         // Note: Field dimensions and April Tag positions pulled from the 2023 Field and Layout Marking document
@@ -240,31 +262,6 @@ public final class Constants {
         * Constants specifically related to the ArmStateMachine
         */
         public static final String kArmStateMachineId = "ArmStateMachine";
-
-        /*
-         * Sequences for the ArmStateMachine
-         * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
-         */
-        public static final StateChangeRequest[] kTestSequenceScore = new StateChangeRequest[]{
-            new StateChangeRequest(ArmInput.EXTEND),
-            new StateChangeRequest(ArmInput.EXTEND_PING),
-            new StateChangeRequest(ArmInput.RELEASE, new StateWaitCondition(ArmWait.UNTIL_LINED_UP_FOR_SCORING, WaitType.PAUSE)),
-            new StateChangeRequest(ArmInput.RETRACT),
-            new StateChangeRequest(ArmInput.RETRACT_PING)
-        };
-
-        public static final StateChangeRequest[] kTestSequencePickup = new StateChangeRequest[]{
-            new StateChangeRequest(ArmInput.EXTEND),
-            new StateChangeRequest(ArmInput.EXTEND_PING),
-            new StateChangeRequest(ArmInput.RETRIEVE),
-            new StateChangeRequest(ArmInput.RETRACT),
-            new StateChangeRequest(ArmInput.RETRACT_PING)
-        };
-        
-        public static final StateChangeRequest[] kTestInvalid = new StateChangeRequest[]{
-            new StateChangeRequest(ArmInput.EXTEND),
-            new StateChangeRequest(ArmInput.EXTEND),
-        };
     }
 
     public static final class ArmConstants {
@@ -282,11 +279,6 @@ public final class Constants {
         public final static double proximalHomePosition = 27300;
         public final static double distalHomePosition = -16167;
         public final static double wristHomePosition = 0.59;
-
-        // Arm path recording constants 
-        public final static boolean recordingArmPath = false; // should be false unless recording
-        public final static double recordingPeriod = 0.01; // seconds
-        public final static double recordingOffset = 0.005; // seconds 
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;
