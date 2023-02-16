@@ -238,12 +238,12 @@ public final class Constants {
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
         public final static int proximalAbsoluteTicsCenter = 2437;
         public final static double distalRelativeTicsPerAbsoluteTick = 105;
-        public final static int distalAbsoluteTicsCenter = 1816;
+        public final static int distalAbsoluteTicsCenter = 1644;
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
         public final static double distalHomePosition = 10489;
-        public final static double wristHomePosition = 0.57;
+        public final static double wristHomePosition = 0.60;
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;
@@ -268,7 +268,7 @@ public final class Constants {
         public final static double wristAllowedErr = 0;
 
          // Hand limits
-        public static final int INTAKE_CURRENT_LIMIT_A = 30;
+        public static final int INTAKE_CURRENT_LIMIT_A = 20;
         public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
         public static final double INTAKE_OUTPUT_POWER = 1.0;
         public static final double INTAKE_HOLD_POWER = 0.07;
