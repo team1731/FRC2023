@@ -8,7 +8,7 @@ public class ScoreHigh {
     public static final int kNumPoints = 290;
     public static final int kWristFlexIndex = 145;
     public static final double kWristFlexPosition = 0.4516710638999939;
-    public static final int kWristExtendIndex = 215;
+    public static final int kWristExtendIndex = 260;
 
     // Position (ticks)	Velocity (RPM)
 

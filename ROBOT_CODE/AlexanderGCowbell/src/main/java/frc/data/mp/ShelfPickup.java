@@ -8,7 +8,7 @@ public class ShelfPickup {
     public static final int kNumPoints = 366;
     public static final int kWristFlexIndex = 75;
     public static final double kWristFlexPosition = 0.04201394319534302;
-    public static final int kWristExtendIndex = 316;
+    public static final int kWristExtendIndex = 190;
 
     // Position (ticks)	Velocity (RPM)
 
