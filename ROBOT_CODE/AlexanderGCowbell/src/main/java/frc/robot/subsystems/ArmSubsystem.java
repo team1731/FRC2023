@@ -55,7 +55,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private CANSparkMax wristMotor;
     private CANSparkMax intakeMotor;
     private SparkMaxPIDController wristPIDController; 
-    private SparkMaxPIDController intakePIDController;
+//private SparkMaxPIDController intakePIDController;
     private AbsoluteEncoder wristEncoder;
 
     // arm recording
@@ -70,6 +70,10 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     private boolean distalMotorRunning = false;
     private boolean wristFlexed = false; // flexed is hand bent down (scoring/pickup), extended is hand bent up (home/carrying position)
     private boolean ejecting = false;
+    private boolean intaking = false;
+    private Double intakingTimer = null;
+    private boolean cone = false;
+    private boolean goHome = true;
 
 
     public ArmSubsystem() {
@@ -250,6 +254,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         } else if (position < 0) {
             return 0;
         }
+
         return position;
     }
 
@@ -286,8 +291,9 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
         intakeMotor.setInverted(false);
         intakeMotor.setIdleMode(IdleMode.kBrake);
-        intakePIDController = intakeMotor.getPIDController();
-        intakePIDController.setReference(ArmConstants.INTAKE_OUTPUT_POWER, CANSparkMax.ControlType.kVoltage);
+       // intakePIDController = intakeMotor.getPIDController();
+      //  intakePIDController.setReference(ArmConstants.INTAKE_OUTPUT_POWER, CANSparkMax.ControlType.kVoltage);
+
     }
 
     public void moveWrist(double position) {
@@ -300,24 +306,36 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
 
     public void intake() {
-        intakeMotor.set(1.0);
+        intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
+        intakeMotor.set(cone == true?1.0:-1.0);
+        intaking = true;
+        intakingTimer = Timer.getFPGATimestamp(); 
+        System.out.println("Intaking");
     }
 
     public void eject() {
         ejecting = true;
-        //intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
-        //intakePIDController.setReference(ArmConstants.INTAKE_OUTPUT_POWER, CANSparkMax.ControlType.kVoltage);
-        intakeMotor.set(-1.0);
+        intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
+        intakeMotor.set(cone==true?-1.0: 1.0);
+        intaking = false;
+        intakingTimer = null;
+        System.out.println("Ejecting");
     }
 
     public void holdIntake() {
-        //intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_HOLD_CURRENT_LIMIT_A);
-        //intakePIDController.setReference(ArmConstants.INTAKE_HOLD_POWER, CANSparkMax.ControlType.kVoltage);
-        intakeMotor.set(0);
+        intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_HOLD_CURRENT_LIMIT_A);
+        intakeMotor.set(cone==true?ArmConstants.INTAKE_HOLD_POWER: -1* ArmConstants.INTAKE_HOLD_POWER);
+        intaking = false;
+        intakingTimer = null;
+        System.out.println("holding");
     }
 
     public void stopIntake() {
+        intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
         intakeMotor.set(0);
+        intaking = false;
+        intakingTimer = null;
+        System.out.println("Stopped");
     }
 
 
@@ -374,6 +392,15 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
                 pathStartedTime = 0;
             } 
         }
+        
+        if ((intakingTimer != null) && ((Timer.getFPGATimestamp() - intakingTimer) > 0.5)  &&  (Math.abs(intakeMotor.getEncoder().getVelocity()) < 60)) {
+            holdIntake();
+            System.out.println("holdingig intake");
+
+        }
+
+
+
         doSD();
     }
 
@@ -449,6 +476,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         SmartDashboard.putNumber("Davids Distall Calc", getArbitraryFeedForwardForDistalArm());
         SmartDashboard.putNumber("Davids Proximal Calc", getArbitraryFeedForwardForProximalArm());
         SmartDashboard.putNumber("Absolute wrist Encoder", wristEncoder.getPosition());
+        SmartDashboard.putNumber("OutputCurrent", intakeMotor.getOutputCurrent());
 
     }
 
@@ -497,5 +525,9 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
     public boolean isArmRecordingRunning() {
         return (armPathLogger != null);
+    }
+
+    public void isCone(boolean b) {
+        cone = b;
     }
 }

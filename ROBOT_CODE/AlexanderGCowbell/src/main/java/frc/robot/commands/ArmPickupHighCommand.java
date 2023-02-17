@@ -4,10 +4,10 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.data.mp.*;
 
-public class ArmPickupTestCommand extends CommandBase {
+public class ArmPickupHighCommand extends CommandBase {
     private ArmSubsystem armSubsystem;
 
-    public ArmPickupTestCommand(ArmSubsystem armSubsystem) {
+    public ArmPickupHighCommand(ArmSubsystem armSubsystem) {
         this.armSubsystem = armSubsystem;
     }
 

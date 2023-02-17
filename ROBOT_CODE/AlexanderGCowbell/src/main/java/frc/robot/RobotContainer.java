@@ -26,6 +26,7 @@ import frc.robot.Constants.AutoConstants;
 public class RobotContainer {
   /* Controllers */
   private final Joystick driver = new Joystick(0);
+  private final Joystick operator = new Joystick(1);
 
   /* Drive Controls */
   private final int translationAxis = XboxController.Axis.kLeftY.value;
@@ -36,11 +37,14 @@ public class RobotContainer {
 
 
   /* Driver Buttons */
-  private final JoystickButton zeroGyro = new JoystickButton(driver, XboxController.Button.kY.value);
-  private final JoystickButton adjustAllEncoders = new JoystickButton(driver, XboxController.Button.kX.value);
-  private final JoystickButton wristPos1 = new JoystickButton(driver,XboxController.Button.kA.value);
+  private final JoystickButton kStart = new JoystickButton(driver, XboxController.Button.kStart.value);
+  private final JoystickButton ky= new JoystickButton(driver, XboxController.Button.kY.value);
+  private final JoystickButton kx= new JoystickButton(driver, XboxController.Button.kX.value);
+  private final JoystickButton kb= new JoystickButton(driver,XboxController.Button.kA.value);
+  private final JoystickButton ka = new JoystickButton(driver,XboxController.Button.kB.value);
   private JoystickButton leftBumper = new JoystickButton(driver,XboxController.Button.kLeftBumper.value);
   private JoystickButton rightBumper = new JoystickButton(driver,XboxController.Button.kRightBumper.value);
+  private JoystickButton coneOrCube = new JoystickButton(operator,8);
 
 
   /* Subsystems */
@@ -77,17 +81,28 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     /* Driver Buttons */
-    zeroGyro.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-    adjustAllEncoders.onTrue(new InstantCommand(() -> {s_Swerve.adjustWheelEncoders(); s_armSubSystem.resetArmEncoders();}));
-    wristPos1.onTrue(new InstantCommand(() -> s_armSubSystem.moveWrist(0.63)));
-    wristPos1.onFalse(new InstantCommand(() -> s_armSubSystem.stopWrist()));
+    kStart.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
+    kStart.onTrue(new InstantCommand(() -> {s_Swerve.adjustWheelEncoders(); s_armSubSystem.resetArmEncoders();}));
+    //intakeTest.onTrue(new InstantCommand(() -> s_armSubSystem.intake()));
+    //intakeTest.onFalse(new InstantCommand(() -> s_armSubSystem.holdIntake()));
+    //ejectTest.onTrue(new InstantCommand(() -> s_armSubSystem.eject()));
+    //ejectTest.onFalse(new InstantCommand(() -> s_armSubSystem.stopIntake()));
+    coneOrCube.whileTrue(new InstantCommand(() -> s_armSubSystem.isCone(false)));
+    coneOrCube.whileFalse(new InstantCommand(() -> s_armSubSystem.isCone(true)));
+    ky.whileTrue((new ArmScoreHighCommand(s_armSubSystem)));
+   // kb.whileTrue((new ArmScoreMid(s_armSubSystem)));
+   // ka.whileTrue((new ArmScoreLow(s_armSubsystem)));
+;
+  
+   // wristPos1.onTrue(new InstantCommand(() -> s_armSubSystem.moveWrist(0.63)));
+   // wristPos1.onFalse(new InstantCommand(() -> s_armSubSystem.stopWrist()));
 
     if(LogWriter.isArmRecordingEnabled()) {
       leftBumper.onTrue(new InstantCommand(() -> s_armSubSystem.startRecordingArmPath()));
       rightBumper.onTrue(new InstantCommand(() -> s_armSubSystem.stopRecordingArmPath()));
     } else {
-      leftBumper.whileTrue(new ArmPickupTestCommand(s_armSubSystem));
-      rightBumper.whileTrue(new ArmScoreTestCommand(s_armSubSystem));
+      leftBumper.whileTrue(new ArmPickupHighCommand(s_armSubSystem));
+      rightBumper.whileTrue(new ArmPickupLowCommand(s_armSubSystem));
     }
   }
 

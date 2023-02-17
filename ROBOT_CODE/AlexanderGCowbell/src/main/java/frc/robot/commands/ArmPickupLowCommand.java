@@ -4,22 +4,24 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.data.mp.*;
 
-public class ArmScoreTestCommand extends CommandBase {
+public class ArmPickupLowCommand extends CommandBase {
     private ArmSubsystem armSubsystem;
 
-    public ArmScoreTestCommand(ArmSubsystem armSubsystem) {
+    public ArmPickupLowCommand(ArmSubsystem armSubsystem) {
         this.armSubsystem = armSubsystem;
     }
 
     @Override
 	public void initialize() {
-        ArmPath path = ScoreHigh.getArmPath();
-        armSubsystem.startArmMovement(path);
+        ArmPath path = intakeLow.getArmPath();
+        armSubsystem.startArmMovement(path); 
+        armSubsystem.intake();
 	}
+
 
     @Override
     public void end(boolean interrupted) {
-        armSubsystem.eject();
+        armSubsystem.holdIntake();
         armSubsystem.reverseArmMovment();
     }
 }
