@@ -213,7 +213,10 @@ public class ArmStateMachine {
       transitionIntake(Input.RETRIEVED);
     }
 
-    if((currentIntakeState == IntakeState.RETRIEVING || currentIntakeState == IntakeState.RELEASING) && currentArmState == ArmState.RESETTING_WRIST) {
+    if((currentIntakeState == IntakeState.RETRIEVING || currentIntakeState == IntakeState.RELEASING) && 
+        subsystem.getDirection() == Direction.REVERSE && 
+        !subsystem.isArmMoving()) {
+      // path has completed in reverse, make sure intake is stopped
       transitionIntake(Input.STOP);
     }
     

@@ -152,11 +152,6 @@ public class ArmSubsystem extends SubsystemBase {
         initArmMovement(0);
     }
 
-    public void restartArmMovement(int startIndex) {
-        currentDirection = Direction.FORWARD;
-        initArmMovement(startIndex);
-    }
-
     public void reverseArmMovment(int startIndex) {
         currentDirection = Direction.REVERSE;
         initArmMovement(startIndex);
