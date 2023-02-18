@@ -48,6 +48,7 @@ public class ArmSubsystem extends SubsystemBase {
     private CANSparkMax intakeMotor;
     private SparkMaxPIDController wristPIDController; 
     private AbsoluteEncoder wristEncoder;
+    private boolean wristResetting = false;
 
     // arm recording
     Logger armPathLogger;
@@ -55,8 +56,10 @@ public class ArmSubsystem extends SubsystemBase {
     // state tracking
     private ArmPath currentPath = null;
     private Direction currentDirection = null;
-    private boolean proximalMotorRunning = false;
-    private boolean distalMotorRunning = false;
+    private boolean proximalMPRunning = false;
+    private boolean distalMPRunning = false;
+    private boolean proximalArmResetting = false;
+    private boolean distalArmResetting = false;
 
 
     public ArmSubsystem() {
@@ -169,10 +172,10 @@ public class ArmSubsystem extends SubsystemBase {
     private void moveArm() {
         // Note: if disabled, the start call will automatically move the MP state to enabled
 
-        proximalMotorRunning = true;
+        proximalMPRunning = true;
         proximalMotor.startMotionProfile(proximalBufferedStream, ArmConstants.minBufferedPoints, TalonFXControlMode.MotionProfile.toControlMode());
 
-        distalMotorRunning = true;
+        distalMPRunning = true;
         distalMotor.startMotionProfile(distalBufferedStream, ArmConstants.minBufferedPoints, TalonFXControlMode.MotionProfile.toControlMode());
 
         stateMachine.startedPath();
@@ -180,10 +183,12 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void moveProximalArmHome() {
         proximalMotor.set(ControlMode.MotionMagic, ArmConstants.proximalHomePosition);
+        proximalArmResetting = true;
     }
 
     public void moveDistalArmHome() {
         distalMotor.set(ControlMode.MotionMagic, ArmConstants.distalHomePosition);
+        distalArmResetting = true;
     }
 
     public void stopArm() {
@@ -191,8 +196,8 @@ public class ArmSubsystem extends SubsystemBase {
         distalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Hold.value);
     }
 
-    public boolean isArmMoving() {
-        return proximalMotorRunning || distalMotorRunning;
+    public boolean isMotionProfileRunning() {
+        return proximalMPRunning || distalMPRunning;
     }
 
 
@@ -243,6 +248,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void moveWristHome() {
         moveWrist(ArmConstants.wristHomePosition, ArmConstants.wristMaxVel);
+        wristResetting = true;
     }
 
     public void stopWrist() {
@@ -285,28 +291,43 @@ public class ArmSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        boolean isArmMovingAtPeriodicStart = isArmMoving();
+        boolean isMPRunningAtPeriodicStart = isMotionProfileRunning();
 
         if(stateMachine != null) {
             stateMachine.periodic(); // prompt the state machine to process any periodic tasks
         }
 
-        if(proximalMotorRunning && proximalMotor.isMotionProfileFinished()) {
+        if(proximalMPRunning && proximalMotor.isMotionProfileFinished()) {
             // Note: when motion profile is finished it should be automatically set to HOLD state and will attempt to maintain final position
-            proximalMotorRunning = false;
+            proximalMPRunning = false;
         }
 
-        if(distalMotorRunning && distalMotor.isMotionProfileFinished()) {
+        if(distalMPRunning && distalMotor.isMotionProfileFinished()) {
             // Note: when motion profile is finished it should be automatically set to HOLD state and will attempt to maintain final position
-            distalMotorRunning = false;
+            distalMPRunning = false;
         }
 
-        if(isArmMovingAtPeriodicStart && !isArmMoving()) { // arm was moving, but has now stopped
+        if(isMPRunningAtPeriodicStart && !isMotionProfileRunning()) { // arm was moving, but has now stopped
             stateMachine.completedArmMovement();
             if(currentDirection == Direction.REVERSE) { // we completed retracting
                 currentPath = null;
                 currentDirection = null;
             } 
+        }
+
+        if(wristResetting && Math.abs(ArmConstants.wristHomePosition - wristMotor.getEncoder().getPosition()) < ArmConstants.wristResetPostionThreshold) {
+            wristResetting = false;
+            stateMachine.completedArmMovement();
+        }
+
+        if(proximalArmResetting && Math.abs(proximalMotor.getActiveTrajectoryVelocity()) < 60) {
+            proximalArmResetting = false;
+            stateMachine.completedArmMovement();
+        }
+
+        if(distalArmResetting && Math.abs(distalMotor.getActiveTrajectoryVelocity()) < 60) {
+            distalArmResetting = false;
+            stateMachine.completedArmMovement();
         }
 
         doSD();

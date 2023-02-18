@@ -35,7 +35,7 @@ public class ArmStateMachine {
   }
 
   public enum Input {
-    EXTEND, COMPLETED, RETRACT, RESET, START, STOP, INTERRUPT,
+    INITIALIZE, EXTEND, COMPLETED, RETRACT, RESET, START, STOP, INTERRUPT,
     RETRIEVED, RELEASE, RELEASED, FLEX;
 }
 
@@ -188,7 +188,7 @@ public class ArmStateMachine {
     /*
      * Logic for flexing/extending wrist
      */
-    if(!wristFlexed && subsystem.isArmMoving() && subsystem.getDirection() == Direction.FORWARD) {
+    if(!wristFlexed && subsystem.isMotionProfileRunning() && subsystem.getDirection() == Direction.FORWARD) {
       int currentIndex = getPathIndex();
       int wristFlexIndex = currentPath.getWristFlexIndex();
       if(currentIndex >= wristFlexIndex) {
@@ -196,7 +196,7 @@ public class ArmStateMachine {
         subsystem.moveWrist(currentPath.getWristFlexPosition(), currentPath.getWristMaxVelocity());
         wristFlexed = true;
       }
-    } else if(wristFlexed && subsystem.isArmMoving() && subsystem.getDirection() == Direction.REVERSE) {
+    } else if(wristFlexed && subsystem.isMotionProfileRunning() && subsystem.getDirection() == Direction.REVERSE) {
       int currentIndex = getPathIndex();
       int wristExtendIndex = currentPath.getWristExtendIndex();
       if(currentIndex <= wristExtendIndex) {
@@ -215,7 +215,7 @@ public class ArmStateMachine {
 
     if((currentIntakeState == IntakeState.RETRIEVING || currentIntakeState == IntakeState.RELEASING) && 
         subsystem.getDirection() == Direction.REVERSE && 
-        !subsystem.isArmMoving()) {
+        !subsystem.isMotionProfileRunning()) {
       // path has completed in reverse, make sure intake is stopped
       transitionIntake(Input.STOP);
     }
@@ -257,7 +257,7 @@ public class ArmStateMachine {
         break;
       case RETRACTING:
         // determine whether to start at current index (midstream) or if completed, at the end
-        int startIndex = (subsystem.isArmMoving())? getPathIndex() : currentPath.getNumberOfPoints()-1;
+        int startIndex = (subsystem.isMotionProfileRunning())? getPathIndex() : currentPath.getNumberOfPoints()-1;
         pathStartedIndex = startIndex;
         subsystem.reverseArmMovment(startIndex);
         break;

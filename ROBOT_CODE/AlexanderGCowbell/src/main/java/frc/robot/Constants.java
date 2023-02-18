@@ -248,6 +248,10 @@ public final class Constants {
         public final static double proximalHomePosition = -4388;
         public final static double distalHomePosition = 10489;
         public final static double wristHomePosition = 0.60;
+        public final static double intakeHoldingVelocity = 60;
+        public final static double wristResetPostionThreshold = 0.2;
+        public final static double proximalStoppedVelocity = 60;
+        public final static double StoppedVelocity = 60;
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;

@@ -3,6 +3,17 @@ package frc.robot.state.arm;
 import frc.robot.state.arm.ArmStateMachine.Input;
 
 public enum ArmState {
+
+  UNKNOWN {
+    public ArmState next(Input input) {
+      switch(input) {
+        case INITIALIZE:
+          return RESETTING_WRIST;
+        default:
+          return this;
+      }
+    }
+  },
     
   HOME {
     public ArmState next(Input input) {
