@@ -47,7 +47,12 @@ public class RobotContainer {
   private final JoystickButton ka = new JoystickButton(driver,XboxController.Button.kA.value);
   private JoystickButton leftBumper = new JoystickButton(driver,XboxController.Button.kLeftBumper.value);
   private JoystickButton rightBumper = new JoystickButton(driver,XboxController.Button.kRightBumper.value);
+
+  /* Operator Buttons */
   private JoystickButton coneOrCube = new JoystickButton(operator,8);
+  private JoystickButton preventScore = new JoystickButton(operator,13);
+  private JoystickButton release = new JoystickButton(operator,14);
+  private JoystickButton intake = new JoystickButton(operator,15);
 
 
   /* Subsystems */
@@ -88,13 +93,10 @@ public class RobotContainer {
     /* Driver Buttons */
     kStart.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
     kStart.onTrue(new InstantCommand(() -> {s_Swerve.adjustWheelEncoders(); s_armSubSystem.resetArmEncoders();}));
-    coneOrCube.whileTrue(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CUBE)));
-    coneOrCube.whileFalse(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CONE)));
-    kx.onTrue(new InstantCommand(() -> sm_armStateMachine.interrupt()));
+    kx.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_KEYPAD)));
     ky.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_HIGH)));
     kb.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_MEDIUM)));
     ka.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_LOW)));
-
     if(LogWriter.isArmRecordingEnabled()) {
       leftBumper.onTrue(new InstantCommand(() -> s_armSubSystem.startRecordingArmPath()));
       rightBumper.onTrue(new InstantCommand(() -> s_armSubSystem.stopRecordingArmPath()));
@@ -102,6 +104,16 @@ public class RobotContainer {
       leftBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.PICKUP_HIGH));
       rightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW));
     }
+
+    /* Operator Buttons */
+    coneOrCube.whileTrue(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CUBE)));
+    coneOrCube.whileFalse(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CONE)));
+    preventScore.whileTrue(new InstantCommand(() -> sm_armStateMachine.setAllowScore(false)));
+    preventScore.whileFalse(new InstantCommand(() -> sm_armStateMachine.setAllowScore(true)));
+    intake.whileTrue(new InstantCommand(() -> sm_armStateMachine.intake()));
+    intake.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopIntake()));
+    release.whileTrue(new InstantCommand(() -> sm_armStateMachine.release()));
+    release.whileTrue(new InstantCommand(() -> sm_armStateMachine.stopRelease()));
   }
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {

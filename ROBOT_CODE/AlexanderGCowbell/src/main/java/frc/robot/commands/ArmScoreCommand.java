@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.state.arm.ArmStateMachine.Status;
-import frc.robot.state.arm.ArmStateMachine.MovementType;
 import frc.data.mp.*;
 
 public class ArmScoreCommand extends CommandBase {
@@ -13,17 +12,17 @@ public class ArmScoreCommand extends CommandBase {
 
     public ArmScoreCommand(ArmStateMachine stateMachine, ArmSequence sequence) {
         this.stateMachine = stateMachine;
-        this.sequence = sequence;
+        if(sequence == ArmSequence.READ_KEYPAD) {
+            this.sequence = ArmSequence.valueForCode("REPLACE_WITH_KEYPAD_CODE");
+        } else {
+            this.sequence = sequence;
+        }
     }
 
     @Override
 	public void initialize() {
-        if(stateMachine.getStatus() == Status.RUNNING ||
-          (stateMachine.getStatus() == Status.PAUSED && stateMachine.getMovementType() != MovementType.SCORE)) {
-            System.out.println("WARNING: cannot command a score when arm state is already running a different movement");
-            return;
-        } else if(stateMachine.getStatus() == Status.PAUSED) {
-            stateMachine.restartMovement();
+        if(stateMachine.getStatus() == Status.RUNNING) {
+            System.out.println("WARNING: cannot command a score when arm state is already running a movement");
             return;
         }
 
@@ -32,11 +31,13 @@ public class ArmScoreCommand extends CommandBase {
             path = ScoreHigh.getArmPath();
         } else if(sequence == ArmSequence.SCORE_MEDIUM) {
             path = ScoreMedium.getArmPath();
-        } else {
+        } else if(sequence == ArmSequence.SCORE_LOW) {
             path = ScoreLow.getArmPath();
         }
 
-        stateMachine.score(path);
+        if(path != null) {
+            stateMachine.score(path);
+        }
 	}
 
     @Override

@@ -1,6 +1,7 @@
 package frc.robot.state.arm;
 
 public enum ArmSequence {
+    READ_KEYPAD(null),
     SCORE_HIGH("SCORE_HIGH"),
     SCORE_MEDIUM("SCORE_MEDIUM"),
     SCORE_LOW("SCORE_LOW"),
@@ -8,8 +9,8 @@ public enum ArmSequence {
     PICKUP_LOW("PICKUP_LOW"),
 
     // Used for unit tests
-    SCORE_TEST("ABC"), 
-    PICKUP_TEST("XYZ"), 
+    SCORE_TEST(null), 
+    PICKUP_TEST(null), 
     UNDEFINED_TEST(null), 
     INVALID_TEST(null);
 

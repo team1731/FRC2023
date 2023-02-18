@@ -8,6 +8,8 @@ public enum IntakeState {
             switch(input) {
                 case START:
                     return RETRIEVING;
+                case RELEASE:
+                    return RELEASING;
                 default:
                     return this;
             }
@@ -42,6 +44,8 @@ public enum IntakeState {
         public IntakeState next(Input input) {
             switch(input) {
                 case RELEASED:
+                    return STOPPED;
+                case STOP:
                     return STOPPED;
                 default:
                     return this;

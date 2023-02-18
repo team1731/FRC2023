@@ -12,13 +12,14 @@ public class ArmStateMachine {
   private Status status = Status.READY;
   private GamePiece gamePiece = GamePiece.CUBE;
   private MovementType movementType;
+  private boolean isInAuto = false;
 
   private ArmState currentArmState = ArmState.HOME;
   private IntakeState currentIntakeState = IntakeState.STOPPED;
+  private boolean allowScore = true;
 
   private ArmPath currentPath;
   private int pathStartedIndex = 0;
-  private int pathPausedIndex = 0;
   private double pathStartedTime = 0;
 
   // extended = home pos (palm facing out), flexed = positioned for pickup/scoring (palm facing down/in)
@@ -30,7 +31,7 @@ public class ArmStateMachine {
    */
 
   public enum Status {
-    READY, RUNNING, PAUSED
+    READY, RUNNING
   }
 
   public enum Input {
@@ -57,15 +58,15 @@ public class ArmStateMachine {
     currentIntakeState = IntakeState.STOPPED;
     currentPath = null;
     pathStartedIndex = 0;
-    pathPausedIndex = 0;
     pathStartedTime = 0;
     movementType = null;
     wristFlexed = false;
+    isInAuto = false;
   }
 
 
   /*
-   * METHODS TO HANDLE PICKUP/SCORE/INTERRUPT
+   * METHODS TO HANDLE PICKUP/SCORE
    */
   
   // PICKUP
@@ -93,21 +94,12 @@ public class ArmStateMachine {
     transitionArm(Input.EXTEND);
   }
 
-  // RESTART PICKUP OR SCORE
-  public void restartMovement() {
-    if(currentArmState == ArmState.PAUSED) {
-      pathStartedIndex = pathPausedIndex;
-      transitionArm(Input.EXTEND);
-    }
-  }
-
   // NOTIFY THAT PICKUP/SCORE BUTTON RELEASED
   public void buttonReleased() {
     if(currentArmState == ArmState.EXTENDING) {
-      pausedPath();
-      transitionArm(Input.STOP);
+      interrupt();
     } else if(currentArmState == ArmState.EXTENDED) {
-      if(movementType == MovementType.SCORE) {
+      if(movementType == MovementType.SCORE && allowScore) {
         transitionIntake(Input.RELEASE);
       }
       transitionArm(Input.RETRACT);
@@ -119,10 +111,13 @@ public class ArmStateMachine {
     transitionArm(Input.COMPLETED);
   }
 
-  // NOTIFY THAT PICKUP/SCORE SHOULD BE STOPPED & RETRACTED MIDSTREAM
+  // NOTIFY THAT PICKUP/SCORE SHOULD BE STOPPED & RETRACTED W/O SCORE/PICKUP
   public void interrupt() {
     subsystem.stopArm();
     transitionArm(Input.INTERRUPT);
+    if(currentIntakeState == IntakeState.RETRIEVING || currentIntakeState == IntakeState.RELEASING) {
+      transitionIntake(Input.STOP);
+    }
   }
 
   private boolean isReadyToStartMovement() {
@@ -136,17 +131,34 @@ public class ArmStateMachine {
 
 
   /*
+   * METHODS TO HANDLE IMMEDIATE INTAKE/EJECT
+   * These methods are intended to be called only by operator buttons
+   */
+
+  public void intake() {
+    transitionIntake(Input.START);
+  }
+
+  public void stopIntake() {
+    transitionIntake(Input.STOP);
+  }
+
+  public void release() {
+    transitionIntake(Input.RELEASE);
+  }
+
+  public void stopRelease() {
+    transitionIntake(Input.STOP);
+  }
+
+
+  /*
    * PATH TRACKING
    */
 
   public void startedPath() {
     status = Status.RUNNING;
     pathStartedTime = Timer.getFPGATimestamp();
-  }
-
-  private void pausedPath() {
-    status = Status.PAUSED;
-    pathPausedIndex = getPathIndex();
   }
 
   public int getPathIndex() {
@@ -205,6 +217,17 @@ public class ArmStateMachine {
     if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
       transitionIntake(Input.RETRIEVED);
     }
+
+    
+    /*
+     * Logic for handling special cases for autonomous where we won't receive a button release event
+     */
+    if(isInAuto && movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING) {
+      transitionArm(Input.RETRACT);
+    } else if(isInAuto && movementType == MovementType.SCORE && currentArmState == ArmState.EXTENDED) {
+      transitionIntake(Input.RELEASE);
+      transitionArm(Input.RETRACT);
+    }
   }
 
 
@@ -226,14 +249,7 @@ public class ArmStateMachine {
 
     switch(newState) {
       case EXTENDING:
-        if(prevState == ArmState.HOME) {
-          subsystem.startArmMovement(currentPath);
-        } else { // restarting from PAUSED
-          subsystem.restartArmMovement(pathStartedIndex);
-        }
-        break;
-      case PAUSED:
-        subsystem.stopArm();
+        subsystem.startArmMovement(currentPath);
         break;
       case EXTENDED:
         // placeholder for possible check to allow extra extension
@@ -300,6 +316,10 @@ public class ArmStateMachine {
     return status;
   }
 
+  public ArmState getArmState() {
+    return currentArmState;
+  }
+
   public GamePiece getGamePiece() {
     return gamePiece;
   }
@@ -310,5 +330,13 @@ public class ArmStateMachine {
 
   public MovementType getMovementType() {
     return movementType;
+  }
+
+  public void setIsInAuto(boolean inAuto) {
+    isInAuto = inAuto;
+  }
+
+  public void setAllowScore(boolean allow) {
+    allowScore = allow;
   }
 }

@@ -20,21 +20,6 @@ public enum ArmState {
       switch(input) {
         case COMPLETED:
           return EXTENDED;
-        case STOP:
-          return PAUSED;
-        case INTERRUPT:
-          return RETRACTING;
-        default:
-          return this;
-      }
-    }
-  },
-
-  PAUSED {
-    public ArmState next(Input input) {
-      switch(input) {
-        case EXTEND:
-          return EXTENDING;
         case INTERRUPT:
           return RETRACTING;
         default:
