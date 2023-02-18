@@ -307,6 +307,7 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         if(isArmMovingAtPeriodicStart && !isArmMoving()) { // arm was moving, but has now stopped
+            stateMachine.completedArmMovement();
             if(currentDirection == Direction.REVERSE) { // we completed retracting
                 currentPath = null;
                 currentDirection = null;

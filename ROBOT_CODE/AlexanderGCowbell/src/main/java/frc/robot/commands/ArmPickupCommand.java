@@ -19,10 +19,11 @@ public class ArmPickupCommand extends CommandBase {
 
     @Override
 	public void initialize() {
-        if(stateMachine.getStatus() == Status.RUNNING && stateMachine.getMovementType() != MovementType.PICKUP) {
+        if(stateMachine.getStatus() == Status.RUNNING ||
+          (stateMachine.getStatus() == Status.PAUSED && stateMachine.getMovementType() != MovementType.PICKUP)) {
             System.out.println("WARNING: cannot command a pickup when arm state is already running a different movement");
             return;
-        } else if(stateMachine.getStatus() == Status.RUNNING) {
+        } else if(stateMachine.getStatus() == Status.PAUSED) {
             stateMachine.restartMovement();
         }
 

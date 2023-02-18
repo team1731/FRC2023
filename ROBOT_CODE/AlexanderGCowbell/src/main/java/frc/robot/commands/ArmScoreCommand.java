@@ -18,10 +18,11 @@ public class ArmScoreCommand extends CommandBase {
 
     @Override
 	public void initialize() {
-        if(stateMachine.getStatus() == Status.RUNNING && stateMachine.getMovementType() != MovementType.SCORE) {
+        if(stateMachine.getStatus() == Status.RUNNING ||
+          (stateMachine.getStatus() == Status.PAUSED && stateMachine.getMovementType() != MovementType.SCORE)) {
             System.out.println("WARNING: cannot command a score when arm state is already running a different movement");
             return;
-        } else if(stateMachine.getStatus() == Status.RUNNING) {
+        } else if(stateMachine.getStatus() == Status.PAUSED) {
             stateMachine.restartMovement();
         }
 

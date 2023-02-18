@@ -18,8 +18,8 @@ public class ArmStateMachine {
 
   private ArmPath currentPath;
   private int pathStartedIndex = 0;
+  private int pathPausedIndex = 0;
   private double pathStartedTime = 0;
-  private double intakeStartedTime = 0;
 
   // extended = home pos (palm facing out), flexed = positioned for pickup/scoring (palm facing down/in)
   private boolean wristFlexed = false; 
@@ -30,7 +30,7 @@ public class ArmStateMachine {
    */
 
   public enum Status {
-    READY, RUNNING
+    READY, RUNNING, PAUSED
   }
 
   public enum Input {
@@ -57,8 +57,8 @@ public class ArmStateMachine {
     currentIntakeState = IntakeState.STOPPED;
     currentPath = null;
     pathStartedIndex = 0;
+    pathPausedIndex = 0;
     pathStartedTime = 0;
-    intakeStartedTime = 0;
     movementType = null;
     wristFlexed = false;
   }
@@ -75,6 +75,7 @@ public class ArmStateMachine {
 
     System.out.println("ArmStateMachine: STARTING PICKUP!!!!!!!!!!!!!!!!!!!!!");
     currentPath = path;
+    pathStartedIndex = 0;
     movementType = MovementType.PICKUP;
     transitionArm(Input.EXTEND);
     transitionIntake(Input.START);
@@ -87,6 +88,7 @@ public class ArmStateMachine {
 
     System.out.println("ArmStateMachine: STARTING SCORE!!!!!!!!!!!!!!!!!!!!!");
     currentPath = path;
+    pathStartedIndex = 0;
     movementType = MovementType.SCORE;
     transitionArm(Input.EXTEND);
   }
@@ -94,6 +96,7 @@ public class ArmStateMachine {
   // RESTART PICKUP OR SCORE
   public void restartMovement() {
     if(currentArmState == ArmState.PAUSED) {
+      pathStartedIndex = pathPausedIndex;
       transitionArm(Input.EXTEND);
     }
   }
@@ -101,6 +104,7 @@ public class ArmStateMachine {
   // NOTIFY THAT PICKUP/SCORE BUTTON RELEASED
   public void buttonReleased() {
     if(currentArmState == ArmState.EXTENDING) {
+      pausedPath();
       transitionArm(Input.STOP);
     } else if(currentArmState == ArmState.EXTENDED) {
       if(movementType == MovementType.SCORE) {
@@ -108,6 +112,11 @@ public class ArmStateMachine {
       }
       transitionArm(Input.RETRACT);
     }
+  }
+
+  // NOTIFY THAT SUBSYSTEM COMPLETED ARM MOVEMENT
+  public void completedArmMovement() {
+    transitionArm(Input.COMPLETED);
   }
 
   // NOTIFY THAT PICKUP/SCORE SHOULD BE STOPPED & RETRACTED MIDSTREAM
@@ -132,6 +141,11 @@ public class ArmStateMachine {
   public void startedPath() {
     status = Status.RUNNING;
     pathStartedTime = Timer.getFPGATimestamp();
+  }
+
+  private void pausedPath() {
+    status = Status.PAUSED;
+    pathPausedIndex = getPathIndex();
   }
 
   public int getPathIndex() {
@@ -177,6 +191,7 @@ public class ArmStateMachine {
         subsystem.moveWrist(ArmConstants.wristHomePosition, currentPath.getWristMaxVelocity());
         wristFlexed = false;
 
+        // by this point we will have released the game piece
         if(currentIntakeState == IntakeState.RELEASING) {
           transitionIntake(Input.RELEASED);
         }
@@ -186,7 +201,7 @@ public class ArmStateMachine {
     /*
      * Logic for moving intake into holding
      */
-    if((intakeStartedTime != 0) && ((Timer.getFPGATimestamp() - intakeStartedTime) > 0.5)  && subsystem.isIntakeAtHoldingVelocity() ) {
+    if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
       transitionIntake(Input.RETRIEVED);
     }
   }
@@ -225,6 +240,7 @@ public class ArmStateMachine {
       case RETRACTING:
         // determine whether to start at current index (midstream) or if completed, at the end
         int startIndex = (subsystem.isArmMoving())? getPathIndex() : currentPath.getNumberOfPoints()-1;
+        pathStartedIndex = startIndex;
         subsystem.reverseArmMovment(startIndex);
         break;
       case RESETTING_WRIST:
