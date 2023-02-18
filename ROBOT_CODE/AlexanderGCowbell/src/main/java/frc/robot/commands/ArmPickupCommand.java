@@ -25,6 +25,7 @@ public class ArmPickupCommand extends CommandBase {
             return;
         } else if(stateMachine.getStatus() == Status.PAUSED) {
             stateMachine.restartMovement();
+            return;
         }
 
         // no movement is currently running, load the correct path and start the pickup

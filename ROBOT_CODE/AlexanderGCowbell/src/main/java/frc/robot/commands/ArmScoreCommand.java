@@ -24,6 +24,7 @@ public class ArmScoreCommand extends CommandBase {
             return;
         } else if(stateMachine.getStatus() == Status.PAUSED) {
             stateMachine.restartMovement();
+            return;
         }
 
         ArmPath path = null;

@@ -90,6 +90,7 @@ public class RobotContainer {
     kStart.onTrue(new InstantCommand(() -> {s_Swerve.adjustWheelEncoders(); s_armSubSystem.resetArmEncoders();}));
     coneOrCube.whileTrue(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CUBE)));
     coneOrCube.whileFalse(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CONE)));
+    kx.onTrue(new InstantCommand(() -> sm_armStateMachine.interrupt()));
     ky.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_HIGH)));
     kb.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_MEDIUM)));
     ka.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_LOW)));
