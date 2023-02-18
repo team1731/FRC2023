@@ -9,7 +9,7 @@ import frc.robot.state.arm.IntakeState;
 
 public class ArmStateTest {
 
-  /* 
+  
   @Test 
   void successfulArmTransitions() {
     ArmState state = ArmState.HOME;
@@ -22,28 +22,11 @@ public class ArmStateTest {
       assertEquals(ArmState.RETRACTING, state, "Didn't move to RETRACTING");
       state = (ArmState)state.next(Input.COMPLETED);
       assertEquals(ArmState.RESETTING_WRIST, state, "Didn't move to RESETTING_WRIST");
-      state = (ArmState)state.next(Input.RESET);
-      assertEquals(ArmState.HOME, state, "Didn't move to HOME");
-    } finally {}
-  }
-
-  @Test 
-  void successfulArmPauseTransitions() {
-    ArmState state = ArmState.HOME;
-    try {
-      state = (ArmState)state.next(Input.EXTEND);
-      assertEquals(ArmState.EXTENDING, state, "Didn't move to EXTENDING");
-      state = (ArmState)state.next(Input.STOP);
-      assertEquals(ArmState.PAUSED, state, "Didn't move to PAUSED");
-      state = (ArmState)state.next(Input.EXTEND);
-      assertEquals(ArmState.EXTENDING, state, "Didn't move to EXTENDING");
       state = (ArmState)state.next(Input.COMPLETED);
-      assertEquals(ArmState.EXTENDED, state, "Didn't move to EXTENDED");
-      state = (ArmState)state.next(Input.RETRACT);
-      assertEquals(ArmState.RETRACTING, state, "Didn't move to RETRACTING");
+      assertEquals(ArmState.RESETTING_PROXIMAL, state, "Didn't move to RESETTING_PROXIMAL");
       state = (ArmState)state.next(Input.COMPLETED);
-      assertEquals(ArmState.RESETTING_WRIST, state, "Didn't move to RESETTING_WRIST");
-      state = (ArmState)state.next(Input.RESET);
+      assertEquals(ArmState.RESETTING_DISTAL, state, "Didn't move to RESETTING_DISTAL");
+      state = (ArmState)state.next(Input.COMPLETED);
       assertEquals(ArmState.HOME, state, "Didn't move to HOME");
     } finally {}
   }
@@ -81,16 +64,5 @@ public class ArmStateTest {
       assertEquals(IntakeState.STOPPED, state, "Didn't move to RETRACTED");
     } finally {}
   }
-
-  @Test 
-  void successfulWristTransitions() {
-    WristState state = WristState.HOME;
-    try {
-      state = (WristState)state.next(Input.FLEX);
-      assertEquals(WristState.FLEXED, state, "Didn't move to FLEXED");
-      state = (WristState)state.next(Input.RESET);
-      assertEquals(WristState.HOME, state, "Didn't move to HOME");
-    } finally {}
-  }
-  */
+  
 }
