@@ -126,7 +126,8 @@ public class ArmStateMachine {
   }
 
   private boolean isReadyToStartMovement() {
-    if(currentArmState != ArmState.HOME ||
+    if(status != Status.READY ||
+       currentArmState != ArmState.HOME ||
        currentPath != null) {
       return false;
     }
