@@ -21,7 +21,7 @@ public class ArmStateTest {
       state = (ArmState)state.next(ArmInput.RETRACT);
       assertEquals(ArmState.RETRACTING, state, "Didn't move to RETRACTING");
       state = (ArmState)state.next(ArmInput.COMPLETED);
-      assertEquals(ArmState.RETRACTED, state, "Didn't move to RETRACTED");
+      assertEquals(ArmState.RESETTING_WRIST, state, "Didn't move to RESETTING_WRIST");
       state = (ArmState)state.next(ArmInput.RESET);
       assertEquals(ArmState.HOME, state, "Didn't move to HOME");
     } finally {}
@@ -42,7 +42,7 @@ public class ArmStateTest {
       state = (ArmState)state.next(ArmInput.RETRACT);
       assertEquals(ArmState.RETRACTING, state, "Didn't move to RETRACTING");
       state = (ArmState)state.next(ArmInput.COMPLETED);
-      assertEquals(ArmState.RETRACTED, state, "Didn't move to RETRACTED");
+      assertEquals(ArmState.RESETTING_WRIST, state, "Didn't move to RESETTING_WRIST");
       state = (ArmState)state.next(ArmInput.RESET);
       assertEquals(ArmState.HOME, state, "Didn't move to HOME");
     } finally {}

@@ -73,10 +73,15 @@ public class ArmSubsystem extends SubsystemBase {
 
 
     public ArmSubsystem() {
+        stateMachine = new ArmStateMachine(this);
         initializeArmMotors();
         distalAbsolute = new AnalogInput(0);
         proximalAbsolute = new AnalogInput(1);
         armPathLogger = null;
+    }
+
+    public ArmStateMachine getStateMachine() {
+        return stateMachine;
     }
     
     private void initializeArmMotors() {

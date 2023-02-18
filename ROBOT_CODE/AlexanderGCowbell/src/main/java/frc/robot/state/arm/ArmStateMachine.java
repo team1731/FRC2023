@@ -24,46 +24,17 @@ public class ArmStateMachine {
     this.subsystem = subsystem;
   }
 
-  public ArmStatus getStatus() {
-    return status;
+  private void resetInternalState() {
+    status = ArmStatus.READY;
+    currentPath = null;
+    currentPathIndex = 0;
+    movementType = null;
   }
 
-  public GamePiece getGamePiece() {
-    return gamePiece;
-  }
 
-  public void setGamePiece(GamePiece gamePiece) {
-    this.gamePiece = gamePiece;
-  }
-
-  public MovementType getMovementType() {
-    return movementType;
-  }
-
-  public void handle(ArmEvent event) {
-    switch(event) {
-      case BUTTON_DOWN:
-        if(currentArmState == ArmState.PAUSED) {
-          transitionArm(ArmInput.EXTEND);
-        }
-        break;
-      case BUTTON_UP:
-        if(currentArmState == ArmState.EXTENDING) {
-          transitionArm(ArmInput.STOP);
-        } else if(currentArmState == ArmState.EXTENDED) {
-          if(movementType == MovementType.SCORE) {
-            transitionIntake(ArmInput.RELEASE);
-          }
-          transitionArm(ArmInput.RETRACT);
-        }
-        break;
-      case COMPLETED_PATH:
-        transitionArm(ArmInput.COMPLETED);
-        break;
-      default:
-        // do nothing
-    }
-  }
+  /*
+   * METHODS TO HANDLE PICKUP/SCORE/INTERRUPT
+   */
   
   public void pickup(ArmPath path) {
     if(path == null) return;
@@ -86,10 +57,20 @@ public class ArmStateMachine {
     transitionArm(ArmInput.EXTEND);
   }
 
-  public void interrupt() {
-    if(currentPath != null) {
-      System.out.println("ArmStateMachine: INTERRUPTING!!!!!!!!!!!!!!!!!!!!!");
-      transitionArm(ArmInput.INTERRUPT);
+  public void restartMovement() {
+    if(currentArmState == ArmState.PAUSED) {
+      transitionArm(ArmInput.EXTEND);
+    }
+  }
+
+  public void buttonReleased() {
+    if(currentArmState == ArmState.EXTENDING) {
+      transitionArm(ArmInput.STOP);
+    } else if(currentArmState == ArmState.EXTENDED) {
+      if(movementType == MovementType.SCORE) {
+        transitionIntake(ArmInput.RELEASE);
+      }
+      transitionArm(ArmInput.RETRACT);
     }
   }
 
@@ -101,10 +82,20 @@ public class ArmStateMachine {
     return true;
   }
 
+
+  /*
+   * PERIODIC
+   *  Note: this periodic should be called each time the subsystem's periodic is called
+   */
+
   public void periodic() {
-    // Note: this periodic should be called each time the subsystem's periodic is called
 
   }
+
+
+  /*
+   * STATE TRANSITIONS
+   */
 
   private void transitionArm(ArmInput input) {
     ArmState prevState = currentArmState;
@@ -178,10 +169,24 @@ public class ArmStateMachine {
     }
   }
 
-  private void resetInternalState() {
-    status = ArmStatus.READY;
-    currentPath = null;
-    currentPathIndex = 0;
-    movementType = null;
+
+  /*
+   * GETTERS/SETTERS
+   */
+
+   public ArmStatus getStatus() {
+    return status;
+  }
+
+  public GamePiece getGamePiece() {
+    return gamePiece;
+  }
+
+  public void setGamePiece(GamePiece gamePiece) {
+    this.gamePiece = gamePiece;
+  }
+
+  public MovementType getMovementType() {
+    return movementType;
   }
 }

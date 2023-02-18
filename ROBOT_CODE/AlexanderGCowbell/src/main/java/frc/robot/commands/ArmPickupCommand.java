@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GamePiece;
-import frc.robot.state.arm.ArmEvent;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.state.arm.ArmStatus;
@@ -27,7 +26,7 @@ public class ArmPickupCommand extends CommandBase {
             System.out.println("WARNING: cannot command a pickup when arm state is already running a different movement");
             return;
         } else if(stateMachine.getStatus() == ArmStatus.RUNNING) {
-            stateMachine.handle(ArmEvent.BUTTON_DOWN); // restart previous movement
+            stateMachine.restartMovement();
         }
 
         // no movement is currently running, load the correct path and start the pickup
@@ -45,6 +44,6 @@ public class ArmPickupCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        stateMachine.handle(ArmEvent.BUTTON_UP);
+        stateMachine.buttonReleased();
     }
 }

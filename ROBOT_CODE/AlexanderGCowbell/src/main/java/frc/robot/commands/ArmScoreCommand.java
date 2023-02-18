@@ -1,10 +1,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.state.arm.ArmEvent;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.state.arm.ArmStatus;
+import frc.robot.state.arm.ArmStateMachine.MovementType;
 import frc.data.mp.*;
 
 public class ArmScoreCommand extends CommandBase {
@@ -21,6 +21,11 @@ public class ArmScoreCommand extends CommandBase {
         if(stateMachine.getStatus() == ArmStatus.DISABLED) {
             System.out.println("WARNING: cannot command a score when arm state is disabled");
             return;
+        } else if(stateMachine.getStatus() == ArmStatus.RUNNING && stateMachine.getMovementType() != MovementType.SCORE) {
+            System.out.println("WARNING: cannot command a score when arm state is already running a different movement");
+            return;
+        } else if(stateMachine.getStatus() == ArmStatus.RUNNING) {
+            stateMachine.restartMovement();
         }
 
         ArmPath path = null;
@@ -37,6 +42,6 @@ public class ArmScoreCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        stateMachine.handle(ArmEvent.BUTTON_UP);
+        stateMachine.buttonReleased();
     }
 }
