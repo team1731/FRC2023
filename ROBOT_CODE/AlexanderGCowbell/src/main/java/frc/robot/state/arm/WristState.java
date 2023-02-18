@@ -1,10 +1,11 @@
 package frc.robot.state.arm;
 
+import frc.robot.state.arm.ArmStateMachine.Input;
+
 public enum WristState {
     HOME {
-        public WristState next(ArmInput input) {
-            ArmInput ai = (ArmInput)input;
-            switch(ai) {
+        public WristState next(Input input) {
+            switch(input) {
                 case FLEX:
                     return FLEXED;
                 default:
@@ -14,9 +15,8 @@ public enum WristState {
         },
       
     FLEXED {
-        public WristState next(ArmInput input) {
-            ArmInput ai = (ArmInput)input;
-            switch(ai) {
+        public WristState next(Input input) {
+            switch(input) {
                 case RESET:
                     return HOME;
                 default:
@@ -25,7 +25,7 @@ public enum WristState {
         }
     };
 
-    public WristState next(ArmInput input) {
+    public WristState next(Input input) {
         return this;
-      }
+    }
 }

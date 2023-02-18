@@ -7,7 +7,7 @@ import frc.robot.subsystems.ArmSubsystem;
 
 public class ArmStateMachine {
   private ArmSubsystem subsystem;
-  private ArmStatus status = ArmStatus.DISABLED;
+  private Status status = Status.READY;
   private GamePiece gamePiece = GamePiece.CUBE;
   private ArmState currentArmState = ArmState.HOME;
   private WristState currentWristState = WristState.HOME;
@@ -16,16 +16,35 @@ public class ArmStateMachine {
   private MovementType movementType;
   private int currentPathIndex = 0;
 
+
+  /*
+   * CONSTANT VALUES
+   */
+
+  public enum Status {
+    READY, RUNNING
+  }
+
+  public enum Input {
+    EXTEND, COMPLETED, RETRACT, RESET, START, STOP, INTERRUPT,
+    RETRIEVED, RELEASE, RELEASED, FLEX;
+}
+
   public enum MovementType {
     PICKUP, SCORE
   }
+
+
+  /*
+   * INITIALIZATION/RESET
+   */
 
   public ArmStateMachine(ArmSubsystem subsystem) {
     this.subsystem = subsystem;
   }
 
   private void resetInternalState() {
-    status = ArmStatus.READY;
+    status = Status.READY;
     currentPath = null;
     currentPathIndex = 0;
     movementType = null;
@@ -36,41 +55,47 @@ public class ArmStateMachine {
    * METHODS TO HANDLE PICKUP/SCORE/INTERRUPT
    */
   
+  // PICKUP
   public void pickup(ArmPath path) {
     if(path == null) return;
     if(!isReadyToStartMovement()) return; 
 
     System.out.println("ArmStateMachine: STARTING PICKUP!!!!!!!!!!!!!!!!!!!!!");
+    status = Status.RUNNING;
     currentPath = path;
     movementType = MovementType.PICKUP;
-    transitionArm(ArmInput.EXTEND);
-    transitionIntake(ArmInput.START);
+    transitionArm(Input.EXTEND);
+    transitionIntake(Input.START);
   }
 
+  // SCORE
   public void score(ArmPath path) {
     if(path == null) return;
     if(!isReadyToStartMovement()) return; 
 
     System.out.println("ArmStateMachine: STARTING SCORE!!!!!!!!!!!!!!!!!!!!!");
+    status = Status.RUNNING;
     currentPath = path;
     movementType = MovementType.SCORE;
-    transitionArm(ArmInput.EXTEND);
+    transitionArm(Input.EXTEND);
   }
 
+  // RESTART PICKUP OR SCORE
   public void restartMovement() {
     if(currentArmState == ArmState.PAUSED) {
-      transitionArm(ArmInput.EXTEND);
+      transitionArm(Input.EXTEND);
     }
   }
 
+  // NOTIFY THAT PICKUP/SCORE BUTTON RELEASED
   public void buttonReleased() {
     if(currentArmState == ArmState.EXTENDING) {
-      transitionArm(ArmInput.STOP);
+      transitionArm(Input.STOP);
     } else if(currentArmState == ArmState.EXTENDED) {
       if(movementType == MovementType.SCORE) {
-        transitionIntake(ArmInput.RELEASE);
+        transitionIntake(Input.RELEASE);
       }
-      transitionArm(ArmInput.RETRACT);
+      transitionArm(Input.RETRACT);
     }
   }
 
@@ -97,7 +122,7 @@ public class ArmStateMachine {
    * STATE TRANSITIONS
    */
 
-  private void transitionArm(ArmInput input) {
+  private void transitionArm(Input input) {
     ArmState prevState = currentArmState;
     currentArmState = currentArmState.next(input);
     if(currentArmState == prevState) {
@@ -141,7 +166,7 @@ public class ArmStateMachine {
     }
   }
 
-  private void transitionIntake(ArmInput input) {
+  private void transitionIntake(Input input) {
     IntakeState prevState = currentIntakeState;
     currentIntakeState = currentIntakeState.next(input);
     if(currentIntakeState == prevState) {
@@ -174,7 +199,7 @@ public class ArmStateMachine {
    * GETTERS/SETTERS
    */
 
-   public ArmStatus getStatus() {
+   public Status getStatus() {
     return status;
   }
 

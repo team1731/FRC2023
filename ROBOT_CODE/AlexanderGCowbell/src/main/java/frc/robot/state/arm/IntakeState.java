@@ -1,10 +1,11 @@
 package frc.robot.state.arm;
 
+import frc.robot.state.arm.ArmStateMachine.Input;
+
 public enum IntakeState {
     STOPPED {
-        public IntakeState next(ArmInput input) {
-            ArmInput ai = (ArmInput)input;
-            switch(ai) {
+        public IntakeState next(Input input) {
+            switch(input) {
                 case START:
                     return RETRIEVING;
                 default:
@@ -14,9 +15,8 @@ public enum IntakeState {
     },
 
     RETRIEVING {
-        public IntakeState next(ArmInput input) {
-            ArmInput ai = (ArmInput)input;
-            switch(ai) {
+        public IntakeState next(Input input) {
+            switch(input) {
                 case RETRIEVED:
                     return HOLDING;
                 case STOP:
@@ -28,9 +28,8 @@ public enum IntakeState {
     },
 
     HOLDING {
-        public IntakeState next(ArmInput input) {
-            ArmInput ai = (ArmInput)input;
-            switch(ai) {
+        public IntakeState next(Input input) {
+            switch(input) {
                 case RELEASE:
                     return RELEASING;
                 default:
@@ -40,9 +39,8 @@ public enum IntakeState {
     },
 
     RELEASING {
-        public IntakeState next(ArmInput input) {
-            ArmInput ai = (ArmInput)input;
-            switch(ai) {
+        public IntakeState next(Input input) {
+            switch(input) {
                 case RELEASED:
                     return STOPPED;
                 default:
@@ -51,7 +49,7 @@ public enum IntakeState {
         }
     };
     
-    public IntakeState next(ArmInput input) {
+    public IntakeState next(Input input) {
         return this;
       }
 

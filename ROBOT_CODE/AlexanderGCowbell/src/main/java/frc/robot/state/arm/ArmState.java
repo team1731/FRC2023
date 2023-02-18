@@ -1,11 +1,12 @@
 package frc.robot.state.arm;
 
+import frc.robot.state.arm.ArmStateMachine.Input;
+
 public enum ArmState {
     
   HOME {
-    public ArmState next(ArmInput input) {
-      ArmInput ai = (ArmInput)input;
-      switch(ai) {
+    public ArmState next(Input input) {
+      switch(input) {
         case EXTEND:
           return EXTENDING;
         default:
@@ -15,9 +16,8 @@ public enum ArmState {
   },
 
   EXTENDING {
-    public ArmState next(ArmInput input) {
-      ArmInput ai = (ArmInput)input;
-      switch(ai) {
+    public ArmState next(Input input) {
+      switch(input) {
         case COMPLETED:
           return EXTENDED;
         case STOP:
@@ -31,9 +31,8 @@ public enum ArmState {
   },
 
   PAUSED {
-    public ArmState next(ArmInput input) {
-      ArmInput ai = (ArmInput)input;
-      switch(ai) {
+    public ArmState next(Input input) {
+      switch(input) {
         case EXTEND:
           return EXTENDING;
         case INTERRUPT:
@@ -45,9 +44,8 @@ public enum ArmState {
   },
 
   EXTENDED {
-    public ArmState next(ArmInput input) {
-      ArmInput ai = (ArmInput)input;
-      switch(ai) {
+    public ArmState next(Input input) {
+      switch(input) {
         case RETRACT:
           return RETRACTING;
         case INTERRUPT:
@@ -59,9 +57,8 @@ public enum ArmState {
   },
 
   RETRACTING {
-    public ArmState next(ArmInput input) {
-      ArmInput ai = (ArmInput)input;
-      switch(ai) {
+    public ArmState next(Input input) {
+      switch(input) {
         case COMPLETED:
           return RESETTING_WRIST;
         default:
@@ -71,9 +68,8 @@ public enum ArmState {
   },
 
   RESETTING_WRIST {
-    public ArmState next(ArmInput input) {
-      ArmInput ai = (ArmInput)input;
-      switch(ai) {
+    public ArmState next(Input input) {
+      switch(input) {
         case COMPLETED:
           return RESETTING_PROXIMAL;
         default:
@@ -83,9 +79,8 @@ public enum ArmState {
   },
 
   RESETTING_PROXIMAL {
-    public ArmState next(ArmInput input) {
-      ArmInput ai = (ArmInput)input;
-      switch(ai) {
+    public ArmState next(Input input) {
+      switch(input) {
         case COMPLETED:
           return RESETTING_DISTAL;
         default:
@@ -95,9 +90,8 @@ public enum ArmState {
   },
 
   RESETTING_DISTAL {
-    public ArmState next(ArmInput input) {
-      ArmInput ai = (ArmInput)input;
-      switch(ai) {
+    public ArmState next(Input input) {
+      switch(input) {
         case COMPLETED:
           return HOME;
         default:
@@ -106,7 +100,7 @@ public enum ArmState {
     }
   };
   
-  public ArmState next(ArmInput input) {
+  public ArmState next(Input input) {
     return this;
   }
 }
