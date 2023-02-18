@@ -1,15 +1,15 @@
 package frc.robot.state.arm;
 
-import frc.robot.state.*;
+public enum ArmSequence {
+    SCORE_HIGH("SCORE_HIGH"),
+    SCORE_MEDIUM("SCORE_MEDIUM"),
+    SCORE_LOW("SCORE_LOW"),
+    PICKUP_HIGH("PICKUP_HIGH"),
+    PICKUP_LOW("PICKUP_LOW"),
 
-/*
- * Defines valid sequences that can be supplied to the state machine
- * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
- */
-public enum ArmSequence implements Sequence {
+    // Used for unit tests
     SCORE_TEST("ABC"), 
     PICKUP_TEST("XYZ"), 
-    PICKUP("123"),
     UNDEFINED_TEST(null), 
     INVALID_TEST(null);
 
@@ -26,9 +26,5 @@ public enum ArmSequence implements Sequence {
             }
         }
         return null;
-    }
-
-    public String getDescription() {
-        return "ArmSequence: " + this.toString();
     }
 };

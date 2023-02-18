@@ -1,238 +1,112 @@
 package frc.robot.state.arm;
 
-import frc.robot.state.*;
-import frc.robot.Constants.StateConstants;
-
-/*
- * Defines valid transitions that can occur within the state machine
- */
-public enum ArmState implements State {
-    RETRACTED {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case EXTEND:
-            return EXTEND_REQUESTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
+public enum ArmState {
+    
+  HOME {
+    public ArmState next(ArmInput input) {
+      ArmInput ai = (ArmInput)input;
+      switch(ai) {
+        case EXTEND:
+          return EXTENDING;
+        default:
+          return this;
       }
-    },
-
-    EXTEND_REQUESTED {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case SUCCESS:
-            return EXTENDING;
-          case FAILED:
-          case INTERRUPT:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    EXTENDING {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case EXTEND_PING:
-            return EXTEND_PINGING;
-          case INTERRUPT:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    EXTEND_PINGING {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case SUCCESS:
-            return EXTENDED;
-          case FAILED:
-          case INTERRUPT:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    EXTENDED {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case RETRIEVE:
-            return RETRIEVING;
-          case RELEASE:
-            return RELEASING;
-          case INTERRUPT:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    RETRIEVING {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case SUCCESS:
-            return RETRIEVED;
-          case FAILED:
-          case INTERRUPT:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    RETRIEVED {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case RETRACT:
-            return RETRACT_REQUESTED;
-          case INTERRUPT:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    RELEASING {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case SUCCESS:
-            return RELEASED;
-          case FAILED:
-          case INTERRUPT:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    RELEASED {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case RETRACT:
-            return RETRACT_REQUESTED;
-          case INTERRUPT:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    RETRACT_REQUESTED {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case SUCCESS:
-            return RETRACTING;
-          case FAILED:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    RETRACTING {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case RETRACT_PING:
-            return RETRACT_PINGING;
-          case FAILED:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    RETRACT_PINGING {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case SUCCESS:
-            return RETRACTED;
-          case FAILED:
-            return INTERRUPTED;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    INTERRUPTED {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case RECOVER:
-            return RECOVERING;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    RECOVERING {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-          case SUCCESS:
-            return RETRACTED;
-          case FAILED:
-            return UNSAFE;
-          default:
-            handleInvalidTransition(this, input);
-            return this;
-        }
-      }
-    },
-
-    UNSAFE {
-      public State next(Input input) throws StateMachineInvalidTransitionException {
-        handleInvalidTransition(this, input);
-        return this;
-      }
-    };
-
-    public String getDescription() {
-      return "ArmState: " + this.toString();
     }
+  },
 
-    private static void handleInvalidTransition(State state, Input input) throws StateMachineInvalidTransitionException {
-      String message = "Invalid arm state: no transition for " + state + " with input " + input;
-      System.out.println(message);
-      throw new StateMachineInvalidTransitionException(StateConstants.kArmStateMachineId, message);
+  EXTENDING {
+    public ArmState next(ArmInput input) {
+      ArmInput ai = (ArmInput)input;
+      switch(ai) {
+        case COMPLETED:
+          return EXTENDED;
+        case STOP:
+          return PAUSED;
+        case INTERRUPT:
+          return RETRACTING;
+        default:
+          return this;
+      }
     }
+  },
+
+  PAUSED {
+    public ArmState next(ArmInput input) {
+      ArmInput ai = (ArmInput)input;
+      switch(ai) {
+        case EXTEND:
+          return EXTENDING;
+        case INTERRUPT:
+          return RETRACTING;
+        default:
+          return this;
+      }
+    }
+  },
+
+  EXTENDED {
+    public ArmState next(ArmInput input) {
+      ArmInput ai = (ArmInput)input;
+      switch(ai) {
+        case RETRACT:
+          return RETRACTING;
+        case INTERRUPT:
+          return RETRACTING;
+        default:
+          return this;
+      }
+    }
+  },
+
+  RETRACTING {
+    public ArmState next(ArmInput input) {
+      ArmInput ai = (ArmInput)input;
+      switch(ai) {
+        case COMPLETED:
+          return RESETTING_WRIST;
+        default:
+          return this;
+      }
+    }
+  },
+
+  RESETTING_WRIST {
+    public ArmState next(ArmInput input) {
+      ArmInput ai = (ArmInput)input;
+      switch(ai) {
+        case COMPLETED:
+          return RESETTING_PROXIMAL;
+        default:
+          return this;
+      }
+    }
+  },
+
+  RESETTING_PROXIMAL {
+    public ArmState next(ArmInput input) {
+      ArmInput ai = (ArmInput)input;
+      switch(ai) {
+        case COMPLETED:
+          return RESETTING_DISTAL;
+        default:
+          return this;
+      }
+    }
+  },
+
+  RESETTING_DISTAL {
+    public ArmState next(ArmInput input) {
+      ArmInput ai = (ArmInput)input;
+      switch(ai) {
+        case COMPLETED:
+          return HOME;
+        default:
+          return this;
+      }
+    }
+  };
+  
+  public ArmState next(ArmInput input) {
+    return this;
   }
+}

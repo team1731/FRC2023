@@ -23,11 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.state.arm.ArmInput;
 import frc.robot.state.arm.ArmStateMachine;
-import frc.robot.state.*;
-import frc.robot.Constants.StateConstants;
-import frc.robot.Constants.StateConstants.ResultCode;
 import frc.robot.Constants.ArmConstants;
 import frc.data.mp.*;
 import frc.data.mp.ArmPath.ArmMotor;
@@ -38,7 +34,7 @@ import frc.robot.util.log.LogWriter;
 import frc.robot.util.log.LogWriter.Log;
 import frc.robot.util.log.loggers.ArmPathRecording;
 
-public class ArmSubsystem extends SubsystemBase implements StateHandler {
+public class ArmSubsystem extends SubsystemBase {
     private ArmStateMachine stateMachine;
 
     // motors for the arm
@@ -81,13 +77,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         distalAbsolute = new AnalogInput(0);
         proximalAbsolute = new AnalogInput(1);
         armPathLogger = null;
-    }
-
-    public StateMachine getStateMachine() {
-        if(stateMachine == null) {
-            stateMachine = new ArmStateMachine(StateConstants.kArmStateMachineId, this);
-        }
-        return stateMachine;
     }
     
     private void initializeArmMotors() {
@@ -148,19 +137,13 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         } else {
             // move the arm into normal home (safe) position
             stopIntake();
-            moveWrist(ArmConstants.wristHomePosition, ArmConstants.wristMaxVel);
-            wristFlexed = false;
-            proximalMotor.set(ControlMode.MotionMagic, ArmConstants.proximalHomePosition);
-            distalMotor.set(ControlMode.MotionMagic, ArmConstants.distalHomePosition);
+            moveWristHome();
+            moveProximalArmHome();
+            moveDistalArmHome();
         }        
     }
 
     public void startArmMovement(ArmPath armPath) {
-        if(currentPath != null) {
-            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: cannot initialize new movement until current path is complete");
-            return;
-        }
-
         // init motion profile buffers for proximal/distal motors
         currentPath = armPath;
         currentDirection = Direction.FORWARD;
@@ -172,17 +155,17 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         moveArm();
     }
 
+    public void restartArmMovement(int startIndex) {
+        // re-init motion profile buffers for proximal/distal motors, 
+        currentDirection = Direction.FORWARD;
+        proximalBufferedStream = currentPath.getInitializedBuffer(ArmMotor.PROXIMAL, startIndex, currentDirection);
+        distalBufferedStream = currentPath.getInitializedBuffer(ArmMotor.DISTAL, startIndex, currentDirection);
+
+        // start arm movement
+        moveArm();
+    }
+
     public void reverseArmMovment() {
-        if(currentPath == null) {
-            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: cannot be reversed, not currently running a path");
-            return;
-        }
-
-        if(currentDirection == Direction.REVERSE) {
-            notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: cannot be reversed, already reversing current path");
-            return;
-        }
-
         boolean completedPath = !isArmMoving();
 
         // update profile buffers with a reverse path
@@ -209,29 +192,24 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
     }
 
     private void moveArm() {
-        // start motion profile for proximal/distal motors
-        ErrorCode code;
+        // Note: if disabled, the start call will automatically move the MP state to enabled
 
         proximalMotorRunning = true;
-        // Note: if disabled, the start call will automatically move the MP state to enabled
-        code = proximalMotor.startMotionProfile(proximalBufferedStream, ArmConstants.minBufferedPoints, TalonFXControlMode.MotionProfile.toControlMode());
-        if(code != ErrorCode.OK) {
-            notifyStateMachine(ResultCode.ARM_MOTION_START_FAILED, "Failed to start proximal motion profile");
-            return;
-        }
+        proximalMotor.startMotionProfile(proximalBufferedStream, ArmConstants.minBufferedPoints, TalonFXControlMode.MotionProfile.toControlMode());
 
         distalMotorRunning = true;
-        // Note: if disabled, the start call will automatically move the MP state to enabled
-        code = distalMotor.startMotionProfile(distalBufferedStream, ArmConstants.minBufferedPoints, TalonFXControlMode.MotionProfile.toControlMode());
-        if(code != ErrorCode.OK) {
-            notifyStateMachine(ResultCode.ARM_MOTION_START_FAILED, "Failed to start distal motion profile");
-            return;
-        }
+        distalMotor.startMotionProfile(distalBufferedStream, ArmConstants.minBufferedPoints, TalonFXControlMode.MotionProfile.toControlMode());
 
         // start path timer
         pathStartedTime = Timer.getFPGATimestamp();
+    }
 
-        notifyStateMachine(ResultCode.SUCCESS, "Successfully started arm movement");
+    public void moveProximalArmHome() {
+        proximalMotor.set(ControlMode.MotionMagic, ArmConstants.proximalHomePosition);
+    }
+
+    public void moveDistalArmHome() {
+        distalMotor.set(ControlMode.MotionMagic, ArmConstants.distalHomePosition);
     }
 
     public void stopArm() {
@@ -301,6 +279,11 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         System.out.println("Moving wrist - velocity: " + maxVelocity + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         //wristPIDController.setSmartMotionMaxVelocity(maxVelocity, smartMotionSlot);
         wristPIDController.setReference(position, CANSparkMax.ControlType.kSmartMotion);
+    }
+
+    public void moveWristHome() {
+        moveWrist(ArmConstants.wristHomePosition, ArmConstants.wristMaxVel);
+        wristFlexed = false;
     }
 
     public void stopWrist() {
@@ -387,8 +370,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         }
 
         if(isArmMovingAtPeriodicStart && !isArmMoving()) { // arm was moving, but has now stopped
-            notifyStateMachine(ResultCode.SUCCESS, "Completed arm movement: " + currentDirection);
-
             if(currentDirection == Direction.REVERSE) { // we completed retracting
                 currentPath = null;
                 currentDirection = null;
@@ -405,47 +386,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
 
         doSD();
-    }
-
-
-    /*
-     * STATE HANDLER INTERFACE
-     */
-
-    public void changeState(Input input, Object data) {
-        ArmInput ai = (ArmInput)input;
-        switch(ai) {
-            case EXTEND_PING:
-                startArmMovement((ArmPath)data);
-                break;
-            case RETRACT_PING:
-            case RECOVER:
-                reverseArmMovment();
-                break;
-            case RETRIEVE:
-                // TODO implement, for the moment just send back success to keep the state process moving
-                notifyStateMachine(ResultCode.SUCCESS, "TEST: sending success code for unimplemented step");
-                break;
-            case RELEASE:
-                // TODO implement, for the moment just send back success to keep the state process moving
-                notifyStateMachine(ResultCode.SUCCESS, "TEST: sending success code for unimplemented step");
-                break;
-            default:
-                // unrecognized state change, send back failure
-                notifyStateMachine(ResultCode.INVALID_REQUEST, "Invalid request: state change request was not recognized");
-        }
-    }
-
-    public void interruptStateChange() {
-        stopArm();
-    }
-
-    private void notifyStateMachine(ResultCode resultCode, String resultMessage) {
-        if(stateMachine != null) {
-            ArmInput input = resultCode == ResultCode.SUCCESS? ArmInput.SUCCESS : ArmInput.FAILED;
-            StateChangeResult result = new StateChangeResult(resultCode, resultMessage, Timer.getFPGATimestamp());
-            stateMachine.transition(input, result);
-        }
     }
 
 
