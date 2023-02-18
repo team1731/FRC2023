@@ -1,19 +1,14 @@
 package driverstation;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -23,32 +18,26 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 
 public class Keypad extends JDialog implements KeyListener {
+	private static final long serialVersionUID = 1L;
 	private JLabel label;
 	private JLabel picLabel;
     private NetworkTable table;
     private State state;
     private StringBuffer inputBuffer;
     
-    static ImageIcon cube;
-    static ImageIcon cone;
-    static ImageIcon none;
-    static {
-		try {
-			cube = new ImageIcon(ImageIO.read(new File("images/cube.png")));
-			cone = new ImageIcon(ImageIO.read(new File("images/cone.png")));
-			none = new ImageIcon(ImageIO.read(new File("images/none.png")));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-    }
+    private ImageIcon cube;
+    private ImageIcon cone;
+    private ImageIcon none;
     
 	public Keypad() {
+		cone = new ImageIcon(Keypad.class.getResource("/images/cone.png"));
+		cube = new ImageIcon(Keypad.class.getResource("/images/cube.png"));
+		none = new ImageIcon(Keypad.class.getResource("/images/none.png"));
 	    NetworkTableInstance inst = NetworkTableInstance.getDefault();
 	    inst.startClient4("keypad");
 	    inst.setServerTeam(1731);
 	    inst.startDSClient();
 		table = inst.getTable("KeyPad");
-		//setLayout(new FlowLayout());
 		label = new JLabel();
 		label.setFont(new Font("Arial Black", Font.BOLD, 32));
 		add(label, BorderLayout.SOUTH);
@@ -63,6 +52,7 @@ public class Keypad extends JDialog implements KeyListener {
 		        System.exit(0);
 		    }
 		});
+		setTitle("ALEXANDER G. COWBELL -- TEAM 1731 -- KEYPAD ENTRY PROGRAM");
 		setSize(700, 500);
 		setVisible(true);
 	}
@@ -84,7 +74,7 @@ public class Keypad extends JDialog implements KeyListener {
     	CLEAR_ENTRY  (96); // "0"
     	
     	private final int value;
-    	private static Map map = new HashMap<>();
+    	private static Map<Integer, KeypadControl> map = new HashMap<>();
     	
     	private KeypadControl(int value) {
     		this.value = value;
@@ -192,13 +182,9 @@ public class Keypad extends JDialog implements KeyListener {
 
 	@Override
 	public void keyReleased(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void keyTyped(KeyEvent arg0) {
-		// TODO Auto-generated method stub
-		
 	}
 }
