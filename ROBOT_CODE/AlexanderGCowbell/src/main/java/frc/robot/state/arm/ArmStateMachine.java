@@ -203,21 +203,19 @@ public class ArmStateMachine {
         // move the wrist back into extended (home) position
         subsystem.moveWrist(ArmConstants.wristHomePosition, currentPath.getWristMaxVelocity());
         wristFlexed = false;
-
-        // by this point we will have released the game piece
-        if(currentIntakeState == IntakeState.RELEASING) {
-          transitionIntake(Input.RELEASED);
-        }
       }
     }
     
     /*
-     * Logic for moving intake into holding
+     * Logic for handling intake cases
      */
     if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
       transitionIntake(Input.RETRIEVED);
     }
 
+    if((currentIntakeState == IntakeState.RETRIEVING || currentIntakeState == IntakeState.RELEASING) && currentArmState == ArmState.RESETTING_WRIST) {
+      transitionIntake(Input.STOP);
+    }
     
     /*
      * Logic for handling special cases for autonomous where we won't receive a button release event

@@ -3,7 +3,6 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GamePiece;
 import frc.robot.state.arm.ArmSequence;
-import frc.robot.state.arm.ArmState;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.state.arm.ArmStateMachine.Status;
 import frc.data.mp.*;
@@ -18,6 +17,7 @@ public class AutoPickupCommand extends CommandBase {
         this.stateMachine = stateMachine;
         this.sequence = sequence;
         stateMachine.setGamePiece(pieceType);
+        stateMachine.setIsInAuto(true);
     }
 
     @Override
