@@ -2,13 +2,14 @@ package frc.data.mp;
 
 public class ScoreHigh {
     public static ArmPath getArmPath() {
-        return new ArmPath(kNumPoints, proximalPoints, distalPoints, kWristFlexIndex, kWristFlexPosition, kWristExtendIndex);
+        return new ArmPath(kNumPoints, proximalPoints, distalPoints, kWristFlexIndex, kWristFlexPosition, kWristExtendIndex, kWristMaxVelocity);
     }
 
     public static final int kNumPoints = 290;
     public static final int kWristFlexIndex = 145;
     public static final double kWristFlexPosition = 0.4516710638999939;
     public static final int kWristExtendIndex = 260;
+    public static final double kWristMaxVelocity = 2000;
 
     // Position (ticks)	Velocity (RPM)
 

@@ -11,6 +11,7 @@ public class ArmPath {
     private double[][] distalPoints;
     private int wristFlexIndex;
     private double wristFlexPosition;
+    private double wristMaxVelocity;
     private int wristExtendIndex;
     private BufferedTrajectoryPointStream proximalBufferedStream;
     private BufferedTrajectoryPointStream distalBufferedStream;
@@ -23,13 +24,14 @@ public class ArmPath {
         FORWARD, REVERSE
     }
 
-    public ArmPath(int numberOfPoints, double[][] proximalPoints, double[][] distalPoints, int wristFlexIndex, double wristFlexPosition, int wristExtendIndex) {
+    public ArmPath(int numberOfPoints, double[][] proximalPoints, double[][] distalPoints, int wristFlexIndex, double wristFlexPosition, int wristExtendIndex, double wristMaxVelocity) {
         this.numberOfPoints = numberOfPoints;
         this.proximalPoints = proximalPoints;
         this.distalPoints = distalPoints;
         this.wristFlexIndex = wristFlexIndex;
         this.wristFlexPosition = wristFlexPosition;
         this.wristExtendIndex = wristExtendIndex;
+        this.wristMaxVelocity = wristMaxVelocity;
         this.proximalBufferedStream = new BufferedTrajectoryPointStream();
         this.distalBufferedStream = new BufferedTrajectoryPointStream();
     }
@@ -48,6 +50,10 @@ public class ArmPath {
 
     public int getWristExtendIndex() {
         return wristExtendIndex;
+    }
+
+    public double getWristMaxVelocity() {
+        return wristMaxVelocity;
     }
 
     public BufferedTrajectoryPointStream getInitializedBuffer(ArmMotor motor, int startFrom, Direction direction) {

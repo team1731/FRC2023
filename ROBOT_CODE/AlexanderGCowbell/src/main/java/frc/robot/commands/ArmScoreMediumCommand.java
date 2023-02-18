@@ -4,24 +4,22 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.data.mp.*;
 
-public class ArmPickupLowCommand extends CommandBase {
+public class ArmScoreMediumCommand extends CommandBase {
     private ArmSubsystem armSubsystem;
 
-    public ArmPickupLowCommand(ArmSubsystem armSubsystem) {
+    public ArmScoreMediumCommand(ArmSubsystem armSubsystem) {
         this.armSubsystem = armSubsystem;
     }
 
     @Override
 	public void initialize() {
-        ArmPath path = armSubsystem.isCone()? PickupLowCone.getArmPath() : PickupLowCube.getArmPath();
-        armSubsystem.startArmMovement(path); 
-        armSubsystem.intake();
+        ArmPath path = ScoreMedium.getArmPath();
+        armSubsystem.startArmMovement(path);
 	}
-
 
     @Override
     public void end(boolean interrupted) {
-        armSubsystem.holdIntake();
+        armSubsystem.eject();
         armSubsystem.reverseArmMovment();
     }
 }

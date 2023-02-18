@@ -40,8 +40,8 @@ public class RobotContainer {
   private final JoystickButton kStart = new JoystickButton(driver, XboxController.Button.kStart.value);
   private final JoystickButton ky= new JoystickButton(driver, XboxController.Button.kY.value);
   private final JoystickButton kx= new JoystickButton(driver, XboxController.Button.kX.value);
-  private final JoystickButton kb= new JoystickButton(driver,XboxController.Button.kA.value);
-  private final JoystickButton ka = new JoystickButton(driver,XboxController.Button.kB.value);
+  private final JoystickButton kb= new JoystickButton(driver,XboxController.Button.kB.value);
+  private final JoystickButton ka = new JoystickButton(driver,XboxController.Button.kA.value);
   private JoystickButton leftBumper = new JoystickButton(driver,XboxController.Button.kLeftBumper.value);
   private JoystickButton rightBumper = new JoystickButton(driver,XboxController.Button.kRightBumper.value);
   private JoystickButton coneOrCube = new JoystickButton(operator,8);
@@ -87,9 +87,12 @@ public class RobotContainer {
     //intakeTest.onFalse(new InstantCommand(() -> s_armSubSystem.holdIntake()));
     //ejectTest.onTrue(new InstantCommand(() -> s_armSubSystem.eject()));
     //ejectTest.onFalse(new InstantCommand(() -> s_armSubSystem.stopIntake()));
-    coneOrCube.whileTrue(new InstantCommand(() -> s_armSubSystem.isCone(false)));
-    coneOrCube.whileFalse(new InstantCommand(() -> s_armSubSystem.isCone(true)));
+    coneOrCube.whileTrue(new InstantCommand(() -> s_armSubSystem.setCone(false)));
+    coneOrCube.whileFalse(new InstantCommand(() -> s_armSubSystem.setCone(true)));
     ky.whileTrue((new ArmScoreHighCommand(s_armSubSystem)));
+    kb.whileTrue((new ArmScoreMediumCommand(s_armSubSystem)));
+    ka.whileTrue((new ArmScoreLowCommand(s_armSubSystem)));
+
    // kb.whileTrue((new ArmScoreMid(s_armSubSystem)));
    // ka.whileTrue((new ArmScoreLow(s_armSubsystem)));
 ;

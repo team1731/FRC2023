@@ -1,14 +1,15 @@
 package frc.data.mp;
 
-public class ShelfPickup {
+public class PickupHigh {
     public static ArmPath getArmPath() {
-        return new ArmPath(kNumPoints, proximalPoints, distalPoints, kWristFlexIndex, kWristFlexPosition, kWristExtendIndex);
+        return new ArmPath(kNumPoints, proximalPoints, distalPoints, kWristFlexIndex, kWristFlexPosition, kWristExtendIndex, kWristMaxVelocity);
     }
 
     public static final int kNumPoints = 366;
     public static final int kWristFlexIndex = 75;
     public static final double kWristFlexPosition = 0.04201394319534302;
     public static final int kWristExtendIndex = 190;
+    public static final double kWristMaxVelocity = 2000;
 
     // Position (ticks)	Velocity (RPM)
 

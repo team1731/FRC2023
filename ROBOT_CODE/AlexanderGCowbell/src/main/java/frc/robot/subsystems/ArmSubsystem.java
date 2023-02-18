@@ -148,7 +148,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         } else {
             // move the arm into normal home (safe) position
             stopIntake();
-            moveWrist(ArmConstants.wristHomePosition);
+            moveWrist(ArmConstants.wristHomePosition, ArmConstants.wristMaxVel);
             wristFlexed = false;
             proximalMotor.set(ControlMode.MotionMagic, ArmConstants.proximalHomePosition);
             distalMotor.set(ControlMode.MotionMagic, ArmConstants.distalHomePosition);
@@ -296,7 +296,10 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
 
     }
 
-    public void moveWrist(double position) {
+    public void moveWrist(double position, double maxVelocity) {
+        int smartMotionSlot = 0;
+        System.out.println("Moving wrist - velocity: " + maxVelocity + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        //wristPIDController.setSmartMotionMaxVelocity(maxVelocity, smartMotionSlot);
         wristPIDController.setReference(position, CANSparkMax.ControlType.kSmartMotion);
     }
 
@@ -366,7 +369,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
             int wristFlexIndex = currentPath.getWristFlexIndex();
             if(currentIndex >= wristFlexIndex) {
                 // move the wrist into the flexed position for this path
-                moveWrist(currentPath.getWristFlexPosition());
+                moveWrist(currentPath.getWristFlexPosition(), currentPath.getWristMaxVelocity());
                 wristFlexed = true;
             }
         } else if(wristFlexed && isArmMoving() && currentDirection == Direction.REVERSE) {
@@ -374,7 +377,7 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
             int wristExtendIndex = currentPath.getWristExtendIndex();
             if(currentIndex <= wristExtendIndex) {
                 // move the wrist back into extended (home) position
-                moveWrist(ArmConstants.wristHomePosition);
+                moveWrist(ArmConstants.wristHomePosition, currentPath.getWristMaxVelocity());
                 wristFlexed = false;
 
                 if(ejecting) {
@@ -527,7 +530,11 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
         return (armPathLogger != null);
     }
 
-    public void isCone(boolean b) {
+    public boolean isCone() {
+        return cone;
+    }
+
+    public void setCone(boolean b) {
         cone = b;
     }
 }

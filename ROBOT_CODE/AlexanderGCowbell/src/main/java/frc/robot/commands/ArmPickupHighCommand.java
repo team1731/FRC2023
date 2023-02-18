@@ -13,7 +13,7 @@ public class ArmPickupHighCommand extends CommandBase {
 
     @Override
 	public void initialize() {
-        ArmPath path = ShelfPickup.getArmPath();
+        ArmPath path = PickupHigh.getArmPath();
         armSubsystem.startArmMovement(path); 
         armSubsystem.intake();
 	}
