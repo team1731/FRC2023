@@ -278,7 +278,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public boolean isIntakeAtHoldingVelocity() {
-        return (Math.abs(intakeMotor.getEncoder().getVelocity()) < 60);
+        return (Math.abs(intakeMotor.getEncoder().getVelocity()) < ArmConstants.intakeHoldingVelocity);
     }
 
     
