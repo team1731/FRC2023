@@ -5,13 +5,9 @@ import com.ctre.phoenix.motorcontrol.TalonFXFeedbackDevice;
 import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.StatorCurrentLimitConfiguration;
 import com.ctre.phoenix.motion.*;
-import com.ctre.phoenix.ErrorCode;
 
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.AbsoluteEncoder;
@@ -21,10 +17,10 @@ import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.GamePiece;
 import frc.data.mp.*;
 import frc.data.mp.ArmPath.ArmMotor;
 import frc.data.mp.ArmPath.Direction;
@@ -51,7 +47,6 @@ public class ArmSubsystem extends SubsystemBase {
     private CANSparkMax wristMotor;
     private CANSparkMax intakeMotor;
     private SparkMaxPIDController wristPIDController; 
-//private SparkMaxPIDController intakePIDController;
     private AbsoluteEncoder wristEncoder;
 
     // arm recording
@@ -60,16 +55,8 @@ public class ArmSubsystem extends SubsystemBase {
     // state tracking
     private ArmPath currentPath = null;
     private Direction currentDirection = null;
-    private double pathStartedTime = 0;
-    private int profileStartIndex = 0;
     private boolean proximalMotorRunning = false;
     private boolean distalMotorRunning = false;
-    private boolean wristFlexed = false; // flexed is hand bent down (scoring/pickup), extended is hand bent up (home/carrying position)
-    private boolean ejecting = false;
-    private boolean intaking = false;
-    private Double intakingTimer = null;
-    private boolean cone = false;
-    private boolean goHome = true;
 
 
     public ArmSubsystem() {
@@ -83,6 +70,38 @@ public class ArmSubsystem extends SubsystemBase {
     public ArmStateMachine getStateMachine() {
         return stateMachine;
     }
+
+    public Direction getDirection() {
+        return currentDirection;
+    }
+
+    // home for any logic needed to reset, especially when robot moves to disabled state
+    // ensures motion profiles are cleared so motor doesn't try to process last profile when re-enabled
+    // moves the arm into a home (safe) position
+    public void reset() {
+        proximalMotor.clearMotionProfileTrajectories();
+        distalMotor.clearMotionProfileTrajectories();
+
+        if(LogWriter.isArmRecordingEnabled()) {
+            // disengage the arm and wrist motors so both can be moved freely for recording
+            stopIntake();
+            stopWrist();
+            proximalMotor.set(ControlMode.PercentOutput, 0);
+            distalMotor.set(ControlMode.PercentOutput, 0);
+        } else {
+            // move the arm into normal home (safe) position
+            stopIntake();
+            moveWristHome();
+            moveProximalArmHome();
+            moveDistalArmHome();
+            stateMachine.resetState();
+        }        
+    }
+
+
+    /*
+     * PROXIMAL/DISTAL ARM MOTOR INIT
+     */
     
     private void initializeArmMotors() {
         proximalMotor = new WPI_TalonFX(ArmConstants.proximalCancoderId, "canivore1");
@@ -108,9 +127,6 @@ public class ArmSubsystem extends SubsystemBase {
         talonConfig.slot0.kD = ArmConstants.kGains_MotProf.kD;
         talonConfig.slot0.integralZone = (int) ArmConstants.kGains_MotProf.kIzone;
         talonConfig.slot0.closedLoopPeakOutput = ArmConstants.kGains_MotProf.kPeakOutput;
-        // talonConfig.slot0.allowableClosedloopError // left default for this example
-        // talonConfig.slot0.maxIntegralAccumulator; // left default for this example
-        // talonConfig.slot0.closedLoopPeriod; // left default for this example
         motor.configAllSettings(talonConfig);
 
         // Note: these two lines required for motion magic to work
@@ -122,77 +138,36 @@ public class ArmSubsystem extends SubsystemBase {
 		motor.configNominalOutputReverse(0, 30);
 		motor.configPeakOutputForward(0.5, 30);
 		motor.configPeakOutputReverse(-0.5, 30);
-        // motor.configStatorCurrentLimit(new StatorCurrentLimitConfiguration(true, 30, 30, 0.2));
         motor.setInverted(invertType);
     }
 
-    // home for any logic needed to reset, especially when robot moves to disabled state
-    // ensures motion profiles are cleared so motor doesn't try to process last profile when re-enabled
-    // moves the arm into a home (safe) position
-    public void reset() {
-        proximalMotor.clearMotionProfileTrajectories();
-        distalMotor.clearMotionProfileTrajectories();
 
-        if(LogWriter.isArmRecordingEnabled()) {
-            // disengage the arm and wrist motors so both can be moved freely for recording
-            stopIntake();
-            stopWrist();
-            proximalMotor.set(ControlMode.PercentOutput, 0);
-            distalMotor.set(ControlMode.PercentOutput, 0);
-        } else {
-            // move the arm into normal home (safe) position
-            stopIntake();
-            moveWristHome();
-            moveProximalArmHome();
-            moveDistalArmHome();
-        }        
-    }
+    /*
+     * PROXIMAL/DISTAL ARM MOTOR MOVEMENT
+     */
 
     public void startArmMovement(ArmPath armPath) {
-        // init motion profile buffers for proximal/distal motors
         currentPath = armPath;
         currentDirection = Direction.FORWARD;
-        profileStartIndex = 0;
-        proximalBufferedStream = armPath.getInitializedBuffer(ArmMotor.PROXIMAL, 0, currentDirection);
-        distalBufferedStream = armPath.getInitializedBuffer(ArmMotor.DISTAL, 0, currentDirection);
-
-        // start arm movement
-        moveArm();
+        initArmMovement(0);
     }
 
     public void restartArmMovement(int startIndex) {
-        // re-init motion profile buffers for proximal/distal motors, 
         currentDirection = Direction.FORWARD;
+        initArmMovement(startIndex);
+    }
+
+    public void reverseArmMovment(int startIndex) {
+        currentDirection = Direction.REVERSE;
+        initArmMovement(startIndex);
+    }
+
+    private void initArmMovement(int startIndex) {
+        // init motion profile buffers for proximal/distal motors
         proximalBufferedStream = currentPath.getInitializedBuffer(ArmMotor.PROXIMAL, startIndex, currentDirection);
         distalBufferedStream = currentPath.getInitializedBuffer(ArmMotor.DISTAL, startIndex, currentDirection);
 
         // start arm movement
-        moveArm();
-    }
-
-    public void reverseArmMovment() {
-        boolean completedPath = !isArmMoving();
-
-        // update profile buffers with a reverse path
-
-        int startPosition = 0;
-        int pointsLastIndex = currentPath.getNumberOfPoints()-1;
-        if(completedPath) { 
-            // not moving, we finished our path, run the whole thing back
-            startPosition = pointsLastIndex;
-        } else { 
-            // we are still in the middle of our path, first stop current movement
-            stopArm();
-            // now, see how far along and run back from where we stopped
-            startPosition = getPathIndex();
-        }
-
-        currentDirection = Direction.REVERSE;
-        profileStartIndex = startPosition;
-        proximalBufferedStream = currentPath.getInitializedBuffer(ArmMotor.PROXIMAL, startPosition, currentDirection);
-        distalBufferedStream = currentPath.getInitializedBuffer(ArmMotor.DISTAL, startPosition, currentDirection);
-
-        // restart arm movement
         moveArm();
     }
 
@@ -205,8 +180,7 @@ public class ArmSubsystem extends SubsystemBase {
         distalMotorRunning = true;
         distalMotor.startMotionProfile(distalBufferedStream, ArmConstants.minBufferedPoints, TalonFXControlMode.MotionProfile.toControlMode());
 
-        // start path timer
-        pathStartedTime = Timer.getFPGATimestamp();
+        stateMachine.startedPath();
     }
 
     public void moveProximalArmHome() {
@@ -226,24 +200,9 @@ public class ArmSubsystem extends SubsystemBase {
         return proximalMotorRunning || distalMotorRunning;
     }
 
-    private int getPathIndex() {
-        int pointsLastIndex = currentPath.getNumberOfPoints()-1;
-        double elapsedTimeMS = (Timer.getFPGATimestamp() - pathStartedTime) * 1000;
-        int pointsProcessed = (int)(elapsedTimeMS / ArmConstants.pointDurationMS);
-        int position = (currentDirection == Direction.FORWARD)? profileStartIndex + pointsProcessed : profileStartIndex - pointsProcessed;
-        // make sure we don't end up with an array out of bounds exception
-        if(position > pointsLastIndex) {
-            return pointsLastIndex;
-        } else if (position < 0) {
-            return 0;
-        }
-
-        return position;
-    }
-
 
     /*
-     * METHODS FOR INITIALIZING THE Intake/WRIST
+     * WRIST/INTAKE MOTOR INIT
      */
 
     public void initializeWrist() {
@@ -274,21 +233,21 @@ public class ArmSubsystem extends SubsystemBase {
         intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
         intakeMotor.setInverted(false);
         intakeMotor.setIdleMode(IdleMode.kBrake);
-       // intakePIDController = intakeMotor.getPIDController();
-      //  intakePIDController.setReference(ArmConstants.INTAKE_OUTPUT_POWER, CANSparkMax.ControlType.kVoltage);
-
     }
+
+
+    /*
+     * WRIST MOTOR MOVEMENT
+     */
 
     public void moveWrist(double position, double maxVelocity) {
         int smartMotionSlot = 0;
-        System.out.println("Moving wrist - velocity: " + maxVelocity + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        //wristPIDController.setSmartMotionMaxVelocity(maxVelocity, smartMotionSlot);
+        wristPIDController.setSmartMotionMaxVelocity(maxVelocity, smartMotionSlot);
         wristPIDController.setReference(position, CANSparkMax.ControlType.kSmartMotion);
     }
 
     public void moveWristHome() {
         moveWrist(ArmConstants.wristHomePosition, ArmConstants.wristMaxVel);
-        wristFlexed = false;
     }
 
     public void stopWrist() {
@@ -296,40 +255,35 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
 
+    /*
+     * INTAKE MOTOR MOVEMENT
+     */
+
     public void intake() {
         intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
-        intakeMotor.set(cone == true?1.0:-1.0);
-        intaking = true;
-        intakingTimer = Timer.getFPGATimestamp(); 
-        System.out.println("Intaking");
+        intakeMotor.set((stateMachine.getGamePiece() == GamePiece.CONE)? 1.0 : -1.0);
     }
 
     public void eject() {
-        ejecting = true;
         intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
-        intakeMotor.set(cone==true?-1.0: 1.0);
-        intaking = false;
-        intakingTimer = null;
-        System.out.println("Ejecting");
+        intakeMotor.set((stateMachine.getGamePiece() == GamePiece.CONE)? -1.0 : 1.0);
     }
 
     public void holdIntake() {
         intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_HOLD_CURRENT_LIMIT_A);
-        intakeMotor.set(cone==true?ArmConstants.INTAKE_HOLD_POWER: -1* ArmConstants.INTAKE_HOLD_POWER);
-        intaking = false;
-        intakingTimer = null;
-        System.out.println("holding");
+        intakeMotor.set((stateMachine.getGamePiece() == GamePiece.CONE)? ArmConstants.INTAKE_HOLD_POWER : -1 * ArmConstants.INTAKE_HOLD_POWER);
     }
 
     public void stopIntake() {
         intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
         intakeMotor.set(0);
-        intaking = false;
-        intakingTimer = null;
-        System.out.println("Stopped");
     }
 
+    public boolean isIntakeAtHoldingVelocity() {
+        return (Math.abs(intakeMotor.getEncoder().getVelocity()) < 60);
+    }
 
+    
     /*-
      * PERIODIC LOGIC
      */
@@ -352,43 +306,12 @@ public class ArmSubsystem extends SubsystemBase {
             distalMotorRunning = false;
         }
 
-        if(!wristFlexed && isArmMoving() && currentDirection == Direction.FORWARD) {
-            int currentIndex = getPathIndex();
-            int wristFlexIndex = currentPath.getWristFlexIndex();
-            if(currentIndex >= wristFlexIndex) {
-                // move the wrist into the flexed position for this path
-                moveWrist(currentPath.getWristFlexPosition(), currentPath.getWristMaxVelocity());
-                wristFlexed = true;
-            }
-        } else if(wristFlexed && isArmMoving() && currentDirection == Direction.REVERSE) {
-            int currentIndex = getPathIndex();
-            int wristExtendIndex = currentPath.getWristExtendIndex();
-            if(currentIndex <= wristExtendIndex) {
-                // move the wrist back into extended (home) position
-                moveWrist(ArmConstants.wristHomePosition, currentPath.getWristMaxVelocity());
-                wristFlexed = false;
-
-                if(ejecting) {
-                    stopIntake();
-                }
-            }
-        }
-
         if(isArmMovingAtPeriodicStart && !isArmMoving()) { // arm was moving, but has now stopped
             if(currentDirection == Direction.REVERSE) { // we completed retracting
                 currentPath = null;
                 currentDirection = null;
-                pathStartedTime = 0;
             } 
         }
-        
-        if ((intakingTimer != null) && ((Timer.getFPGATimestamp() - intakingTimer) > 0.5)  &&  (Math.abs(intakeMotor.getEncoder().getVelocity()) < 60)) {
-            holdIntake();
-            System.out.println("holdingig intake");
-
-        }
-
-
 
         doSD();
     }
@@ -473,13 +396,5 @@ public class ArmSubsystem extends SubsystemBase {
 
     public boolean isArmRecordingRunning() {
         return (armPathLogger != null);
-    }
-
-    public boolean isCone() {
-        return cone;
-    }
-
-    public void setCone(boolean b) {
-        cone = b;
     }
 }

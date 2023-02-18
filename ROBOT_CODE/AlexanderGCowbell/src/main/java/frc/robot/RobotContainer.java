@@ -18,6 +18,7 @@ import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.subsystems.*;
 import frc.robot.util.log.LogWriter;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.GamePiece;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -87,8 +88,8 @@ public class RobotContainer {
     /* Driver Buttons */
     kStart.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
     kStart.onTrue(new InstantCommand(() -> {s_Swerve.adjustWheelEncoders(); s_armSubSystem.resetArmEncoders();}));
-    coneOrCube.whileTrue(new InstantCommand(() -> s_armSubSystem.setCone(false)));
-    coneOrCube.whileFalse(new InstantCommand(() -> s_armSubSystem.setCone(true)));
+    coneOrCube.whileTrue(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CUBE)));
+    coneOrCube.whileFalse(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CONE)));
     ky.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_HIGH)));
     kb.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_MEDIUM)));
     ka.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_LOW)));

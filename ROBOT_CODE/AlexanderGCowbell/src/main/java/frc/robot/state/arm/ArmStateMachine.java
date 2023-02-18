@@ -2,6 +2,8 @@ package frc.robot.state.arm;
 
 import edu.wpi.first.wpilibj.Timer;
 import frc.data.mp.ArmPath;
+import frc.data.mp.ArmPath.Direction;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GamePiece;
 import frc.robot.subsystems.ArmSubsystem;
 
@@ -9,12 +11,18 @@ public class ArmStateMachine {
   private ArmSubsystem subsystem;
   private Status status = Status.READY;
   private GamePiece gamePiece = GamePiece.CUBE;
-  private ArmState currentArmState = ArmState.HOME;
-  private WristState currentWristState = WristState.HOME;
-  private IntakeState currentIntakeState = IntakeState.STOPPED;
-  private ArmPath currentPath;
   private MovementType movementType;
-  private int currentPathIndex = 0;
+
+  private ArmState currentArmState = ArmState.HOME;
+  private IntakeState currentIntakeState = IntakeState.STOPPED;
+
+  private ArmPath currentPath;
+  private int pathStartedIndex = 0;
+  private double pathStartedTime = 0;
+  private double intakeStartedTime = 0;
+
+  // extended = home pos (palm facing out), flexed = positioned for pickup/scoring (palm facing down/in)
+  private boolean wristFlexed = false; 
 
 
   /*
@@ -43,11 +51,16 @@ public class ArmStateMachine {
     this.subsystem = subsystem;
   }
 
-  private void resetInternalState() {
+  public void resetState() {
     status = Status.READY;
+    currentArmState = ArmState.HOME;
+    currentIntakeState = IntakeState.STOPPED;
     currentPath = null;
-    currentPathIndex = 0;
+    pathStartedIndex = 0;
+    pathStartedTime = 0;
+    intakeStartedTime = 0;
     movementType = null;
+    wristFlexed = false;
   }
 
 
@@ -61,7 +74,6 @@ public class ArmStateMachine {
     if(!isReadyToStartMovement()) return; 
 
     System.out.println("ArmStateMachine: STARTING PICKUP!!!!!!!!!!!!!!!!!!!!!");
-    status = Status.RUNNING;
     currentPath = path;
     movementType = MovementType.PICKUP;
     transitionArm(Input.EXTEND);
@@ -74,7 +86,6 @@ public class ArmStateMachine {
     if(!isReadyToStartMovement()) return; 
 
     System.out.println("ArmStateMachine: STARTING SCORE!!!!!!!!!!!!!!!!!!!!!");
-    status = Status.RUNNING;
     currentPath = path;
     movementType = MovementType.SCORE;
     transitionArm(Input.EXTEND);
@@ -99,6 +110,12 @@ public class ArmStateMachine {
     }
   }
 
+  // NOTIFY THAT PICKUP/SCORE SHOULD BE STOPPED & RETRACTED MIDSTREAM
+  public void interrupt() {
+    subsystem.stopArm();
+    transitionArm(Input.INTERRUPT);
+  }
+
   private boolean isReadyToStartMovement() {
     if(currentArmState != ArmState.HOME ||
        currentPath != null) {
@@ -109,12 +126,69 @@ public class ArmStateMachine {
 
 
   /*
+   * PATH TRACKING
+   */
+
+  public void startedPath() {
+    status = Status.RUNNING;
+    pathStartedTime = Timer.getFPGATimestamp();
+  }
+
+  public int getPathIndex() {
+    Direction direction = subsystem.getDirection();
+    int pointsLastIndex = currentPath.getNumberOfPoints()-1;
+    double elapsedTimeMS = (Timer.getFPGATimestamp() - pathStartedTime) * 1000;
+    int pointsProcessed = (int)(elapsedTimeMS / ArmConstants.pointDurationMS);
+    int position = (direction == Direction.FORWARD)? pathStartedIndex + pointsProcessed : pathStartedIndex - pointsProcessed;
+    // make sure we don't end up with an array out of bounds exception
+    if(position > pointsLastIndex) {
+        return pointsLastIndex;
+    } else if (position < 0) {
+        return 0;
+    }
+
+    return position;
+  }
+
+
+  /*
    * PERIODIC
    *  Note: this periodic should be called each time the subsystem's periodic is called
    */
 
   public void periodic() {
 
+    /*
+     * Logic for flexing/extending wrist
+     */
+    if(!wristFlexed && subsystem.isArmMoving() && subsystem.getDirection() == Direction.FORWARD) {
+      int currentIndex = getPathIndex();
+      int wristFlexIndex = currentPath.getWristFlexIndex();
+      if(currentIndex >= wristFlexIndex) {
+        // move the wrist into the flexed position for this path
+        subsystem.moveWrist(currentPath.getWristFlexPosition(), currentPath.getWristMaxVelocity());
+        wristFlexed = true;
+      }
+    } else if(wristFlexed && subsystem.isArmMoving() && subsystem.getDirection() == Direction.REVERSE) {
+      int currentIndex = getPathIndex();
+      int wristExtendIndex = currentPath.getWristExtendIndex();
+      if(currentIndex <= wristExtendIndex) {
+        // move the wrist back into extended (home) position
+        subsystem.moveWrist(ArmConstants.wristHomePosition, currentPath.getWristMaxVelocity());
+        wristFlexed = false;
+
+        if(currentIntakeState == IntakeState.RELEASING) {
+          transitionIntake(Input.RELEASED);
+        }
+      }
+    }
+    
+    /*
+     * Logic for moving intake into holding
+     */
+    if((intakeStartedTime != 0) && ((Timer.getFPGATimestamp() - intakeStartedTime) > 0.5)  && subsystem.isIntakeAtHoldingVelocity() ) {
+      transitionIntake(Input.RETRIEVED);
+    }
   }
 
 
@@ -124,20 +198,22 @@ public class ArmStateMachine {
 
   private void transitionArm(Input input) {
     ArmState prevState = currentArmState;
-    currentArmState = currentArmState.next(input);
-    if(currentArmState == prevState) {
+    ArmState newState = currentArmState.next(input); 
+    if(newState == prevState) {
       System.out.println("WARNING: arm state transition ignored, no change from " + prevState + ", input: " + input);
       return; 
+    } else {
+      currentArmState = newState;
     }
 
-    System.out.println("ArmState Transition: " + input + " --> " + currentArmState);
+    System.out.println("ArmState Transition: " + input + " --> " + newState);
 
-    switch(currentArmState) {
+    switch(newState) {
       case EXTENDING:
         if(prevState == ArmState.HOME) {
           subsystem.startArmMovement(currentPath);
-        } else {
-          subsystem.restartArmMovement(currentPathIndex);
+        } else { // restarting from PAUSED
+          subsystem.restartArmMovement(pathStartedIndex);
         }
         break;
       case PAUSED:
@@ -147,7 +223,9 @@ public class ArmStateMachine {
         // placeholder for possible check to allow extra extension
         break;
       case RETRACTING:
-        subsystem.reverseArmMovment();
+        // determine whether to start at current index (midstream) or if completed, at the end
+        int startIndex = (subsystem.isArmMoving())? getPathIndex() : currentPath.getNumberOfPoints()-1;
+        subsystem.reverseArmMovment(startIndex);
         break;
       case RESETTING_WRIST:
         subsystem.moveWristHome();
@@ -159,24 +237,26 @@ public class ArmStateMachine {
         subsystem.moveDistalArmHome();
         break;
       case HOME:
-        resetInternalState();
+        resetState();
         break;
       default:
-        System.out.println("WARNING: Invalid arm input sent to state machine: " + input + " --> " + currentArmState);
+        System.out.println("WARNING: Invalid arm input sent to state machine: " + input + " --> " + newState);
     }
   }
 
   private void transitionIntake(Input input) {
     IntakeState prevState = currentIntakeState;
-    currentIntakeState = currentIntakeState.next(input);
-    if(currentIntakeState == prevState) {
+    IntakeState newState = currentIntakeState.next(input);
+    if(newState == prevState) {
       System.out.println("WARNING: intake state transition ignored, no change from " + prevState);
       return; 
+    } else {
+      currentIntakeState = newState;
     }
 
-    System.out.println("IntakeState Transition: " + input + " --> " + currentIntakeState);
+    System.out.println("IntakeState Transition: " + input + " --> " + newState);
 
-    switch(currentIntakeState) {
+    switch(newState) {
       case RETRIEVING:
         subsystem.intake();
         break;
@@ -190,7 +270,7 @@ public class ArmStateMachine {
         subsystem.stopIntake();
         break;
       default:
-        System.out.println("WARNING: Invalid intake input sent to state machine: " + input + " --> " + currentIntakeState);
+        System.out.println("WARNING: Invalid intake input sent to state machine: " + input + " --> " + newState);
     }
   }
 
@@ -199,7 +279,7 @@ public class ArmStateMachine {
    * GETTERS/SETTERS
    */
 
-   public Status getStatus() {
+  public Status getStatus() {
     return status;
   }
 
