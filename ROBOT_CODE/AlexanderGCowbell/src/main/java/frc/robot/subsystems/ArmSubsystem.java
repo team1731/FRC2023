@@ -94,10 +94,7 @@ public class ArmSubsystem extends SubsystemBase {
         } else {
             // move the arm into normal home (safe) position
             stopIntake();
-            moveWristHome();
-            moveProximalArmHome();
-            moveDistalArmHome();
-            stateMachine.resetState();
+            stateMachine.initializeArm();
         }        
     }
 
@@ -320,12 +317,14 @@ public class ArmSubsystem extends SubsystemBase {
             stateMachine.completedArmMovement();
         }
 
-        if(proximalArmResetting && Math.abs(proximalMotor.getActiveTrajectoryVelocity()) < 60) {
+        // Note: the difference between the current position and home is less than the differents between home and 0 position
+        if(proximalArmResetting && Math.abs(proximalMotor.getSelectedSensorPosition() - ArmConstants.proximalHomePosition) < Math.abs(ArmConstants.proximalHomePosition)) {
             proximalArmResetting = false;
             stateMachine.completedArmMovement();
         }
 
-        if(distalArmResetting && Math.abs(distalMotor.getActiveTrajectoryVelocity()) < 60) {
+        // Note: the difference between the current position and home is less than the differents between home and 0 position
+        if(distalArmResetting && Math.abs(distalMotor.getSelectedSensorPosition() - ArmConstants.distalHomePosition) < Math.abs(ArmConstants.distalHomePosition)) {
             distalArmResetting = false;
             stateMachine.completedArmMovement();
         }

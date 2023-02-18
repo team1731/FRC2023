@@ -14,7 +14,7 @@ public class ArmStateMachine {
   private MovementType movementType;
   private boolean isInAuto = false;
 
-  private ArmState currentArmState = ArmState.HOME;
+  private ArmState currentArmState = ArmState.UNKNOWN;
   private IntakeState currentIntakeState = IntakeState.STOPPED;
   private boolean allowScore = true;
 
@@ -62,6 +62,11 @@ public class ArmStateMachine {
     movementType = null;
     wristFlexed = false;
     isInAuto = false;
+  }
+
+  // kick off a sequence to get us into our Home position safely
+  public void initializeArm() {
+    transitionArm(Input.INITIALIZE);
   }
 
 
