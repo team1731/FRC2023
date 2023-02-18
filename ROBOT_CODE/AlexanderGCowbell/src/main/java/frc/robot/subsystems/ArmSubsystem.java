@@ -379,10 +379,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
                 // move the wrist back into extended (home) position
                 moveWrist(ArmConstants.wristHomePosition, currentPath.getWristMaxVelocity());
                 wristFlexed = false;
-
-                if(ejecting) {
-                    stopIntake();
-                }
             }
         }
 
@@ -393,6 +389,10 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
                 currentPath = null;
                 currentDirection = null;
                 pathStartedTime = 0;
+
+                if(intaking || ejecting) {
+                    stopIntake();
+                }
             } 
         }
         
@@ -401,8 +401,6 @@ public class ArmSubsystem extends SubsystemBase implements StateHandler {
             System.out.println("holdingig intake");
 
         }
-
-
 
         doSD();
     }
