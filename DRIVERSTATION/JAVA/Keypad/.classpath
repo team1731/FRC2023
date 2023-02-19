@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jdk">
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/WPILib"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/FRC">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/SHARED/FRC_2023/FRC2023/DRIVERSTATION/JAVA/Keypad/lib/ntcore-java-2023.2.1-8-g5f1a025.jar"/>
-	<classpathentry kind="lib" path="C:/SHARED/FRC_2023/FRC2023/DRIVERSTATION/JAVA/Keypad/lib/ntcore-jni-2023.2.1-8-g5f1a025-windowsx86-64.jar"/>
-	<classpathentry kind="lib" path="C:/SHARED/FRC_2023/FRC2023/DRIVERSTATION/JAVA/Keypad/lib/wpiutil-java-2023.2.1-8-g5f1a025.jar"/>
-	<classpathentry kind="lib" path="C:/SHARED/FRC_2023/FRC2023/DRIVERSTATION/JAVA/Keypad/lib/wpiutil-jni-2023.2.1-22-gb2b25bf-windowsx86-64.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
