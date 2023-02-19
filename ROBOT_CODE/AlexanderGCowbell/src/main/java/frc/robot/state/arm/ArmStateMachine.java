@@ -1,115 +1,348 @@
 package frc.robot.state.arm;
 
-import java.util.ArrayList;
 import edu.wpi.first.wpilibj.Timer;
-import frc.robot.Constants.StateConstants;
-import frc.robot.state.*;
+import frc.data.mp.ArmPath;
+import frc.data.mp.ArmPath.Direction;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.GamePiece;
+import frc.robot.subsystems.ArmSubsystem;
 
-public class ArmStateMachine extends StateMachine {
+public class ArmStateMachine {
+  private ArmSubsystem subsystem;
+  private Status status = Status.READY;
+  private GamePiece gamePiece = GamePiece.CUBE;
+  private MovementType movementType;
+  private boolean isInAuto = false;
+
+  private ArmState currentArmState = ArmState.UNKNOWN;
+  private IntakeState currentIntakeState = IntakeState.STOPPED;
+  private boolean allowScore = true;
+
+  private ArmPath currentPath;
+  private int pathStartedIndex = 0;
+  private double pathStartedTime = 0;
+
+  // extended = home pos (palm facing out), flexed = positioned for pickup/scoring (palm facing down/in)
+  private boolean wristFlexed = false; 
+
+
+  /*
+   * CONSTANT VALUES
+   */
+
+  public enum Status {
+    READY, RUNNING
+  }
+
+  public enum Input {
+    INITIALIZE, EXTEND, COMPLETED, RETRACT, RESET, START, STOP, INTERRUPT,
+    RETRIEVED, RELEASE, RELEASED, FLEX;
+}
+
+  public enum MovementType {
+    PICKUP, SCORE
+  }
+
+
+  /*
+   * INITIALIZATION/RESET
+   */
+
+  public ArmStateMachine(ArmSubsystem subsystem) {
+    this.subsystem = subsystem;
+  }
+
+  public void resetState() {
+    status = Status.READY;
+    currentArmState = ArmState.HOME;
+    currentIntakeState = IntakeState.STOPPED;
+    currentPath = null;
+    pathStartedIndex = 0;
+    pathStartedTime = 0;
+    movementType = null;
+    wristFlexed = false;
+    isInAuto = false;
+  }
+
+  // kick off a sequence to get us into our Home position safely
+  public void initializeArm() {
+    transitionArm(Input.INITIALIZE);
+  }
+
+
+  /*
+   * METHODS TO HANDLE PICKUP/SCORE
+   */
   
-  /*
-   * Overrides to define the behavior of the Arm State Machine
-   */
+  // PICKUP
+  public void pickup(ArmPath path) {
+    if(path == null) return;
+    if(!isReadyToStartMovement()) return; 
 
-  public ArmStateMachine(String id, StateHandler stateHandler) {
-    super(id, stateHandler);
-    state = ArmState.RETRACTED;
+    System.out.println("ArmStateMachine: STARTING PICKUP!!!!!!!!!!!!!!!!!!!!!");
+    currentPath = path;
+    pathStartedIndex = 0;
+    movementType = MovementType.PICKUP;
+    transitionArm(Input.EXTEND);
+    transitionIntake(Input.START);
   }
 
-  // this method should be used with caution, it can be used to reset the state machine and it 
-  // should definitely not be called unless it is certain that the arm is in a safe retracted state
-  // there may not be a use case for this method outside of unit testing
-  public void reset() {
-    state = ArmState.RETRACTED;
+  // SCORE
+  public void score(ArmPath path) {
+    if(path == null) return;
+    if(!isReadyToStartMovement()) return; 
+
+    System.out.println("ArmStateMachine: STARTING SCORE!!!!!!!!!!!!!!!!!!!!!");
+    currentPath = path;
+    pathStartedIndex = 0;
+    movementType = MovementType.SCORE;
+    transitionArm(Input.EXTEND);
   }
 
-  @Override
-  protected void initializationChecks() throws StateMachineInitializationException {
-    if(state == ArmState.UNSAFE) {
-      throw new StateMachineInitializationException(getId(), "Arm is in UNSAFE state. No actions can be performed.");
-    } else if(state != ArmState.RETRACTED) {
-      // should always be starting from a retracted state
-      throw new StateMachineInitializationException(getId(), "Arm is in unexpected state: " + state + ". Should be RETRACTED.");
-    }
-  }
-
-  /*
-   * Retrieves the sequence config matching the provided sequence, and maps them into an iterator of StateChangeRequest objects
-   * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
-   */
-  @Override
-  protected StateChangeRequest[] defineSequence(Sequence selectedSequence) throws StateMachineInitializationException {
-    ArmSequence ss = (ArmSequence)selectedSequence;
-    switch(ss) {
-      case SCORE_TEST:
-        return ArmSequenceBuilder.getSequenceByCode(ArmSequence.SCORE_TEST);
-      case PICKUP_TEST:
-        return ArmSequenceBuilder.getSequenceByCode(ArmSequence.PICKUP_TEST);
-      case INVALID_TEST:
-        return ArmSequenceBuilder.getSequenceByCode(ArmSequence.INVALID_TEST);
-      default:
-        throw new StateMachineInitializationException(getId(), "Sequence supplied is not supported " + selectedSequence);
-    }
-  }
-
-  @Override
-  public void interruptSequence() {
-    if(!isInInterruptibleStatus()) {
-      return; // not interruptible
-    }
-
-    // check to see if we are in an interruptible state
-    boolean shouldInterrupt = false;
-    ArmState currentState = (ArmState)state;
-    switch(currentState) {
-      case RETRACTED: case INTERRUPTED: case RECOVERING: case UNSAFE:
-        return; // not interruptible
-      default:
-        shouldInterrupt = true; // if we got here, we are in an interruptible status and state
-    }
-
-    if(shouldInterrupt) {
-      getStateHandler().interruptStateChange();
-      previouState = state;
-      transitionState(ArmInput.INTERRUPT);
-      if(status == Status.INVALID) {
-        return; // something went wrong w/transition
-      } else {
-        status = Status.INTERRUPTED;
+  // NOTIFY THAT PICKUP/SCORE BUTTON RELEASED
+  public void buttonReleased() {
+    if(currentArmState == ArmState.EXTENDING) {
+      interrupt();
+    } else if(currentArmState == ArmState.EXTENDED) {
+      if(movementType == MovementType.SCORE && allowScore) {
+        transitionIntake(Input.RELEASE);
       }
-
-      // Add current step we interrupted to the processed steps list
-      var change = new StateChange(status, previouState, state, currentStep);
-      change.interrupted = true;
-      change.interruptedTimestamp = Timer.getFPGATimestamp();
-      processedSteps.add(change);
-
-      // now initiate recovery
-      recover();
+      transitionArm(Input.RETRACT);
     }
   }
 
-  @Override
-  protected void handleFailureCondition(StateChangeResult result) {
-    recover();
+  // NOTIFY THAT SUBSYSTEM COMPLETED ARM MOVEMENT
+  public void completedArmMovement() {
+    transitionArm(Input.COMPLETED);
   }
 
-  @Override
-  protected void handleInvalidTransition() {
-    state = ArmState.UNSAFE;
+  // NOTIFY THAT PICKUP/SCORE SHOULD BE STOPPED & RETRACTED W/O SCORE/PICKUP
+  public void interrupt() {
+    subsystem.stopArm();
+    transitionArm(Input.INTERRUPT);
+    if(currentIntakeState == IntakeState.RETRIEVING || currentIntakeState == IntakeState.RELEASING) {
+      transitionIntake(Input.STOP);
+    }
   }
 
-  private void recover() {
-    // redefine the state sequence w/recovery step
-    var step = new StateChangeRequest(ArmInput.RECOVER);
-    var sequenceList = new ArrayList<StateChangeRequest>();
-    sequenceList.add(step);
-    sequence = sequenceList.iterator();
+  private boolean isReadyToStartMovement() {
+    if(status != Status.READY ||
+       currentArmState != ArmState.HOME ||
+       currentPath != null) {
+      return false;
+    }
+    return true;
+  }
 
-    // advance the iterator to pre-load this step
-    currentStep = sequence.next();
 
-    // restart processing to initiate recovery
-    processCurrentSequenceStep();
+  /*
+   * METHODS TO HANDLE IMMEDIATE INTAKE/EJECT
+   * These methods are intended to be called only by operator buttons
+   */
+
+  public void intake() {
+    transitionIntake(Input.START);
+  }
+
+  public void stopIntake() {
+    transitionIntake(Input.STOP);
+  }
+
+  public void release() {
+    transitionIntake(Input.RELEASE);
+  }
+
+  public void stopRelease() {
+    transitionIntake(Input.STOP);
+  }
+
+
+  /*
+   * PATH TRACKING
+   */
+
+  public void startedPath() {
+    status = Status.RUNNING;
+    pathStartedTime = Timer.getFPGATimestamp();
+  }
+
+  public int getPathIndex() {
+    Direction direction = subsystem.getDirection();
+    int pointsLastIndex = currentPath.getNumberOfPoints()-1;
+    double elapsedTimeMS = (Timer.getFPGATimestamp() - pathStartedTime) * 1000;
+    int pointsProcessed = (int)(elapsedTimeMS / ArmConstants.pointDurationMS);
+    int position = (direction == Direction.FORWARD)? pathStartedIndex + pointsProcessed : pathStartedIndex - pointsProcessed;
+    // make sure we don't end up with an array out of bounds exception
+    if(position > pointsLastIndex) {
+        return pointsLastIndex;
+    } else if (position < 0) {
+        return 0;
+    }
+
+    return position;
+  }
+
+
+  /*
+   * PERIODIC
+   *  Note: this periodic should be called each time the subsystem's periodic is called
+   */
+
+  public void periodic() {
+
+    /*
+     * Logic for flexing/extending wrist
+     */
+    if(!wristFlexed && subsystem.isMotionProfileRunning() && subsystem.getDirection() == Direction.FORWARD) {
+      int currentIndex = getPathIndex();
+      int wristFlexIndex = currentPath.getWristFlexIndex();
+      if(currentIndex >= wristFlexIndex) {
+        // move the wrist into the flexed position for this path
+        subsystem.moveWrist(currentPath.getWristFlexPosition(), currentPath.getWristMaxVelocity());
+        wristFlexed = true;
+      }
+    } else if(wristFlexed && subsystem.isMotionProfileRunning() && subsystem.getDirection() == Direction.REVERSE) {
+      int currentIndex = getPathIndex();
+      int wristExtendIndex = currentPath.getWristExtendIndex();
+      if(currentIndex <= wristExtendIndex) {
+        // move the wrist back into extended (home) position
+        subsystem.moveWrist(ArmConstants.wristHomePosition, currentPath.getWristMaxVelocity());
+        wristFlexed = false;
+      }
+    }
+    
+    /*
+     * Logic for handling intake cases
+     */
+    if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
+      transitionIntake(Input.RETRIEVED);
+    }
+
+    if((currentIntakeState == IntakeState.RETRIEVING || currentIntakeState == IntakeState.RELEASING) && 
+        subsystem.getDirection() == Direction.REVERSE && 
+        !subsystem.isMotionProfileRunning()) {
+      // path has completed in reverse, make sure intake is stopped
+      transitionIntake(Input.STOP);
+    }
+    
+    /*
+     * Logic for handling special cases for autonomous where we won't receive a button release event
+     */
+    if(isInAuto && movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING) {
+      transitionArm(Input.RETRACT);
+    } else if(isInAuto && movementType == MovementType.SCORE && currentArmState == ArmState.EXTENDED) {
+      transitionIntake(Input.RELEASE);
+      transitionArm(Input.RETRACT);
+    }
+  }
+
+
+  /*
+   * STATE TRANSITIONS
+   */
+
+  private void transitionArm(Input input) {
+    ArmState prevState = currentArmState;
+    ArmState newState = currentArmState.next(input); 
+    if(newState == prevState) {
+      System.out.println("WARNING: arm state transition ignored, no change from " + prevState + ", input: " + input);
+      return; 
+    } else {
+      currentArmState = newState;
+    }
+
+    System.out.println("ArmState Transition: " + input + " --> " + newState);
+
+    switch(newState) {
+      case EXTENDING:
+        subsystem.startArmMovement(currentPath);
+        break;
+      case EXTENDED:
+        // placeholder for possible check to allow extra extension
+        break;
+      case RETRACTING:
+        // determine whether to start at current index (midstream) or if completed, at the end
+        int startIndex = (subsystem.isMotionProfileRunning())? getPathIndex() : currentPath.getNumberOfPoints()-1;
+        pathStartedIndex = startIndex;
+        subsystem.reverseArmMovment(startIndex);
+        break;
+      case RESETTING_WRIST:
+        subsystem.moveWristHome();
+        break;
+      case RESETTING_PROXIMAL:
+        subsystem.moveProximalArmHome();
+        break;
+      case RESETTING_DISTAL:
+        subsystem.moveDistalArmHome();
+        break;
+      case HOME:
+        resetState();
+        break;
+      default:
+        System.out.println("WARNING: Invalid arm input sent to state machine: " + input + " --> " + newState);
+    }
+  }
+
+  private void transitionIntake(Input input) {
+    IntakeState prevState = currentIntakeState;
+    IntakeState newState = currentIntakeState.next(input);
+    if(newState == prevState) {
+      System.out.println("WARNING: intake state transition ignored, no change from " + prevState);
+      return; 
+    } else {
+      currentIntakeState = newState;
+    }
+
+    System.out.println("IntakeState Transition: " + input + " --> " + newState);
+
+    switch(newState) {
+      case RETRIEVING:
+        subsystem.intake();
+        break;
+      case HOLDING:
+        subsystem.holdIntake();
+        break;
+      case RELEASING:
+        subsystem.eject();
+        break;
+      case STOPPED:
+        subsystem.stopIntake();
+        break;
+      default:
+        System.out.println("WARNING: Invalid intake input sent to state machine: " + input + " --> " + newState);
+    }
+  }
+
+
+  /*
+   * GETTERS/SETTERS
+   */
+
+  public Status getStatus() {
+    return status;
+  }
+
+  public ArmState getArmState() {
+    return currentArmState;
+  }
+
+  public GamePiece getGamePiece() {
+    return gamePiece;
+  }
+
+  public void setGamePiece(GamePiece gamePiece) {
+    this.gamePiece = gamePiece;
+  }
+
+  public MovementType getMovementType() {
+    return movementType;
+  }
+
+  public void setIsInAuto(boolean inAuto) {
+    isInAuto = inAuto;
+  }
+
+  public void setAllowScore(boolean allow) {
+    allowScore = allow;
   }
 }

@@ -26,7 +26,11 @@ import frc.robot.util.log.LogWriter.LogMode;
 public final class Constants {
     public static final double stickDeadband = 0.1;
 	public static final int kTICKS = 33024; // 16.125 * 2048;
-    
+
+
+    public static enum GamePiece {
+        CONE, CUBE
+    }
 
     public static final class LogConstants {
         /*
@@ -244,6 +248,8 @@ public final class Constants {
         public final static double proximalHomePosition = -4388;
         public final static double distalHomePosition = 10489;
         public final static double wristHomePosition = 0.60;
+        public final static double intakeHoldingVelocity = 60;
+        public final static double wristResetPostionThreshold = 0.2;
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;

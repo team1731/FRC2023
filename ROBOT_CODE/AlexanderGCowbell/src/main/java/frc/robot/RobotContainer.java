@@ -13,9 +13,12 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import frc.robot.autos.*;
 import frc.robot.commands.*;
+import frc.robot.state.arm.ArmSequence;
+import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.subsystems.*;
 import frc.robot.util.log.LogWriter;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.GamePiece;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -44,14 +47,20 @@ public class RobotContainer {
   private final JoystickButton ka = new JoystickButton(driver,XboxController.Button.kA.value);
   private JoystickButton leftBumper = new JoystickButton(driver,XboxController.Button.kLeftBumper.value);
   private JoystickButton rightBumper = new JoystickButton(driver,XboxController.Button.kRightBumper.value);
+
+  /* Operator Buttons */
   private JoystickButton coneOrCube = new JoystickButton(operator,8);
+  private JoystickButton preventScore = new JoystickButton(operator,13);
+  private JoystickButton release = new JoystickButton(operator,14);
+  private JoystickButton intake = new JoystickButton(operator,15);
 
 
   /* Subsystems */
 
   private Swerve s_Swerve;
-  private PoseEstimatorSubsystem s_poseEstimatorSubsystem ;
-  private ArmSubsystem s_armSubSystem ;
+  private PoseEstimatorSubsystem s_poseEstimatorSubsystem;
+  private ArmSubsystem s_armSubSystem;
+  private ArmStateMachine sm_armStateMachine;
 
   // The container for the robot. Contains subsystems, OI devices, and commands. 
   public RobotContainer(
@@ -64,6 +73,7 @@ public class RobotContainer {
     s_Swerve = swerve;
     s_armSubSystem = armSubsystem;
     s_poseEstimatorSubsystem = poseEstimatorSubsystem;
+    sm_armStateMachine = armSubsystem.getStateMachine();
     // s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
     // s_armSubSystem.setDefaultCommand(new TestArm(s_armSubSystem, driver, translationAxis, distalAxis)); 
  
@@ -83,30 +93,27 @@ public class RobotContainer {
     /* Driver Buttons */
     kStart.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
     kStart.onTrue(new InstantCommand(() -> {s_Swerve.adjustWheelEncoders(); s_armSubSystem.resetArmEncoders();}));
-    //intakeTest.onTrue(new InstantCommand(() -> s_armSubSystem.intake()));
-    //intakeTest.onFalse(new InstantCommand(() -> s_armSubSystem.holdIntake()));
-    //ejectTest.onTrue(new InstantCommand(() -> s_armSubSystem.eject()));
-    //ejectTest.onFalse(new InstantCommand(() -> s_armSubSystem.stopIntake()));
-    coneOrCube.whileTrue(new InstantCommand(() -> s_armSubSystem.setCone(false)));
-    coneOrCube.whileFalse(new InstantCommand(() -> s_armSubSystem.setCone(true)));
-    ky.whileTrue((new ArmScoreHighCommand(s_armSubSystem)));
-    kb.whileTrue((new ArmScoreMediumCommand(s_armSubSystem)));
-    ka.whileTrue((new ArmScoreLowCommand(s_armSubSystem)));
-
-   // kb.whileTrue((new ArmScoreMid(s_armSubSystem)));
-   // ka.whileTrue((new ArmScoreLow(s_armSubsystem)));
-;
-  
-   // wristPos1.onTrue(new InstantCommand(() -> s_armSubSystem.moveWrist(0.63)));
-   // wristPos1.onFalse(new InstantCommand(() -> s_armSubSystem.stopWrist()));
-
+    kx.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_KEYPAD)));
+    ky.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_HIGH)));
+    kb.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_MEDIUM)));
+    ka.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_LOW)));
     if(LogWriter.isArmRecordingEnabled()) {
       leftBumper.onTrue(new InstantCommand(() -> s_armSubSystem.startRecordingArmPath()));
       rightBumper.onTrue(new InstantCommand(() -> s_armSubSystem.stopRecordingArmPath()));
     } else {
-      leftBumper.whileTrue(new ArmPickupHighCommand(s_armSubSystem));
-      rightBumper.whileTrue(new ArmPickupLowCommand(s_armSubSystem));
+      leftBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.PICKUP_HIGH));
+      rightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW));
     }
+
+    /* Operator Buttons */
+    coneOrCube.whileTrue(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CUBE)));
+    coneOrCube.whileFalse(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CONE)));
+    preventScore.whileTrue(new InstantCommand(() -> sm_armStateMachine.setAllowScore(false)));
+    preventScore.whileFalse(new InstantCommand(() -> sm_armStateMachine.setAllowScore(true)));
+    intake.whileTrue(new InstantCommand(() -> sm_armStateMachine.intake()));
+    intake.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopIntake()));
+    release.whileTrue(new InstantCommand(() -> sm_armStateMachine.release()));
+    release.whileTrue(new InstantCommand(() -> sm_armStateMachine.stopRelease()));
   }
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {

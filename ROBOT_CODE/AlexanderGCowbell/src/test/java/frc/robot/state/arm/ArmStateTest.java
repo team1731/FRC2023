@@ -1,120 +1,97 @@
 package frc.robot.state.arm;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 import org.junit.jupiter.api.Test;
-import frc.robot.state.arm.ArmInput;
+import frc.robot.state.arm.ArmStateMachine.Input;
 import frc.robot.state.arm.ArmState;
-import frc.robot.state.*;
+import frc.robot.state.arm.IntakeState;
 
 
 public class ArmStateTest {
+
+  
   @Test 
-  void successfulScoringTransitions() {
-    ArmState state = ArmState.RETRACTED;
+  void successfulArmTransitions() {
+    ArmState state = ArmState.HOME;
     try {
-      state = (ArmState)state.next(ArmInput.EXTEND);
-      assertEquals(ArmState.EXTEND_REQUESTED, state, "Didn't move to EXTEND_REQUESTED");
-      state = (ArmState)state.next(ArmInput.SUCCESS);
+      state = (ArmState)state.next(Input.EXTEND);
       assertEquals(ArmState.EXTENDING, state, "Didn't move to EXTENDING");
-      state = (ArmState)state.next(ArmInput.EXTEND_PING);
-      assertEquals(ArmState.EXTEND_PINGING, state, "Didn't move to EXTEND_PINGING");
-      state = (ArmState)state.next(ArmInput.SUCCESS);
+      state = (ArmState)state.next(Input.COMPLETED);
       assertEquals(ArmState.EXTENDED, state, "Didn't move to EXTENDED");
-      state = (ArmState)state.next(ArmInput.RELEASE);
-      assertEquals(ArmState.RELEASING, state, "Didn't move to RELEASING");
-      state = (ArmState)state.next(ArmInput.SUCCESS);
-      assertEquals(ArmState.RELEASED, state, "Didn't move to RELEASED");
-      state = (ArmState)state.next(ArmInput.RETRACT);
-      assertEquals(ArmState.RETRACT_REQUESTED, state, "Didn't move to RETRACT_REQUESTED");
-      state = (ArmState)state.next(ArmInput.SUCCESS);
+      state = (ArmState)state.next(Input.RETRACT);
       assertEquals(ArmState.RETRACTING, state, "Didn't move to RETRACTING");
-      state = (ArmState)state.next(ArmInput.RETRACT_PING);
-      assertEquals(ArmState.RETRACT_PINGING, state, "Didn't move to RETRACT_PINGING");
-      state = (ArmState)state.next(ArmInput.SUCCESS);
-      assertEquals(ArmState.RETRACTED, state, "Didn't move to RETRACTED");
-    } catch(StateMachineInvalidTransitionException ite) {
-      fail(ite);
-    }
+      state = (ArmState)state.next(Input.COMPLETED);
+      assertEquals(ArmState.RESETTING_WRIST, state, "Didn't move to RESETTING_WRIST");
+      state = (ArmState)state.next(Input.COMPLETED);
+      assertEquals(ArmState.RESETTING_PROXIMAL, state, "Didn't move to RESETTING_PROXIMAL");
+      state = (ArmState)state.next(Input.COMPLETED);
+      assertEquals(ArmState.RESETTING_DISTAL, state, "Didn't move to RESETTING_DISTAL");
+      state = (ArmState)state.next(Input.COMPLETED);
+      assertEquals(ArmState.HOME, state, "Didn't move to HOME");
+    } finally {}
   }
-
+  
   @Test 
-  void successfulPickupTransitions() {
-    ArmState state = ArmState.RETRACTED;
+  void successfulArmInitializeTransitions() {
+    ArmState state = ArmState.UNKNOWN;
     try {
-      state = (ArmState)state.next(ArmInput.EXTEND);
-      assertEquals(ArmState.EXTEND_REQUESTED, state, "Didn't move to EXTEND_REQUESTED");
-      state = (ArmState)state.next(ArmInput.SUCCESS);
+      state = (ArmState)state.next(Input.INITIALIZE);
+      assertEquals(ArmState.RESETTING_WRIST, state, "Didn't move to RESETTING_WRIST");
+      state = (ArmState)state.next(Input.COMPLETED);
+      assertEquals(ArmState.RESETTING_PROXIMAL, state, "Didn't move to RESETTING_PROXIMAL");
+      state = (ArmState)state.next(Input.COMPLETED);
+      assertEquals(ArmState.RESETTING_DISTAL, state, "Didn't move to RESETTING_DISTAL");
+      state = (ArmState)state.next(Input.COMPLETED);
+      assertEquals(ArmState.HOME, state, "Didn't move to HOME");
+      state = (ArmState)state.next(Input.EXTEND);
       assertEquals(ArmState.EXTENDING, state, "Didn't move to EXTENDING");
-      state = (ArmState)state.next(ArmInput.EXTEND_PING);
-      assertEquals(ArmState.EXTEND_PINGING, state, "Didn't move to EXTEND_PINGING");
-      state = (ArmState)state.next(ArmInput.SUCCESS);
+      state = (ArmState)state.next(Input.COMPLETED);
       assertEquals(ArmState.EXTENDED, state, "Didn't move to EXTENDED");
-      state = (ArmState)state.next(ArmInput.RETRIEVE);
-      assertEquals(ArmState.RETRIEVING, state, "Didn't move to RETRIEVING");
-      state = (ArmState)state.next(ArmInput.SUCCESS);
-      assertEquals(ArmState.RETRIEVED, state, "Didn't move to RETRIEVED");
-      state = (ArmState)state.next(ArmInput.RETRACT);
-      assertEquals(ArmState.RETRACT_REQUESTED, state, "Didn't move to RETRACT_REQUESTED");
-      state = (ArmState)state.next(ArmInput.SUCCESS);
+      state = (ArmState)state.next(Input.RETRACT);
       assertEquals(ArmState.RETRACTING, state, "Didn't move to RETRACTING");
-      state = (ArmState)state.next(ArmInput.RETRACT_PING);
-      assertEquals(ArmState.RETRACT_PINGING, state, "Didn't move to RETRACT_PINGING");
-      state = (ArmState)state.next(ArmInput.SUCCESS);
-      assertEquals(ArmState.RETRACTED, state, "Didn't move to RETRACTED");
-    } catch(StateMachineInvalidTransitionException ite) {
-      fail(ite);
-    }
+      state = (ArmState)state.next(Input.COMPLETED);
+      assertEquals(ArmState.RESETTING_WRIST, state, "Didn't move to RESETTING_WRIST");
+      state = (ArmState)state.next(Input.COMPLETED);
+      assertEquals(ArmState.RESETTING_PROXIMAL, state, "Didn't move to RESETTING_PROXIMAL");
+      state = (ArmState)state.next(Input.COMPLETED);
+      assertEquals(ArmState.RESETTING_DISTAL, state, "Didn't move to RESETTING_DISTAL");
+      state = (ArmState)state.next(Input.COMPLETED);
+      assertEquals(ArmState.HOME, state, "Didn't move to HOME");
+    } finally {}
   }
 
   @Test 
-  void interruptedTransitionHandling() {
-    ArmState state = ArmState.RETRACTED;
+  void successfulIntakeTransitions() {
+    IntakeState state = IntakeState.STOPPED;
     try {
-      state = (ArmState)state.next(ArmInput.EXTEND);
-      assertEquals(ArmState.EXTEND_REQUESTED, state, "Didn't move to EXTENDING");
-      state = (ArmState)state.next(ArmInput.INTERRUPT);
-      assertEquals(ArmState.INTERRUPTED, state, "Didn't move to INTERRUPTED");
-      state = (ArmState)state.next(ArmInput.RECOVER);
-      assertEquals(ArmState.RECOVERING, state, "Didn't move to RECOVERING");
-      state = (ArmState)state.next(ArmInput.SUCCESS);
-      assertEquals(ArmState.RETRACTED, state, "Didn't move to RETRACTED");
-    } catch(StateMachineInvalidTransitionException ite) {
-      fail(ite);
-    }
+      state = (IntakeState)state.next(Input.START);
+      assertEquals(IntakeState.RETRIEVING, state, "Didn't move to RETRIEVING");
+      state = (IntakeState)state.next(Input.RETRIEVED);
+      assertEquals(IntakeState.HOLDING, state, "Didn't move to HOLDING");
+      state = (IntakeState)state.next(Input.RELEASE);
+      assertEquals(IntakeState.RELEASING, state, "Didn't move to RELEASING");
+      state = (IntakeState)state.next(Input.RELEASED);
+      assertEquals(IntakeState.STOPPED, state, "Didn't move to RETRACTED");
+    } finally {}
   }
 
   @Test 
-  void failedTransitionHandling() {
-    ArmState state = ArmState.RETRACTED;
+  void successfulIntakeStopTransitions() {
+    IntakeState state = IntakeState.STOPPED;
     try {
-      state = (ArmState)state.next(ArmInput.EXTEND);
-      assertEquals(ArmState.EXTEND_REQUESTED, state, "Didn't move to EXTENDING");
-      state = (ArmState)state.next(ArmInput.FAILED);
-      assertEquals(ArmState.INTERRUPTED, state, "Didn't move to INTERRUPTED");
-      state = (ArmState)state.next(ArmInput.RECOVER);
-      assertEquals(ArmState.RECOVERING, state, "Didn't move to RECOVERING");
-      state = (ArmState)state.next(ArmInput.SUCCESS);
-      assertEquals(ArmState.RETRACTED, state, "Didn't move to RETRACTED");
-    } catch(StateMachineInvalidTransitionException ite) {
-      fail(ite);
-    }
+      state = (IntakeState)state.next(Input.START);
+      assertEquals(IntakeState.RETRIEVING, state, "Didn't move to RETRIEVING");
+      state = (IntakeState)state.next(Input.STOP);
+      assertEquals(IntakeState.STOPPED, state, "Didn't move to STOPPED");
+      state = (IntakeState)state.next(Input.START);
+      assertEquals(IntakeState.RETRIEVING, state, "Didn't move to RETRIEVING");
+      state = (IntakeState)state.next(Input.RETRIEVED);
+      assertEquals(IntakeState.HOLDING, state, "Didn't move to HOLDING");
+      state = (IntakeState)state.next(Input.RELEASE);
+      assertEquals(IntakeState.RELEASING, state, "Didn't move to RELEASING");
+      state = (IntakeState)state.next(Input.RELEASED);
+      assertEquals(IntakeState.STOPPED, state, "Didn't move to RETRACTED");
+    } finally {}
   }
-
-  @Test 
-  void unsafeTransitionHandling() {
-    ArmState state = ArmState.RETRACTED;
-    try {
-      state = (ArmState)state.next(ArmInput.EXTEND);
-      assertEquals(ArmState.EXTEND_REQUESTED, state, "Didn't move to EXTENDING");
-      state = (ArmState)state.next(ArmInput.FAILED);
-      assertEquals(ArmState.INTERRUPTED, state, "Didn't move to INTERRUPTED");
-      state = (ArmState)state.next(ArmInput.RECOVER);
-      assertEquals(ArmState.RECOVERING, state, "Didn't move to RECOVERING");
-      state = (ArmState)state.next(ArmInput.FAILED);
-      assertEquals(ArmState.UNSAFE, state, "Didn't move to UNSAFE");
-    } catch(StateMachineInvalidTransitionException ite) {
-      fail(ite);
-    }
-  }
+  
 }
