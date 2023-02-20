@@ -20,6 +20,11 @@ public class AutoScoreCommand extends CommandBase {
 
     @Override
 	public void initialize() {
+        if(stateMachine.getStatus() == Status.RUNNING) {
+            System.out.println("WARNING: autonomous cannot command a score when arm state is already running a movement");
+            return;
+        }
+
         ArmPath path = null;
         if(sequence == ArmSequence.SCORE_HIGH) {
             path = ScoreHigh.getArmPath();

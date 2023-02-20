@@ -278,7 +278,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public boolean isIntakeAtHoldingVelocity() {
-        return (Math.abs(intakeMotor.getEncoder().getVelocity()) < ArmConstants.intakeHoldingVelocity);
+        return (Math.abs(intakeMotor.getEncoder().getVelocity()) < ArmConstants.intakeHoldingVelocityThreshold);
     }
 
     
@@ -317,7 +317,13 @@ public class ArmSubsystem extends SubsystemBase {
             stateMachine.completedArmMovement();
         }
 
-        // Note: the difference between the current position and home is less than the differents between home and 0 position
+        // Note: the difference between the current position and home is less than the difference between home and 0 position
+        if(proximalArmResetting && Math.abs(proximalMotor.getSelectedSensorPosition() - ArmConstants.proximalHomePosition) < Math.abs(ArmConstants.proximalHomePosition)) {
+            proximalArmResetting = false;
+            stateMachine.completedArmMovement();
+        }
+
+        // Note: the difference between the current position and home is less than the difference between home and 0 position
         if(distalArmResetting && Math.abs(distalMotor.getSelectedSensorPosition() - ArmConstants.distalHomePosition) < Math.abs(ArmConstants.distalHomePosition)) {
             distalArmResetting = false;
             stateMachine.completedArmMovement();

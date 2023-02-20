@@ -54,14 +54,13 @@ public class ArmStateMachine {
 
   public void resetState() {
     status = Status.READY;
-    currentArmState = ArmState.HOME;
-    currentIntakeState = IntakeState.STOPPED;
     currentPath = null;
     pathStartedIndex = 0;
     pathStartedTime = 0;
     movementType = null;
     wristFlexed = false;
     isInAuto = false;
+    allowScore = true;
   }
 
   // kick off a sequence to get us into our Home position safely
@@ -129,6 +128,10 @@ public class ArmStateMachine {
     if(status != Status.READY ||
        currentArmState != ArmState.HOME ||
        currentPath != null) {
+      System.out.println("WARNING: state machine failed on readiness check --> Status: " + status + 
+        ", ArmState: " + currentArmState + 
+        ", Path Already Loaded? " + (currentPath != null)
+      );
       return false;
     }
     return true;
