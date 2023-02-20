@@ -14,7 +14,7 @@ import frc.robot.Constants.LogConstants;
  */
 public class LogWriter {
     public enum Log {
-        POSE_ESTIMATIONS, ARM_PATH_RECORDING
+        POSE_ESTIMATIONS, ARM_PATH_RECORDING, MESSAGE
     }
 
     public enum LogMode {

@@ -45,6 +45,7 @@ public final class Constants {
 
         // list of loggers and enabled status, note: must also enable logging above
         public static final Map<Log, Boolean> loggers = Map.of(
+            Log.MESSAGE, false,
             Log.ARM_PATH_RECORDING, false,
             Log.POSE_ESTIMATIONS, false
         );
