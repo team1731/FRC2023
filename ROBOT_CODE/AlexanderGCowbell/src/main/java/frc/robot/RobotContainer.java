@@ -17,6 +17,7 @@ import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.subsystems.*;
 import frc.robot.util.log.LogWriter;
+import frc.robot.util.log.MessageLog;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.GamePiece;
 
@@ -158,8 +159,8 @@ public class RobotContainer {
 	public void processKeypadCommand(String newKeypadCommand) {
 		if(newKeypadCommand.length() > 0) {
 			// delegate to FSM
-      // TODO add logging for keypad command
-			System.out.println("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
+      MessageLog.add("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
+
 		}
 	}
 }
