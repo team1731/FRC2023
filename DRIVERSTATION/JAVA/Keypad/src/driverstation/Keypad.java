@@ -26,7 +26,7 @@ public class Keypad extends JDialog implements KeyListener {
     private NetworkTable table;
     private State state;
     private StringBuffer inputBuffer;
-    
+    private boolean sent;
     private ImageIcon cube;
     private ImageIcon cone;
     private ImageIcon none;
@@ -41,6 +41,7 @@ public class Keypad extends JDialog implements KeyListener {
 	    inst.startClient4("keypad");
 	    inst.setServerTeam(1731);
 	    inst.startDSClient();
+	    sent = false;
 		table = inst.getTable("KeyPad");
 		feedbackLabel = new JLabel();
 		feedbackLabel.setFont(new Font("Arial Black", Font.BOLD, 24));
@@ -209,6 +210,7 @@ public class Keypad extends JDialog implements KeyListener {
             	case SCORE_LOW: 
             		inputBuffer.append("; " + controlName);
             		state = state.DONE;
+            		sent = false;
             	}
            		break;
            	case DONE:
@@ -221,10 +223,10 @@ public class Keypad extends JDialog implements KeyListener {
         	String command = inputBuffer.toString();
         	if(command.length() > 0) {
 		        commandLabel.setText(command);
-		        if(state != State.PENDING1 && state != State.PENDING2) {
+		        if(!sent) {
 			        table.putValue("driver entry", NetworkTableValue.makeString(command));
+			        sent = true;
 			        System.out.println("sent " + command + " to network tables");
-            		state = State.INPUT;
 		        }
         	}
         }
@@ -235,6 +237,7 @@ public class Keypad extends JDialog implements KeyListener {
 		inputBuffer = new StringBuffer("CLEAR");
 		commandLabel.setText("");
 		state = State.INPUT;
+		sent = false;
 	}
 	
 	@Override
