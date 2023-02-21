@@ -98,6 +98,13 @@ public class ArmSubsystem extends SubsystemBase {
         }        
     }
 
+    public void resetToHome() {
+        moveWrist(ArmConstants.wristHomePosition, ArmConstants.wristMaxVel);
+        proximalMotor.set(ControlMode.MotionMagic, ArmConstants.proximalHomePosition);
+        distalMotor.set(ControlMode.MotionMagic, ArmConstants.distalHomePosition);
+        stateMachine.completedArmMovement();
+    }
+
 
     /*
      * PROXIMAL/DISTAL ARM MOTOR INIT

@@ -269,6 +269,11 @@ public class ArmStateMachine {
         pathStartedIndex = startIndex;
         subsystem.reverseArmMovment(startIndex);
         break;
+      case RESETTING:
+        subsystem.resetToHome();
+        break;
+      /*
+      Temporarily disabling these states until we revise this process
       case RESETTING_WRIST:
         subsystem.moveWristHome();
         break;
@@ -278,6 +283,7 @@ public class ArmStateMachine {
       case RESETTING_DISTAL:
         subsystem.moveDistalArmHome();
         break;
+      */
       case HOME:
         resetState();
         break;

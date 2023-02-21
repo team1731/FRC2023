@@ -8,7 +8,7 @@ public enum ArmState {
     public ArmState next(Input input) {
       switch(input) {
         case INITIALIZE:
-          return RESETTING_WRIST;
+          return RESETTING;
         default:
           return this;
       }
@@ -56,13 +56,26 @@ public enum ArmState {
     public ArmState next(Input input) {
       switch(input) {
         case COMPLETED:
-          return RESETTING_WRIST;
+          return RESETTING;
         default:
           return this;
       }
     }
   },
 
+  RESETTING {
+    public ArmState next(Input input) {
+      switch(input) {
+        case COMPLETED:
+          return HOME;
+        default:
+          return this;
+      }
+    }
+  };
+
+  /* 
+  Temporarily disabling these states until we revise this process
   RESETTING_WRIST {
     public ArmState next(Input input) {
       switch(input) {
@@ -95,6 +108,7 @@ public enum ArmState {
       }
     }
   };
+  */
   
   public ArmState next(Input input) {
     return this;
