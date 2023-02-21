@@ -28,11 +28,15 @@ public class Keypad extends JDialog implements KeyListener {
     private ImageIcon cube;
     private ImageIcon cone;
     private ImageIcon none;
+    private ImageIcon lock;
+    
+    private boolean NUMLOCK = false;
     
 	public Keypad() {
 		cone = new ImageIcon(Keypad.class.getResource("/images/cone.png"));
 		cube = new ImageIcon(Keypad.class.getResource("/images/cube.png"));
 		none = new ImageIcon(Keypad.class.getResource("/images/none.png"));
+		lock = new ImageIcon(Keypad.class.getResource("/images/lock.png"));
 	    NetworkTableInstance inst = NetworkTableInstance.getDefault();
 	    inst.startClient4("keypad");
 	    inst.setServerTeam(1731);
@@ -121,19 +125,28 @@ public class Keypad extends JDialog implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
         int keyCode = e.getKeyCode();
+        System.out.println(keyCode);
+        if(keyCode == 144) {
+        	picLabel.setIcon(lock);
+        	label.setText("Press NumLock; then press CLEAR.");
+        	return;
+        }
         if(KeypadControl.map.containsKey(keyCode)) {
         	KeypadControl control = KeypadControl.valueOf(keyCode);
         	String controlName = control.name();
         	switch(state) {
         	case INPUT:
             	switch(control) {
-            	case GET_CONE: picLabel.setIcon(cone);
+            	case GET_CONE:
+            		picLabel.setIcon(cone);
             		inputBuffer = new StringBuffer(controlName);
             		break;
-            	case GET_CUBE: picLabel.setIcon(cube);
+            	case GET_CUBE:
+            		picLabel.setIcon(cube);
             		inputBuffer = new StringBuffer(controlName);
             		break;
-            	case CLEAR_ENTRY: picLabel.setIcon(none);
+            	case CLEAR_ENTRY:
+            		picLabel.setIcon(none);
             		inputBuffer = new StringBuffer("CLEAR");
             		label.setText("");
             		break;
