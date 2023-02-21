@@ -171,12 +171,10 @@ public class Keypad extends JDialog implements KeyListener {
             	case GRID_1:
             	case GRID_2:
             	case GRID_3:
-            		//
-            		// TODO ERROR-CHECK HERE!!!
-            		//      what if we have a cone and the driver presses CUBE_MIDDLE?
-            		//
-            		inputBuffer.append("; " + controlName);
-            		state = State.PENDING1;
+            		if(inputBuffer.toString().toLowerCase().contains("cube") || inputBuffer.toString().toLowerCase().contains("cone")) {
+            			inputBuffer.append("; " + controlName);
+            			state = State.PENDING1;
+            		}
             	}
             	break;
         	case PENDING1:
