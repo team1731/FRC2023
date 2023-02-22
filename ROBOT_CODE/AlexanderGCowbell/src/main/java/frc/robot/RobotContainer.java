@@ -15,8 +15,6 @@ import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.OpConstants;
-import frc.robot.Constants.OpConstants.KeypadControl;
 import frc.robot.Constants.OpConstants.LedOption;
 
 /**
@@ -103,21 +101,22 @@ public class RobotContainer {
 	public void processKeypadCommand(String newKeypadCommand) {
 		if(newKeypadCommand.length() > 0){
       System.out.println(newKeypadCommand + "\n");
-		    switch(KeypadControl.valueOf(newKeypadCommand)){
-			    case CONE:
-            m_ledstring.setBlink(false);
-            m_ledstring.setColor(LedOption.YELLOW);
-            System.out.println("\n\nSHOWING YELLOW\n\n");
-				    break;
-          case CUBE:
-            m_ledstring.setBlink(false);
-            m_ledstring.setColor(LedOption.PURPLE);
-            System.out.println("\n\nSHOWING PURPLE\n\n");
-            break;
-			  default:
-				  break;
-        }
-			// delegate to FSM
+      if (newKeypadCommand.toLowerCase().contains("cone")){
+          m_ledstring.setBlink(false);
+          m_ledstring.setColor(LedOption.YELLOW);
+          System.out.println("\n\nSHOWING YELLOW\n\n");
+      }
+      else if (newKeypadCommand.toLowerCase().contains("cube")){
+        m_ledstring.setBlink(false);
+        m_ledstring.setColor(LedOption.PURPLE);
+        System.out.println("\n\nSHOWING PURPLE\n\n");
+      }
+      else if (newKeypadCommand.toLowerCase().contains("clear")){
+        m_ledstring.setBlink(false);
+        m_ledstring.setColor(LedOption.WHITE);
+        System.out.println("\n\nSHOWING WHITE\n\n");
+    }
+// delegate to FSM
 			DataLogManager.log("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
 		}
 	}

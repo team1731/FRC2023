@@ -91,6 +91,7 @@ public class LEDStringSubsystem extends SubsystemBase{
         // Fill the buffer with selection
         switch (color) {
           case INIT:
+          case WHITE:
             setFullColor(WHITE[0], WHITE[1], WHITE[2]);
             if (!blink){
               this.currentColor = LedOption.WHITE;

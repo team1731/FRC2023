@@ -313,27 +313,7 @@ public final class Constants {
     }
 
     public static final class OpConstants{
-        // KEYBOARD CONSTANTS
-        public static enum KeypadControl{
-            CONE (111), // "/"
-            CUBE (106); // "*"
-    
-            private int value;
-            private static Map map = new HashMap<>();
-            
-            private KeypadControl(int value){
-                this.value = value;
-            }
-
-            public static KeypadControl valueOf(int control){
-                return (KeypadControl) map.get(control);
-            }
-    
-            public int getValue(){
-                return value;
-            }
-        }
-
+        // KEYBOARD CONSTANTS   
         public static final int kPWM_LedSting = 6;         // Addressable Led String
 
         public enum LedOption {
