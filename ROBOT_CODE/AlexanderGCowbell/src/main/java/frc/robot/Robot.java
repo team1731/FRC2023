@@ -82,7 +82,6 @@ public class Robot extends TimedRobot {
 	s_Swerve = new Swerve();
   	s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);
   	s_armSubSystem = new ArmSubsystem();
-	s_armSubSystem.reset();
 
 	// Instantiate our robot container. This will perform all of our button bindings,
 	// and put our autonomous chooser on the dashboard
@@ -238,6 +237,9 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
 	keypad.putValue("driver entry", NetworkTableValue.makeString(""));
+	s_armSubSystem.getStateMachine().disabledInit();
+	s_armSubSystem.initializeArmPositions();
+	s_armSubSystem.resetArmEncoders();
   }
 
 

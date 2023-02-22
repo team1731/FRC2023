@@ -66,6 +66,7 @@ public class ArmSubsystem extends SubsystemBase {
 
 
     public ArmSubsystem() {
+        System.out.println("ArmSubsystem: Starting up!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         stateMachine = new ArmStateMachine(this);
         initializeArmMotors();
         distalAbsolute = new AnalogInput(0);
@@ -84,10 +85,8 @@ public class ArmSubsystem extends SubsystemBase {
     // home for any logic needed to reset, especially when robot moves to disabled state
     // ensures motion profiles are cleared so motor doesn't try to process last profile when re-enabled
     // moves the arm into a home (safe) position
-    public void reset() {
-        proximalMotor.clearMotionProfileTrajectories();
-        distalMotor.clearMotionProfileTrajectories();
-
+    public void initializeArmPositions() {
+        System.out.println("ArmSubsystem: Intializing arm positions!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         if(LogWriter.isArmRecordingEnabled()) {
             // disengage the arm and wrist motors so both can be moved freely for recording
             stopIntake();
@@ -115,11 +114,16 @@ public class ArmSubsystem extends SubsystemBase {
      */
     
     private void initializeArmMotors() {
+        System.out.println("ArmSubsystem: Initializing arm motors!!!!!!!!!!!!!!!!!!!!!!!!!");
         proximalMotor = new WPI_TalonFX(ArmConstants.proximalCancoderId, "canivore1");
         initializeTalonMotor(proximalMotor, TalonFXInvertType.CounterClockwise);
 
         distalMotor = new WPI_TalonFX(ArmConstants.distalCancoderId, "canivore1");
         initializeTalonMotor(distalMotor, TalonFXInvertType.CounterClockwise);
+
+        // make sure any previous motion profile trajectories are not present
+        //proximalMotor.clearMotionProfileTrajectories();
+        //distalMotor.clearMotionProfileTrajectories();
 
         wristMotor = new CANSparkMax(ArmConstants.wristCancoderId, MotorType.kBrushless);
         intakeMotor = new CANSparkMax(ArmConstants.intakeCancoderId, MotorType.kBrushless);

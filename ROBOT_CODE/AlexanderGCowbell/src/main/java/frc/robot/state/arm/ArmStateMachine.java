@@ -63,6 +63,13 @@ public class ArmStateMachine {
     allowScore = true;
   }
 
+  // put arm into unknown state whenever disabled
+  public void disabledInit() {
+    System.out.println("ArmStateMachine: DISABLED!!!!!!!!!!!!!!!!!!!!!!!!!");
+    resetState();
+    currentArmState = ArmState.UNKNOWN;
+  }
+
   // kick off a sequence to get us into our Home position safely
   public void initializeArm() {
     System.out.println("ArmStateMachine: INITIALIZING!!!!!!!!!!!!!!!!!!!!!");
