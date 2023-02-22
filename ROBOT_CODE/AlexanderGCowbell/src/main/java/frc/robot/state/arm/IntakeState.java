@@ -7,9 +7,22 @@ public enum IntakeState {
         public IntakeState next(Input input) {
             switch(input) {
                 case START:
-                    return RETRIEVING;
+                    return STARTING;
                 case RELEASE:
                     return RELEASING;
+                default:
+                    return this;
+            }
+        }
+    },
+
+    STARTING {
+        public IntakeState next(Input input) {
+            switch(input) {
+                case STARTED:
+                    return RETRIEVING;
+                case STOP:
+                    return STOPPED;
                 default:
                     return this;
             }

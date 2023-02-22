@@ -102,8 +102,8 @@ public class RobotContainer {
       leftBumper.onTrue(new InstantCommand(() -> s_armSubSystem.startRecordingArmPath()));
       rightBumper.onTrue(new InstantCommand(() -> s_armSubSystem.stopRecordingArmPath()));
     } else {
-      leftBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.PICKUP_HIGH));
-      rightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW));
+      leftBumper.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_HIGH));
+      rightBumper.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW));
     }
 
     /* Operator Buttons */
@@ -114,7 +114,7 @@ public class RobotContainer {
     intake.whileTrue(new InstantCommand(() -> sm_armStateMachine.intake()));
     intake.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopIntake()));
     release.whileTrue(new InstantCommand(() -> sm_armStateMachine.release()));
-    release.whileTrue(new InstantCommand(() -> sm_armStateMachine.stopRelease()));
+    release.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopRelease()));
   }
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {

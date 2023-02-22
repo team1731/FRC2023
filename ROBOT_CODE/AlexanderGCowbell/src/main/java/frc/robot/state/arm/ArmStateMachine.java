@@ -22,6 +22,7 @@ public class ArmStateMachine {
   private int pathStartedIndex = 0;
   private double pathStartedTime = 0;
 
+
   // extended = home pos (palm facing out), flexed = positioned for pickup/scoring (palm facing down/in)
   private boolean wristFlexed = false; 
 
@@ -35,7 +36,7 @@ public class ArmStateMachine {
   }
 
   public enum Input {
-    INITIALIZE, EXTEND, COMPLETED, RETRACT, RESET, START, STOP, INTERRUPT,
+    INITIALIZE, EXTEND, COMPLETED, RETRACT, RESET, START, STARTED, STOP, INTERRUPT,
     RETRIEVED, RELEASE, RELEASED, FLEX;
 }
 
@@ -152,19 +153,25 @@ public class ArmStateMachine {
    */
 
   public void intake() {
-    transitionIntake(Input.START);
+    System.out.println("ArmStateMachine: Full intake requested!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    subsystem.intake();
   }
 
   public void stopIntake() {
-    transitionIntake(Input.STOP);
+    System.out.println("ArmStateMachine: Releasing full intake!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    currentIntakeState = IntakeState.HOLDING;
+    subsystem.holdIntake();
   }
 
   public void release() {
-    transitionIntake(Input.RELEASE);
+    System.out.println("ArmStateMachine: Full eject requested!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    subsystem.eject();
   }
 
   public void stopRelease() {
-    transitionIntake(Input.STOP);
+    System.out.println("ArmStateMachine: Releasing full eject!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    currentIntakeState = IntakeState.STOPPED;
+    subsystem.stopIntake();
   }
 
 
@@ -225,13 +232,16 @@ public class ArmStateMachine {
     /*
      * Logic for handling intake cases
      */
+    if(currentIntakeState == IntakeState.STARTING && subsystem.isIntakeAtStartedVelocity()) {
+      transitionIntake(Input.STARTED);
+    }
+
     if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
       transitionIntake(Input.RETRIEVED);
     }
 
     if((currentIntakeState == IntakeState.RETRIEVING || currentIntakeState == IntakeState.RELEASING) && 
-        subsystem.getDirection() == Direction.REVERSE && 
-        !subsystem.isMotionProfileRunning()) {
+        currentArmState == ArmState.HOME) {
       // path has completed in reverse, make sure intake is stopped
       transitionIntake(Input.STOP);
     }
@@ -314,6 +324,9 @@ public class ArmStateMachine {
 
     switch(newState) {
       case RETRIEVING:
+        // nothing to do, just waiting to detect that we are holding a piece
+        break;
+      case STARTING:
         subsystem.intake();
         break;
       case HOLDING:
