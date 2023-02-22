@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.subsystems.LEDStringSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -43,6 +44,10 @@ public class Robot extends TimedRobot {
   private DoubleArrayLogEntry autoLog;
   public static long millis = System.currentTimeMillis();
 
+  // SUBSYSTEM DECLARATION
+  private LEDStringSubsystem m_ledstring;
+  private boolean blink;
+
   /**
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
@@ -63,9 +68,12 @@ public class Robot extends TimedRobot {
 	LiveWindow.disableAllTelemetry();
     ctreConfigs = new CTREConfigs();
 
+	// Instantiate Subsystems
+	m_ledstring = new LEDStringSubsystem();
+
 	// Instantiate our robot container. This will perform all of our button bindings,
 	// and put our autonomous chooser on the dashboard
-	m_robotContainer = new RobotContainer();
+	m_robotContainer = new RobotContainer(m_ledstring);
 	
 	initSubsystems();
 
