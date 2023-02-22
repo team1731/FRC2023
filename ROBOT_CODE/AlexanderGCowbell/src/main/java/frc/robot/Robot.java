@@ -238,7 +238,7 @@ public class Robot extends TimedRobot {
 //   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
   @Override
   public void disabledInit() {
-	keypad.putValue("driver entry", NetworkTableValue.makeString(""));
+	
   }
 
 
@@ -332,7 +332,6 @@ public class Robot extends TimedRobot {
 	}
 	currentKeypadCommand = "";
 	SmartDashboard.getString("keypadCommand", currentKeypadCommand);
-	keypad.putValue("driver entry", NetworkTableValue.makeString(""));
   }
 
 
