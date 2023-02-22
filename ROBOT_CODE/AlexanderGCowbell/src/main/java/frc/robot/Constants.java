@@ -313,7 +313,7 @@ public final class Constants {
         public static final int kPWM_LedSting = 6;         // Addressable Led String
 
         public enum LedOption {
-            TEAM, RED, BLUE, GREEN, YELLOW, ORANGE, PURPLE, RAINBOW, FULL, CLIMB, SHOOT, INTAKE, INTAKEBALL, WHEEL, BALLONE, BALLTWO, BALLTHREE, BALLFOUR
+            INIT, YELLOW, PURPLE, BLACK, WHITE, BLUE
           }
     }
 }
