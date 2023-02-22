@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.LEDStringSubsystem;
 
@@ -48,6 +49,9 @@ public class Robot extends TimedRobot {
   // SUBSYSTEM DECLARATION
   private LEDStringSubsystem m_ledstring;
   private boolean blink;
+
+  private final JoystickButton blinker = new JoystickButton(driver, XboxController.Button.kX.value);
+
 
   /**
    * This function is run when the robot is first started up and should be used for any

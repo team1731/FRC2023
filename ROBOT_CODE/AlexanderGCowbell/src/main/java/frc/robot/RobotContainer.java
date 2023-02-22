@@ -27,7 +27,7 @@ import frc.robot.Constants.OpConstants.LedOption;
  */
 public class RobotContainer {
   /* Controllers */
-  private final Joystick driver = new Joystick(0);
+  public final Joystick driver = new Joystick(0);
 
   /* Drive Controls */
   private final int translationAxis = XboxController.Axis.kLeftY.value;
