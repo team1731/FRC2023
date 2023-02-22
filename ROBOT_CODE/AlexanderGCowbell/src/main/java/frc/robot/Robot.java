@@ -15,7 +15,9 @@ import edu.wpi.first.util.datalog.DoubleArrayLogEntry;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -50,6 +52,8 @@ public class Robot extends TimedRobot {
   private LEDStringSubsystem m_ledstring;
   private boolean blink;
 
+  
+  private final Joystick driver = new Joystick(0);
   private final JoystickButton blinker = new JoystickButton(driver, XboxController.Button.kX.value);
 
 
