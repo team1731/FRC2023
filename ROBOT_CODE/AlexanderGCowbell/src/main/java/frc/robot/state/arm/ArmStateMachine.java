@@ -65,6 +65,7 @@ public class ArmStateMachine {
 
   // kick off a sequence to get us into our Home position safely
   public void initializeArm() {
+    System.out.println("ArmStateMachine: INITIALIZING!!!!!!!!!!!!!!!!!!!!!");
     transitionArm(Input.INITIALIZE);
   }
 

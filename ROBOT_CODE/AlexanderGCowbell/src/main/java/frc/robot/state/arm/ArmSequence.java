@@ -9,20 +9,20 @@ public enum ArmSequence {
     PICKUP_LOW("PICKUP_LOW"),
 
     // Used for unit tests
-    SCORE_TEST(null), 
-    PICKUP_TEST(null), 
-    UNDEFINED_TEST(null), 
-    INVALID_TEST(null);
+    SCORE_TEST("SCORE_TEST"), 
+    PICKUP_TEST("PICKUP_TEST"), 
+    UNDEFINED_TEST("UNDEFINED_TEST"), 
+    INVALID_TEST("INVALID_TEST");
 
-    public final String code;
+    public String code;
 
     private ArmSequence(String code) {
         this.code = code;
     }
 
     public static ArmSequence valueForCode(String code) {
-        for (ArmSequence as : values()) {
-            if (as.code.equals(code)) {
+        for(ArmSequence as : values()) {
+            if(as.code != null && as.code.equals(code)) {
                 return as;
             }
         }
