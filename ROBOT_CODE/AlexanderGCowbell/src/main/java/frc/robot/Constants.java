@@ -19,6 +19,9 @@ import frc.lib.util.SwerveModuleConstants;
 import frc.robot.state.StateChangeRequest;
 import frc.robot.state.arm.ArmStateMachine.ArmInput;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public final class Constants {
     public static final double stickDeadband = 0.1;
 	public static final int kTICKS = 33024; // 16.125 * 2048;
@@ -310,6 +313,27 @@ public final class Constants {
     }
 
     public static final class OpConstants{
+        // KEYBOARD CONSTANTS
+        public static enum KeypadControl{
+            GET_CONE (111), // "/"
+            GET_CUBE (106); // "*"
+    
+            private int value;
+            private static Map map = new HashMap<>();
+            
+            private KeypadControl(int value){
+                this.value = value;
+            }
+
+            public static KeypadControl valueOf(int control){
+                return (KeypadControl) map.get(control);
+            }
+    
+            public int getValue(){
+                return value;
+            }
+        }
+
         public static final int kPWM_LedSting = 6;         // Addressable Led String
 
         public enum LedOption {

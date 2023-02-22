@@ -15,6 +15,9 @@ import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.OpConstants;
+import frc.robot.Constants.OpConstants.KeypadControl;
+import frc.robot.Constants.OpConstants.LedOption;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -36,15 +39,17 @@ public class RobotContainer {
   private final JoystickButton adjustWheelEncoders = new JoystickButton(driver, XboxController.Button.kX.value);
 
   /* Subsystems */
-
   private final Swerve s_Swerve = new Swerve();
   private final PoseEstimatorSubsystem s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);
+  private final LEDStringSubsystem m_ledstring;
 
   // The container for the robot. Contains subsystems, OI devices, and commands. 
-  public RobotContainer() {
+  public RobotContainer(LEDStringSubsystem m_ledstring) {
 	boolean fieldRelative = true;
     boolean openLoop = true;
     s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
+
+    this.m_ledstring = m_ledstring;
 
     // Configure the button bindings
     configureButtonBindings();
@@ -97,6 +102,21 @@ public class RobotContainer {
 
 	public void processKeypadCommand(String newKeypadCommand) {
 		if(newKeypadCommand.length() > 0){
+      System.out.println(newKeypadCommand + "\n");
+		    switch(KeypadControl.valueOf(newKeypadCommand)){
+			    case GET_CONE:
+            m_ledstring.setBlink(false);
+            m_ledstring.setColor(LedOption.YELLOW);
+            System.out.println("\n\nSHOWING YELLOW\n\n");
+				    break;
+          case GET_CUBE:
+            m_ledstring.setBlink(false);
+            m_ledstring.setColor(LedOption.PURPLE);
+            System.out.println("\n\nSHOWING PURPLE\n\n");
+            break;
+			  default:
+				  break;
+        }
 			// delegate to FSM
 			DataLogManager.log("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
 		}
