@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.LEDStringSubsystem;
 
@@ -119,6 +120,10 @@ public class Robot extends TimedRobot {
 
 	autoInitPreload();
 	keypad = NetworkTableInstance.getDefault().getTable("KeyPad");
+
+	//For testing LED Blinking only. The arm will set blink true after a piece has been secured.
+	blink = true;
+	blinker.onTrue(new InstantCommand(() -> {m_ledstring.setBlink(blink); blink = !blink;}));
   }
   
 
