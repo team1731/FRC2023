@@ -64,6 +64,9 @@ public class LEDStringSubsystem extends SubsystemBase{
           }
           startBlink = mTimer.get();
         }
+        else{
+          setColor(currentColor);
+        }
       }
       public void init() {
         // initialization stuff
