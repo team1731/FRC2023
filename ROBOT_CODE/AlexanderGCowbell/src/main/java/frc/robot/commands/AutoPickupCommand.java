@@ -28,11 +28,13 @@ public class AutoPickupCommand extends CommandBase {
         }
 
         ArmPath path = null;
-        if(sequence == ArmSequence.PICKUP_HIGH) {
-            path = PickupHigh.getArmPath();
-        } else if(stateMachine.getGamePiece() == GamePiece.CONE) {
+        if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {
+            path = PickupHighCone.getArmPath();
+        } else if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE) {
+            path = PickupHighCube.getArmPath();
+        } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = PickupLowCone.getArmPath();
-        } else {
+        } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
             path = PickupLowCube.getArmPath();
         }
 

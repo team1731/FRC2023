@@ -7,7 +7,7 @@ public class PickupLowCone {
 
     public static final int kNumPoints = 182;
     public static final int kWristFlexIndex = 90;
-    public static final double kWristFlexPosition = 0.1874653697013855;
+    public static final double kWristFlexPosition = 0.18;
     public static final int kWristExtendIndex = 182;
     public static final double kWristMaxVelocity = 3000;
 
