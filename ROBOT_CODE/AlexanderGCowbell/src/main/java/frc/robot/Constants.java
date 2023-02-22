@@ -315,8 +315,8 @@ public final class Constants {
     public static final class OpConstants{
         // KEYBOARD CONSTANTS
         public static enum KeypadControl{
-            GET_CONE (111), // "/"
-            GET_CUBE (106); // "*"
+            CONE (111), // "/"
+            CUBE (106); // "*"
     
             private int value;
             private static Map map = new HashMap<>();

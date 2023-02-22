@@ -190,8 +190,10 @@ public class Robot extends TimedRobot {
 //   █▀ ▀██ ██▄ █▀ ▀███ ██████ ▀▀▀ ██▄▀▀▄██ ▀▀ ██ ▀▀▀ ████ ████ ▀▀▀ ███ ████ ▀▀▀██ ███ ██ ▀▀▀ 
 //   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
   private void initSubsystems() {
+	m_ledstring.init();
 	m_robotContainer.resetEncoders();
   }
+
   
 
   /**
@@ -222,6 +224,7 @@ public class Robot extends TimedRobot {
 		DataLogManager.log(".\n.\n.\nDRIVER ENTRY ==========================>>>>>>>> " + newKeypadEntry + "\n.\n.\n.");
 		oldKeypadEntry = newKeypadEntry;
 		SmartDashboard.putString("keypadCommand", newKeypadEntry);
+		m_robotContainer.processKeypadCommand(newKeypadEntry);
 	}
 
 	m_robotContainer.displayEncoders();

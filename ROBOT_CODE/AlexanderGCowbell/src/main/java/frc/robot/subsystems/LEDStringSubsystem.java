@@ -72,7 +72,7 @@ public class LEDStringSubsystem extends SubsystemBase{
       }
     
       void setFullColor(int r, int g, int b) {
-        for(int i=1; i < m_ledBuffer.getLength(); i++) {
+        for(int i=0; i < m_ledBuffer.getLength(); i++) {
           m_ledBuffer.setRGB(i, r, g, b);
         }
         m_led.setData(m_ledBuffer);

@@ -104,12 +104,12 @@ public class RobotContainer {
 		if(newKeypadCommand.length() > 0){
       System.out.println(newKeypadCommand + "\n");
 		    switch(KeypadControl.valueOf(newKeypadCommand)){
-			    case GET_CONE:
+			    case CONE:
             m_ledstring.setBlink(false);
             m_ledstring.setColor(LedOption.YELLOW);
             System.out.println("\n\nSHOWING YELLOW\n\n");
 				    break;
-          case GET_CUBE:
+          case CUBE:
             m_ledstring.setBlink(false);
             m_ledstring.setColor(LedOption.PURPLE);
             System.out.println("\n\nSHOWING PURPLE\n\n");

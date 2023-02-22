@@ -221,11 +221,11 @@ public class Keypad extends JDialog implements KeyListener {
         	String command = inputBuffer.toString();
         	if(command.length() > 0) {
 		        commandLabel.setText(command);
-		        if(!sent) {
+		        //if(!sent) {
 			        table.putValue("driver entry", NetworkTableValue.makeString(command));
 			        sent = true;
 			        System.out.println("sent " + command + " to network tables");
-		        }
+		        //}
         	}
         }
 	}
