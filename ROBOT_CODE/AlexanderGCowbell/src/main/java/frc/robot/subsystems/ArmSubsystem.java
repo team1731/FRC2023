@@ -119,8 +119,8 @@ public class ArmSubsystem extends SubsystemBase {
         initializeTalonMotor(distalMotor, TalonFXInvertType.CounterClockwise);
 
         // make sure any previous motion profile trajectories are not present
-        //proximalMotor.clearMotionProfileTrajectories();
-        //distalMotor.clearMotionProfileTrajectories();
+        proximalMotor.clearMotionProfileTrajectories();
+        distalMotor.clearMotionProfileTrajectories();
 
         wristMotor = new CANSparkMax(ArmConstants.wristCancoderId, MotorType.kBrushless);
         intakeMotor = new CANSparkMax(ArmConstants.intakeCancoderId, MotorType.kBrushless);
