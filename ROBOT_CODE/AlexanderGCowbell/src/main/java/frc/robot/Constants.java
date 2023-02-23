@@ -23,6 +23,9 @@ import frc.robot.util.log.LogWriter.Log;
 import frc.robot.util.log.LogWriter.LogMode;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 public final class Constants {
     public static final double stickDeadband = 0.1;
 	public static final int kTICKS = 33024; // 16.125 * 2048;
@@ -364,10 +367,11 @@ public final class Constants {
     }
 
     public static final class OpConstants{
+        // KEYBOARD CONSTANTS   
         public static final int kPWM_LedSting = 6;         // Addressable Led String
 
         public enum LedOption {
-            TEAM, RED, BLUE, GREEN, YELLOW, ORANGE, PURPLE, RAINBOW, FULL, CLIMB, SHOOT, INTAKE, INTAKEBALL, WHEEL, BALLONE, BALLTWO, BALLTHREE, BALLFOUR
+            INIT, YELLOW, PURPLE, BLACK, WHITE, BLUE
           }
     }
 }

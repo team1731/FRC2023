@@ -13,18 +13,23 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.LogConstants;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.util.log.LogWriter;
 import frc.robot.util.log.MessageLog;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.LEDStringSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -45,7 +50,6 @@ public class Robot extends TimedRobot {
   private boolean isRedAlliance = true;
   private int stationNumber = 0;
   public static long millis = System.currentTimeMillis();
-
   private Swerve s_Swerve;
   private PoseEstimatorSubsystem s_poseEstimatorSubsystem;
   private ArmSubsystem s_armSubSystem;
@@ -60,6 +64,15 @@ public class Robot extends TimedRobot {
 		}, LogConstants.recordingPeriod, LogConstants.recordingOffset);
 	}
   }
+
+  // SUBSYSTEM DECLARATION
+  private LEDStringSubsystem m_ledstring;
+  private boolean blink;
+
+  // NOTE: FOR TESTING PURPOSES ONLY!
+  private final Joystick driver = new Joystick(0);
+  private final JoystickButton blinker = null; //new JoystickButton(driver, XboxController.Button.kX.value);
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
@@ -85,11 +98,12 @@ public class Robot extends TimedRobot {
   	s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);
   	s_armSubSystem = new ArmSubsystem();
 	sm_armStateMachine = s_armSubSystem.getStateMachine();
+	m_ledstring = new LEDStringSubsystem();
 
 	// Instantiate our robot container. This will perform all of our button bindings,
 	// and put our autonomous chooser on the dashboard
-	m_robotContainer = new RobotContainer(s_Swerve, s_poseEstimatorSubsystem, s_armSubSystem);
-	
+	m_robotContainer = new RobotContainer(s_Swerve, s_poseEstimatorSubsystem, s_armSubSystem, m_ledstring);
+
 	initSubsystems();
 
 	autoChooser.setDefaultOption(AutoConstants.kDefault,                     AutoConstants.kDefault);
@@ -134,6 +148,10 @@ public class Robot extends TimedRobot {
 
 	autoInitPreload();
 	keypad = NetworkTableInstance.getDefault().getTable("KeyPad");
+
+	//For testing LED Blinking only. The arm will set blink true after a piece has been secured.
+	blink = true;
+	//blinker.onTrue(new InstantCommand(() -> {m_ledstring.setBlink(blink); blink = !blink;}));
   }
   
 
@@ -193,8 +211,10 @@ public class Robot extends TimedRobot {
 //   █▀ ▀██ ██▄ █▀ ▀███ ██████ ▀▀▀ ██▄▀▀▄██ ▀▀ ██ ▀▀▀ ████ ████ ▀▀▀ ███ ████ ▀▀▀██ ███ ██ ▀▀▀ 
 //   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
   private void initSubsystems() {
+	m_ledstring.init();
 	m_robotContainer.resetEncoders();
   }
+
   
 
   /**
@@ -224,8 +244,9 @@ public class Robot extends TimedRobot {
 	if (!newKeypadEntry.equals(oldKeypadEntry)){
         MessageLog.add(".\n.\n.\nDRIVER ENTRY ==========================>>>>>>>> " + newKeypadEntry + "\n.\n.\n.");
 		oldKeypadEntry = newKeypadEntry;
-		sm_armStateMachine.setKeyedSequence(newKeypadEntry);
 		SmartDashboard.putString("keypadCommand", newKeypadEntry);
+		m_robotContainer.processKeypadCommand(newKeypadEntry);
+		sm_armStateMachine.setKeyedSequence(newKeypadEntry);
 	}
 
 	m_robotContainer.displayEncoders();
@@ -244,6 +265,7 @@ public class Robot extends TimedRobot {
 	sm_armStateMachine.disabledInit();
 	s_armSubSystem.initializeArmPositions();
 	s_armSubSystem.resetArmEncoders();
+
   }
 
 
@@ -337,7 +359,6 @@ public class Robot extends TimedRobot {
 	}
 	currentKeypadCommand = "";
 	SmartDashboard.getString("keypadCommand", currentKeypadCommand);
-	keypad.putValue("driver entry", NetworkTableValue.makeString(""));
   }
 
 
