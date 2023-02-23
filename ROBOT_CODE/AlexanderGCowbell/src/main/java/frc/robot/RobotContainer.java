@@ -76,6 +76,7 @@ public class RobotContainer {
     s_poseEstimatorSubsystem = poseEstimatorSubsystem;
     sm_armStateMachine = armSubsystem.getStateMachine();
     s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
+    //Test command to use joystick control of the arm
     //s_armSubSystem.setDefaultCommand(new TestArm(s_armSubSystem, driver, translationAxis, distalAxis)); 
  
 

@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.GamePiece;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.state.arm.ArmStateMachine.Status;
@@ -12,9 +13,10 @@ public class AutoScoreCommand extends CommandBase {
     private boolean started = false;
     private boolean isFinished = false;
 
-    public AutoScoreCommand(ArmStateMachine stateMachine, ArmSequence sequence) {
+    public AutoScoreCommand(ArmStateMachine stateMachine, ArmSequence sequence, GamePiece pieceType) {
         this.stateMachine = stateMachine;
         this.sequence = sequence;
+        stateMachine.setGamePiece(pieceType);
         stateMachine.setIsInAuto(true);
     }
 

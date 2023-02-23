@@ -21,6 +21,7 @@ public class ArmStateMachine {
   private ArmPath currentPath;
   private int pathStartedIndex = 0;
   private double pathStartedTime = 0;
+  private QueuedCommand queuedCommand = null;
 
 
   // extended = home pos (palm facing out), flexed = positioned for pickup/scoring (palm facing down/in)
@@ -43,6 +44,18 @@ public class ArmStateMachine {
   public enum MovementType {
     PICKUP, SCORE
   }
+  
+  class QueuedCommand {
+    public MovementType type;
+    public ArmPath path;
+    public double queuedTime;
+
+    public QueuedCommand(MovementType type, ArmPath path) {
+      this.type = type;
+      this.path = path;
+      this.queuedTime = Timer.getFPGATimestamp();
+    }
+  }
 
 
   /*
@@ -59,6 +72,7 @@ public class ArmStateMachine {
     pathStartedIndex = 0;
     pathStartedTime = 0;
     movementType = null;
+    queuedCommand = null;
     wristFlexed = false;
     isInAuto = false;
     allowScore = true;
@@ -85,7 +99,12 @@ public class ArmStateMachine {
   // PICKUP
   public void pickup(ArmPath path) {
     if(path == null) return;
-    if(!isReadyToStartMovement()) return; 
+    if(!isReadyToStartMovement()) {
+      if(isInAuto) {
+        queuedCommand = new QueuedCommand(MovementType.PICKUP, path);
+      }
+      return;
+    }
 
     System.out.println("ArmStateMachine: STARTING PICKUP!!!!!!!!!!!!!!!!!!!!!");
     currentPath = path;
@@ -98,7 +117,12 @@ public class ArmStateMachine {
   // SCORE
   public void score(ArmPath path) {
     if(path == null) return;
-    if(!isReadyToStartMovement()) return; 
+    if(!isReadyToStartMovement()) {
+      if(isInAuto) {
+        queuedCommand = new QueuedCommand(MovementType.SCORE, path);
+      }
+      return;
+    } 
 
     System.out.println("ArmStateMachine: STARTING SCORE!!!!!!!!!!!!!!!!!!!!!");
     currentPath = path;
@@ -207,6 +231,26 @@ public class ArmStateMachine {
    */
 
   public void periodic() {
+
+    /*
+     * Logic for handling queued auto commands
+     * These commands can get queued when the command is requested while the arm is still reaching a ready state
+     */
+    if(isInAuto && queuedCommand != null) {
+      if(isReadyToStartMovement() && queuedCommand.type == MovementType.PICKUP) {
+        pickup(queuedCommand.path);
+        queuedCommand = null;
+      } else if(isReadyToStartMovement() && queuedCommand.type == MovementType.SCORE) {
+        score(queuedCommand.path);
+        queuedCommand = null;
+      } else if(Timer.getFPGATimestamp() - queuedCommand.queuedTime > 2.0) {
+        // something is wrong, we should have been home by now, clear the queued command
+        queuedCommand = null;
+      }
+    } else if(!isInAuto && queuedCommand != null) {
+      // we are no longer in auto, this command no longer applies, clear the queued command
+      queuedCommand = null;
+    }
 
     /*
      * Logic for flexing/extending wrist
