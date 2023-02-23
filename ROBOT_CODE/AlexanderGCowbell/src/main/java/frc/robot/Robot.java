@@ -67,7 +67,7 @@ public class Robot extends TimedRobot {
 
   // SUBSYSTEM DECLARATION
   private LEDStringSubsystem m_ledstring;
-  private boolean blink;
+  private boolean ledBlinking;
 
   // NOTE: FOR TESTING PURPOSES ONLY!
   private final Joystick driver = new Joystick(0);
@@ -150,8 +150,8 @@ public class Robot extends TimedRobot {
 	keypad = NetworkTableInstance.getDefault().getTable("KeyPad");
 
 	//For testing LED Blinking only. The arm will set blink true after a piece has been secured.
-	blink = true;
-	//blinker.onTrue(new InstantCommand(() -> {m_ledstring.setBlink(blink); blink = !blink;}));
+	//ledBlinking = true;
+	//blinker.onTrue(new InstantCommand(() -> {m_ledstring.setBlink(ledBlinking); ledBlinking = !ledBlinking;}));
   }
   
 
@@ -389,7 +389,16 @@ public class Robot extends TimedRobot {
 	if(!newKeypadCommand.equals(currentKeypadCommand)){
 		// FEED FSM
 		m_robotContainer.processKeypadCommand(newKeypadCommand);
+		sm_armStateMachine.setKeyedSequence(newKeypadCommand);
 		currentKeypadCommand = newKeypadCommand;
+	}
+
+	if(!ledBlinking && sm_armStateMachine.isHoldingGamePiece()) {
+		m_ledstring.setBlink(true);
+		ledBlinking = true;
+	} else if(ledBlinking && !sm_armStateMachine.isHoldingGamePiece()) {
+		m_ledstring.setBlink(false);
+		ledBlinking = false;
 	}
   }
 

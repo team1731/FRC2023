@@ -53,7 +53,8 @@ public class RobotContainer {
   private JoystickButton rightBumper = new JoystickButton(driver,XboxController.Button.kRightBumper.value);
 
   /* Operator Buttons */
-  private JoystickButton coneOrCube = new JoystickButton(operator,8);
+  // Disabled cone/cube switch in favor of using keypad to indicate these values
+  //private JoystickButton coneOrCube = new JoystickButton(operator,8);
   private JoystickButton preventScore = new JoystickButton(operator,13);
   private JoystickButton release = new JoystickButton(operator,14);
   private JoystickButton intake = new JoystickButton(operator,15);
@@ -115,8 +116,9 @@ public class RobotContainer {
     }
 
     /* Operator Buttons */
-    coneOrCube.whileTrue(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CUBE)));
-    coneOrCube.whileFalse(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CONE)));
+    // Disabled cone/cube switch in favor of using keypad to indicate these values
+    //coneOrCube.whileTrue(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CUBE)));
+    //coneOrCube.whileFalse(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CONE)));
     preventScore.whileTrue(new InstantCommand(() -> sm_armStateMachine.setAllowScore(false)));
     preventScore.whileFalse(new InstantCommand(() -> sm_armStateMachine.setAllowScore(true)));
     intake.whileTrue(new InstantCommand(() -> sm_armStateMachine.intake()));
@@ -168,23 +170,25 @@ public class RobotContainer {
 		if(newKeypadCommand.length() > 0){
       System.out.println(newKeypadCommand + "\n");
       if (newKeypadCommand.toLowerCase().contains("cone")){
-          m_ledstring.setBlink(false);
-          m_ledstring.setColor(LedOption.YELLOW);
-          System.out.println("\n\nSHOWING YELLOW\n\n");
+        m_ledstring.setBlink(false);
+        m_ledstring.setColor(LedOption.YELLOW);
+        sm_armStateMachine.setGamePiece(GamePiece.CONE);
+        System.out.println("\n\nSHOWING YELLOW\n\n");
       }
       else if (newKeypadCommand.toLowerCase().contains("cube")){
         m_ledstring.setBlink(false);
         m_ledstring.setColor(LedOption.PURPLE);
+        sm_armStateMachine.setGamePiece(GamePiece.CUBE);
         System.out.println("\n\nSHOWING PURPLE\n\n");
       }
       else if (newKeypadCommand.toLowerCase().contains("clear")){
         m_ledstring.setBlink(false);
         m_ledstring.setColor(LedOption.WHITE);
+        sm_armStateMachine.setGamePiece(null);
         System.out.println("\n\nSHOWING WHITE\n\n");
-    }
-    // delegate to FSM
-		DataLogManager.log("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
-
+     }
+     // delegate to FSM
+		 DataLogManager.log("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
 		}
 	}
 }

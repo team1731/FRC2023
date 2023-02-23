@@ -431,7 +431,14 @@ public class ArmStateMachine {
   }
 
   public void setGamePiece(GamePiece gamePiece) {
+    if(gamePiece == null && status == Status.RUNNING) {
+      return; // do not clear if running a path
+    }
     this.gamePiece = gamePiece;
+  }
+
+  public boolean isHoldingGamePiece() {
+    return (currentIntakeState == IntakeState.HOLDING);
   }
 
   public MovementType getMovementType() {
@@ -447,6 +454,8 @@ public class ArmStateMachine {
   }
 
   public void setKeyedSequence(String keypadEntry) {
+    if(isRunningKeypadEntry) return; // do not allow keypad change if running a keyed path
+
     String[] keypadValues = keypadEntry.split("; ");
     if(keypadValues.length > 1) {
       String sequenceCode = keypadValues[1];
