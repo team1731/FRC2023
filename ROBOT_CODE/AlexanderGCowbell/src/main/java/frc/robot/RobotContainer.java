@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -20,6 +21,7 @@ import frc.robot.util.log.LogWriter;
 import frc.robot.util.log.MessageLog;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.GamePiece;
+import frc.robot.Constants.OpConstants.LedOption;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -31,6 +33,7 @@ public class RobotContainer {
   /* Controllers */
   private final Joystick driver = new Joystick(0);
   private final Joystick operator = new Joystick(1);
+
 
   /* Drive Controls */
   private final int translationAxis = XboxController.Axis.kLeftY.value;
@@ -57,17 +60,18 @@ public class RobotContainer {
 
 
   /* Subsystems */
-
   private Swerve s_Swerve;
   private PoseEstimatorSubsystem s_poseEstimatorSubsystem;
   private ArmSubsystem s_armSubSystem;
   private ArmStateMachine sm_armStateMachine;
+  private final LEDStringSubsystem m_ledstring;
 
   // The container for the robot. Contains subsystems, OI devices, and commands. 
   public RobotContainer(
           Swerve swerve,
           PoseEstimatorSubsystem poseEstimatorSubsystem,
-          ArmSubsystem armSubsystem) {
+          ArmSubsystem armSubsystem,
+          LEDStringSubsystem m_ledstring) {
     
 	  boolean fieldRelative = true;
     boolean openLoop = false;
@@ -75,10 +79,13 @@ public class RobotContainer {
     s_armSubSystem = armSubsystem;
     s_poseEstimatorSubsystem = poseEstimatorSubsystem;
     sm_armStateMachine = armSubsystem.getStateMachine();
+
     s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
     //Test command to use joystick control of the arm
     //s_armSubSystem.setDefaultCommand(new TestArm(s_armSubSystem, driver, translationAxis, distalAxis)); 
  
+
+    this.m_ledstring = m_ledstring;
 
     // Configure the button bindings
     configureButtonBindings();
@@ -158,9 +165,25 @@ public class RobotContainer {
 
 
 	public void processKeypadCommand(String newKeypadCommand) {
-		if(newKeypadCommand.length() > 0) {
-			// delegate to FSM
-      MessageLog.add("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
+		if(newKeypadCommand.length() > 0){
+      System.out.println(newKeypadCommand + "\n");
+      if (newKeypadCommand.toLowerCase().contains("cone")){
+          m_ledstring.setBlink(false);
+          m_ledstring.setColor(LedOption.YELLOW);
+          System.out.println("\n\nSHOWING YELLOW\n\n");
+      }
+      else if (newKeypadCommand.toLowerCase().contains("cube")){
+        m_ledstring.setBlink(false);
+        m_ledstring.setColor(LedOption.PURPLE);
+        System.out.println("\n\nSHOWING PURPLE\n\n");
+      }
+      else if (newKeypadCommand.toLowerCase().contains("clear")){
+        m_ledstring.setBlink(false);
+        m_ledstring.setColor(LedOption.WHITE);
+        System.out.println("\n\nSHOWING WHITE\n\n");
+    }
+    // delegate to FSM
+		DataLogManager.log("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
 
 		}
 	}
