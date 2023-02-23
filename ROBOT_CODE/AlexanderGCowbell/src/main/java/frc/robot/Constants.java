@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.Map;
+
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 
 import edu.wpi.first.apriltag.AprilTag;
@@ -16,12 +18,42 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import frc.lib.util.SwerveModuleConstants;
-import frc.robot.state.StateChangeRequest;
-import frc.robot.state.arm.ArmStateMachine.ArmInput;
+import frc.robot.util.Gains;
+import frc.robot.util.log.LogWriter.Log;
+import frc.robot.util.log.LogWriter.LogMode;
+
 
 public final class Constants {
     public static final double stickDeadband = 0.1;
 	public static final int kTICKS = 33024; // 16.125 * 2048;
+
+
+    public static enum GamePiece {
+        CONE, CUBE
+    }
+
+    public static final class LogConstants {
+        /*
+         * To write to a log you must:
+         * 1. Set loggingEnabled = true
+         * 2. Set the desired logMode (CSV, DATA_LOG)
+         * 2. Set the desired loggers below = true
+         */
+        public static final boolean loggingEnabled = false;     // note: must also turn on applicable loggers below
+        public static final boolean logNetworkTables = false;   // only applicable when logMode = DATA_LOG
+        public static final LogMode logMode = LogMode.CSV;
+
+        // list of loggers and enabled status, note: must also enable logging above
+        public static final Map<Log, Boolean> loggers = Map.of(
+            Log.MESSAGE, false,
+            Log.ARM_PATH_RECORDING, false,
+            Log.POSE_ESTIMATIONS, false
+        );
+
+        // Arm path recording constants
+        public final static double recordingPeriod = 0.01; // seconds
+        public final static double recordingOffset = 0.005; // seconds 
+    }
 
     public static final class FieldConstants {
         // Note: Field dimensions and April Tag positions pulled from the 2023 Field and Layout Marking document
@@ -109,8 +141,8 @@ public final class Constants {
         public static final double driveKA = (0.27 / 12);
 
         /* Swerve Profiling Values */
-        public static final double maxSpeed = 0.5; // disabled for testing = 4.5; //meters per second
-        public static final double maxAngularVelocity = 11.5;
+        public static final double maxSpeed = 0.5; // disabled for testing = 3.0; //meters per second
+        public static final double maxAngularVelocity = 11.5; // disabled for testing = 3.0;
 
         /* Neutral Modes */
         public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
@@ -129,7 +161,7 @@ public final class Constants {
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
             public static final int canCoderID = 1;
-            public static final double angleOffset = 219.375;
+            public static final double angleOffset = 348.486;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -139,7 +171,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 2;
-            public static final double angleOffset = 27.42;
+            public static final double angleOffset = 24.082;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -149,7 +181,7 @@ public final class Constants {
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 3;
-            public static final double angleOffset = 266.66;
+            public static final double angleOffset = 265.5;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -159,54 +191,23 @@ public final class Constants {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 4;
-            public static final double angleOffset = 135.70;
+            public static final double angleOffset = 134.4;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
 
     }
 
-    public static final class DriveConstants {
-
-		// Drive motor CAN IDs
-		public static final int kLeftFrontDriveMotorPort = 21;
-		public static final int kRightFrontDriveMotorPort = 22;
-		public static final int kLeftRearDriveMotorPort = 23;
-		public static final int kRightRearDriveMotorPort = 24;
-
-		// Turn motor CAN IDs
-		public static final int kLeftFrontTurningMotorPort = 11;
-		public static final int kRightFrontTurningMotorPort = 12;
-		public static final int kLeftRearTurningMotorPort = 13;
-		public static final int kRightRearTurningMotorPort = 14;
-
-		public static final double kTrackWidth = 0.7112;
-		// Distance between centers of right and left wheels on robot
-		public static final double kWheelBase = 0.7;
-		// Distance between front and back wheels on robot
-		public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics( // leftFront,
-																								// rightFront, leftRear,
-																								// rightRear
-				new Translation2d(kWheelBase / 2, kTrackWidth / 2), new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-				new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-				new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
-
-		public static final boolean kGyroReversed = true; // 09FEB false;
-
-		public static final double kMaxSpeedMetersPerSecond = 0.5; // disabled for testing = 3.5; // tune
-
-		public static final double kTurnP = 0.1; // was 0.05
-		public static final double kTurnI = 0;
-		public static final double kTurnD = 0;
-
-	}
-
     public static final class AutoConstants {
-        public static final String kDefault                  = "_Default_Auto";
-        public static final String k_0_Example               = "_0_Example_Auto";
-        public static final String k_1_11Top_A_13Top_Drive_A = "_1_1Top_A_13Top_Drive_A";
-        public static final String k_2_13Top_B_Engage        = "_2_13Top_B_Engage";
-        public static final String k_9_Move_Forward          = "_9_Move_Forward";
+        public static final String kDefault                      = "_Default_Auto";
+        public static final String k_0_Example                   = "_0_Example_Auto";
+        public static final String k_1_11Top_A_13Top_Drive_A     = "_1_1Top_A_13Top_Drive_A";
+        public static final String k_2_13Top_B_Engage            = "_2_13Top_B_Engage";
+        public static final String k_3_31Top_C_Engage            = "_3_31Top_C_Engage";
+        public static final String k_4_33Top_D_31Top_Drive_D     = "_4_33Top_D_31Top_Drive_D";
+        public static final String k_5_11Top_A_11Middle_Drive_A  = "_5_11Top_A_11Middle_Drive_A";
+        public static final String k_6_33Top_D_33Middle_Drive_D  = "_6_33Top_D_33Middle_Drive_D";
+        public static final String k_9_Move_Forward              = "_9_Move_Forward";
         
 		public static final String kAutoCodeKey = "Auto Selector";
         public static final double kMaxSpeedMetersPerSecond = 0.5; // disabled for testing = 3;
@@ -225,38 +226,95 @@ public final class Constants {
       }
       
     public static final class StateConstants {
-        public static final String kSuccessCode = "00";
-        public static final String kGenericFailedCode = "01";
-
-        public enum StateMachineWaitCondition {
-            UNTIL_LINED_UP_FOR_SCORING
+        public enum ResultCode {
+            SUCCESS, FAILED, INVALID_REQUEST,
+            // Arm Specific
+            ARM_BUFFERING_FAILED, ARM_MOTION_START_FAILED
         }
         
         /*
         * Constants specifically related to the ArmStateMachine
         */
         public static final String kArmStateMachineId = "ArmStateMachine";
+    }
 
-        /*
-         * Sequences for the ArmStateMachine
-         * Note: leave test sequences in place, they are used by the ArmStateMachineTest (JUnit)
+    public static final class ArmConstants {
+        public final static int proximalCancoderId = 11;
+        public final static int distalCancoderId = 10;
+        public final static int wristCancoderId = 12;
+        public final static int intakeCancoderId = 13;
+
+        public final static double proximalRelativeTicsPerAbsoluteTick = 140;
+        public final static int proximalAbsoluteTicsCenter = 3104;
+        public final static double distalRelativeTicsPerAbsoluteTick = 90;
+        public final static int distalAbsoluteTicsCenter = 1564;
+        public final static int pointDurationMS = 10;
+        public final static int minBufferedPoints = 10;
+        public final static double proximalHomePosition = -4388;
+        public final static double distalHomePosition = 10489;
+        public final static double wristHomePosition = 0.60;
+        public final static double intakeStartedVelocityThreshold = 1000;
+        public final static double intakeHoldingVelocityThreshold = 60;
+        public final static double wristResetPostionThreshold = 0.2;
+
+        // Arm PID constants
+        public final static int armPIDLoopIdx = 0;
+
+        // Wrist PID coefficients
+        public final static double wristP = 8e-4;
+        public final static double wristI = 0;
+        public final static double wristD = 0; 
+        public final static double wristIz = 0; 
+        public final static double wristFF = 0.000356; //.000156
+        public final static double wristMaxOutput = 1.0; 
+        public final static double wristMinOutput = -1.0;
+        public final static double wristMaxRPM = 5700;
+
+        // Wrist limits
+        public static final int WRIST_CURRENT_LIMIT = 20;
+
+        // Wrist Smart Motion Coefficients
+        public final static double wristMaxVel = 2000;
+        public final static double wristMinVel = 0;
+        public final static double wristMaxAcc = 1500; 
+        public final static double wristAllowedErr = 0;
+
+         // Hand limits
+        public static final int INTAKE_CURRENT_LIMIT_A = 20;
+        public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
+        public static final double INTAKE_OUTPUT_POWER = 1.0;
+        public static final double INTAKE_HOLD_POWER = 0.07;
+
+        //Geometry Constants
+        public final static double proximalArmLength = 35.75; //inches
+        public final static double distalArmLength = 32; //inches
+        public final static double proximalTicksPerDegree = 286720.0/360.0;
+        public final static double distalTicksPerDegree = 512.0; 
+        public final static double ThrottleAtFullExtensionDistalAndProximal = 0.02639; //TBD empirically
+        public final static double ThrottleAtFullExtensionDistal = .03225; //TBD empirically
+        public final static double distalFullExtensionDistance =33.0; //TBD empirically
+        public final static double armFullExtensionDistance = 56.25;
+        
+        
+
+
+        /**
+         * How many sensor units per rotation.
+         * Using Talon FX Integrated Sensor.
+         * @link https://github.com/CrossTheRoadElec/Phoenix-Documentation#what-are-the-units-of-my-sensor
          */
-        public static final StateChangeRequest[] kTestSequenceScore = new StateChangeRequest[]{
-            new StateChangeRequest(ArmInput.EXTEND, new double[]{ 1, 2, 3, 4, 5 }),
-            new StateChangeRequest(ArmInput.RELEASE, null, StateMachineWaitCondition.UNTIL_LINED_UP_FOR_SCORING),
-            new StateChangeRequest(ArmInput.RETRACT, new double[]{ 6, 7, 8, 9, 10 })
-        };
-
-        public static final StateChangeRequest[] kTestSequencePickup = new StateChangeRequest[]{
-            new StateChangeRequest(ArmInput.EXTEND, new double[]{ 1, 2, 3, 4, 5 }),
-            new StateChangeRequest(ArmInput.INTAKE),
-            new StateChangeRequest(ArmInput.RETRACT, new double[]{ 6, 7, 8, 9, 10 })
-        };
-
-        public static final StateChangeRequest[] kTestInvalid = new StateChangeRequest[]{
-            new StateChangeRequest(ArmInput.EXTEND),
-            new StateChangeRequest(ArmInput.EXTEND)
-        };
+        public final static int kSensorUnitsPerRotation = 2048;
+        
+        /**
+         * Motor neutral dead-band, set to the minimum 0.1%.
+         */
+        public final static double kNeutralDeadband = 0.001;
+        
+        /**
+         * PID Gains may have to be adjusted based on the responsiveness of control loop
+         * 	                                    			  kP   kI    kD     kF             Iz    PeakOut */
+        public final static Gains kGains_MotProf = new Gains( 0.05, 0.0,  0.0, 1023.0/7200.0,  400,  1.00 ); /* measured 6800 velocity units at full motor output */
+        public final static int kPrimaryPIDSlot = 0; // any slot [0,3]
     }
 
     public static final class VisionConstants {

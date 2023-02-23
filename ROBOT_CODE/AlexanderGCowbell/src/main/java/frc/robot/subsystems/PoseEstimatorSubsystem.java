@@ -24,6 +24,10 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.VisionConstants;
+import frc.robot.util.log.Logger;
+import frc.robot.util.log.LogWriter;
+import frc.robot.util.log.LogWriter.Log;
+import frc.robot.util.log.loggers.PoseEstimations;
 
 
 class CameraTransform {
@@ -42,7 +46,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   private final SwerveDrivePoseEstimator poseEstimator;
   private AprilTagFieldLayout aprilTagFieldLayout;
   private final Field2d field2d = new Field2d();
-
+  
   // Camera configuration
   private HashMap<String, CameraTransform> cameraMap = new HashMap<String, CameraTransform>();
   private final PhotonCamera photonCamera1 = new PhotonCamera(VisionConstants.kCameraMount1Id);
@@ -51,6 +55,11 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   // Physical location of the camera on the robot, relative to the center of the robot.
   private static final Transform3d CAMERA_TO_ROBOT_1 = VisionConstants.kCameraMount1Pose.getPoseTransform();
   private static final Transform3d CAMERA_TO_ROBOT_2 = VisionConstants.kCameraMount2Pose.getPoseTransform();
+
+  // logging
+  Logger poseLogger;
+  double lastLogTime = 0;
+  double logInterval = 1.0; // in seconds
 
 
   public PoseEstimatorSubsystem( Swerve m_swerve) {
@@ -83,6 +92,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     tab.addString("Pose (X, Y)", this::getFomattedPose).withPosition(0, 4);
     tab.addNumber("Pose Degrees", () -> getCurrentPose().getRotation().getDegrees()).withPosition(1, 4);
     tab.add(field2d);
+
+    // setup logger
+    poseLogger = LogWriter.getLogger(Log.POSE_ESTIMATIONS, PoseEstimations.class);
   }
 
   @Override
@@ -121,6 +133,14 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       // Update pose estimator with drivetrain sensors
       poseEstimator.updateWithTime(Timer.getFPGATimestamp(), m_swerve.getYaw(), m_swerve.getPositions());
       field2d.setRobotPose(getCurrentPose());
+    }
+
+    // log pose estimations
+    Pose2d currentPose = getCurrentPose();
+    poseLogger.add(new PoseEstimations(currentPose.getX(), currentPose.getY(), currentPose.getRotation().getDegrees()));
+    if(Timer.getFPGATimestamp() - lastLogTime > logInterval) {
+      poseLogger.flush();
+      lastLogTime = Timer.getFPGATimestamp();
     }
   }
 
