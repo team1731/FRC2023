@@ -12,11 +12,7 @@ public class ArmScoreCommand extends CommandBase {
 
     public ArmScoreCommand(ArmStateMachine stateMachine, ArmSequence sequence) {
         this.stateMachine = stateMachine;
-        if(sequence == ArmSequence.READ_KEYPAD) {
-            this.sequence = ArmSequence.valueForCode("REPLACE_WITH_KEYPAD_CODE");
-        } else {
-            this.sequence = sequence;
-        }
+        this.sequence = sequence;
     }
 
     @Override
@@ -35,7 +31,9 @@ public class ArmScoreCommand extends CommandBase {
             path = ScoreLow.getArmPath();
         }
 
-        if(path != null) {
+        if(sequence == ArmSequence.READ_KEYPAD) {
+            stateMachine.scoreKeyedEntry();
+        } else if(path != null) {
             stateMachine.score(path);
         }
 	}

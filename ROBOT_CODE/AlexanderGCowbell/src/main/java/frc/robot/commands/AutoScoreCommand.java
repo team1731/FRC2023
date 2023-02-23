@@ -36,7 +36,11 @@ public class AutoScoreCommand extends CommandBase {
             path = ScoreLow.getArmPath();
         }
 
-        stateMachine.score(path);
+        if(path != null) {
+            stateMachine.score(path);
+        } else {
+            isFinished = true;
+        }
 	}
 
     @Override

@@ -1,20 +1,22 @@
 package frc.robot.state.arm;
 
+/*
+ * Note: if the sequence has a keypad mapping the appropriate keypad input should be 
+ * set for the 'code' and otherwise the code should be left null
+ */
+
 public enum ArmSequence {
-    READ_KEYPAD(null),
-    SCORE_HIGH("SCORE_HIGH"),
-    SCORE_MEDIUM("SCORE_MEDIUM"),
-    SCORE_LOW("SCORE_LOW"),
-    PICKUP_HIGH("PICKUP_HIGH"),
-    PICKUP_LOW("PICKUP_LOW"),
+    READ_KEYPAD,
+    SCORE_HIGH("DEPLOY_HIGH"),
+    SCORE_MEDIUM("DEPLOY_MID"),
+    SCORE_LOW("DEPLOY_LOW"),
+    PICKUP_HIGH,
+    PICKUP_LOW;
 
-    // Used for unit tests
-    SCORE_TEST("SCORE_TEST"), 
-    PICKUP_TEST("PICKUP_TEST"), 
-    UNDEFINED_TEST("UNDEFINED_TEST"), 
-    INVALID_TEST("INVALID_TEST");
+    public String code = null;
 
-    public String code;
+    private ArmSequence() {
+    }
 
     private ArmSequence(String code) {
         this.code = code;

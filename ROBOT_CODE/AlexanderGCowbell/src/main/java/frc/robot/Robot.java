@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.LogConstants;
+import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.util.log.LogWriter;
 import frc.robot.util.log.MessageLog;
 import frc.robot.subsystems.*;
@@ -48,6 +49,7 @@ public class Robot extends TimedRobot {
   private Swerve s_Swerve;
   private PoseEstimatorSubsystem s_poseEstimatorSubsystem;
   private ArmSubsystem s_armSubSystem;
+  private ArmStateMachine sm_armStateMachine;
 
   public Robot() {
 	if(LogWriter.isArmRecordingEnabled()) {
@@ -82,6 +84,7 @@ public class Robot extends TimedRobot {
 	s_Swerve = new Swerve();
   	s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);
   	s_armSubSystem = new ArmSubsystem();
+	sm_armStateMachine = s_armSubSystem.getStateMachine();
 
 	// Instantiate our robot container. This will perform all of our button bindings,
 	// and put our autonomous chooser on the dashboard
@@ -221,6 +224,7 @@ public class Robot extends TimedRobot {
 	if (!newKeypadEntry.equals(oldKeypadEntry)){
         MessageLog.add(".\n.\n.\nDRIVER ENTRY ==========================>>>>>>>> " + newKeypadEntry + "\n.\n.\n.");
 		oldKeypadEntry = newKeypadEntry;
+		sm_armStateMachine.setKeyedSequence(newKeypadEntry);
 		SmartDashboard.putString("keypadCommand", newKeypadEntry);
 	}
 
@@ -237,7 +241,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
 	keypad.putValue("driver entry", NetworkTableValue.makeString(""));
-	s_armSubSystem.getStateMachine().disabledInit();
+	sm_armStateMachine.disabledInit();
 	s_armSubSystem.initializeArmPositions();
 	s_armSubSystem.resetArmEncoders();
   }

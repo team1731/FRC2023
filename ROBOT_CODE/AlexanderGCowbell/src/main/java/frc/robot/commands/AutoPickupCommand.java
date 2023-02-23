@@ -38,7 +38,11 @@ public class AutoPickupCommand extends CommandBase {
             path = PickupLowCube.getArmPath();
         }
 
-        stateMachine.pickup(path);
+        if(path != null) {
+            stateMachine.pickup(path);
+        } else {
+            isFinished = true;
+        }
 	}
 
     @Override

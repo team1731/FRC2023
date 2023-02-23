@@ -1,7 +1,7 @@
 package frc.robot.state.arm;
 
 import edu.wpi.first.wpilibj.Timer;
-import frc.data.mp.ArmPath;
+import frc.data.mp.*;
 import frc.data.mp.ArmPath.Direction;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GamePiece;
@@ -13,6 +13,8 @@ public class ArmStateMachine {
   private GamePiece gamePiece = GamePiece.CUBE;
   private MovementType movementType;
   private boolean isInAuto = false;
+  private boolean isRunningKeypadEntry = false;
+  private ArmSequence keyedSequence;
 
   private ArmState currentArmState = ArmState.UNKNOWN;
   private IntakeState currentIntakeState = IntakeState.STOPPED;
@@ -76,6 +78,11 @@ public class ArmStateMachine {
     wristFlexed = false;
     isInAuto = false;
     allowScore = true;
+
+    if(isRunningKeypadEntry) {
+      keyedSequence = null;
+      isRunningKeypadEntry = false;
+    }
   }
 
   // put arm into unknown state whenever disabled
@@ -129,6 +136,25 @@ public class ArmStateMachine {
     pathStartedIndex = 0;
     movementType = MovementType.SCORE;
     transitionArm(Input.EXTEND);
+  }
+
+  // SCORE BASED ON KEYPAD ENTRY
+  public void scoreKeyedEntry() {
+    if(!isReadyToStartMovement()) return;
+
+    ArmPath path = null;
+    if(keyedSequence == ArmSequence.SCORE_HIGH) {
+      path = ScoreHigh.getArmPath();
+    } else if(keyedSequence == ArmSequence.SCORE_MEDIUM) {
+      path = ScoreMedium.getArmPath();
+    } else if(keyedSequence == ArmSequence.SCORE_LOW) {
+      path = ScoreLow.getArmPath();
+    }
+    
+    if(path != null) {
+      isRunningKeypadEntry = true;
+      score(path);
+    }
   }
 
   // NOTIFY THAT PICKUP/SCORE BUTTON RELEASED
@@ -418,5 +444,17 @@ public class ArmStateMachine {
 
   public void setAllowScore(boolean allow) {
     allowScore = allow;
+  }
+
+  public void setKeyedSequence(String keypadEntry) {
+    String[] keypadValues = keypadEntry.split("; ");
+    if(keypadValues.length > 1) {
+      String sequenceCode = keypadValues[1];
+      keyedSequence = ArmSequence.valueForCode(sequenceCode);
+    }
+  }
+
+  public ArmSequence getKeyedSequence() {
+    return keyedSequence;
   }
 }
