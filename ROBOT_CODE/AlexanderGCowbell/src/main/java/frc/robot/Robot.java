@@ -370,6 +370,7 @@ public class Robot extends TimedRobot {
   public static boolean doSD() {
 	long now = System.currentTimeMillis();
 	if (now - millis > 1000) {
+		MessageLog.getLogger().flush();
 		millis = now;
 		return true;
 	}

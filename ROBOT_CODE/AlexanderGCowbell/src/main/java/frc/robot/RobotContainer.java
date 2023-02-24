@@ -4,13 +4,14 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 import frc.robot.autos.*;
 import frc.robot.commands.*;
@@ -31,7 +32,7 @@ import frc.robot.Constants.OpConstants.LedOption;
  */
 public class RobotContainer {
   /* Controllers */
-  private final Joystick driver = new Joystick(0);
+  private final CommandXboxController xboxController = new CommandXboxController(0);
   private final Joystick operator = new Joystick(1);
 
 
@@ -39,25 +40,21 @@ public class RobotContainer {
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
   private final int rotationAxis = XboxController.Axis.kRightX.value;
-
   private final int distalAxis = XboxController.Axis.kRightY.value;
 
-
   /* Driver Buttons */
-  private final JoystickButton kStart = new JoystickButton(driver, XboxController.Button.kStart.value);
-  private final JoystickButton ky= new JoystickButton(driver, XboxController.Button.kY.value);
-  private final JoystickButton kx= new JoystickButton(driver, XboxController.Button.kX.value);
-  private final JoystickButton kb= new JoystickButton(driver,XboxController.Button.kB.value);
-  private final JoystickButton ka = new JoystickButton(driver,XboxController.Button.kA.value);
-  private JoystickButton leftBumper = new JoystickButton(driver,XboxController.Button.kLeftBumper.value);
-  private JoystickButton rightBumper = new JoystickButton(driver,XboxController.Button.kRightBumper.value);
+  private final Trigger kStart = xboxController.start();
+  private final Trigger ky = xboxController.y();
+  private final Trigger kb = xboxController.b();
+  private final Trigger ka = xboxController.a();
+  private final Trigger kLeftBumper = xboxController.leftBumper();
+  private final Trigger kRightBumper = xboxController.rightBumper();
+  private final Trigger kLeftTrigger = xboxController.leftTrigger();
 
   /* Operator Buttons */
-  // Disabled cone/cube switch in favor of using keypad to indicate these values
-  //private JoystickButton coneOrCube = new JoystickButton(operator,8);
-  private JoystickButton preventScore = new JoystickButton(operator,13);
-  private JoystickButton release = new JoystickButton(operator,14);
-  private JoystickButton intake = new JoystickButton(operator,15);
+  private final JoystickButton kPreventScoreBtn = new JoystickButton(operator,13);
+  private final JoystickButton kReleaseBtn = new JoystickButton(operator,14);
+  private final JoystickButton kIntakeBtn = new JoystickButton(operator,15);
 
 
   /* Subsystems */
@@ -81,9 +78,9 @@ public class RobotContainer {
     s_poseEstimatorSubsystem = poseEstimatorSubsystem;
     sm_armStateMachine = armSubsystem.getStateMachine();
 
-    s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, driver, translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
+    s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, xboxController.getHID(), translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
     //Test command to use joystick control of the arm
-    //s_armSubSystem.setDefaultCommand(new TestArm(s_armSubSystem, driver, translationAxis, distalAxis)); 
+    //s_armSubSystem.setDefaultCommand(new TestArm(s_armSubSystem, xboxController.getHID(), translationAxis, distalAxis)); 
  
 
     this.m_ledstring = m_ledstring;
@@ -101,30 +98,30 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     /* Driver Buttons */
-    kStart.onTrue(new InstantCommand(() -> s_Swerve.zeroGyro()));
-    kStart.onTrue(new InstantCommand(() -> {s_Swerve.adjustWheelEncoders(); s_armSubSystem.resetArmEncoders();}));
-    kx.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_KEYPAD)));
+    kStart.onTrue(new InstantCommand(() -> {
+      s_Swerve.zeroGyro();
+      s_Swerve.adjustWheelEncoders(); 
+      s_armSubSystem.resetArmEncoders();
+    }));
     ky.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_HIGH)));
     kb.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_MEDIUM)));
     ka.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_LOW)));
     if(LogWriter.isArmRecordingEnabled()) {
-      leftBumper.onTrue(new InstantCommand(() -> s_armSubSystem.startRecordingArmPath()));
-      rightBumper.onTrue(new InstantCommand(() -> s_armSubSystem.stopRecordingArmPath()));
+      kLeftBumper.onTrue(new InstantCommand(() -> s_armSubSystem.startRecordingArmPath()));
+      kRightBumper.onTrue(new InstantCommand(() -> s_armSubSystem.stopRecordingArmPath()));
     } else {
-      leftBumper.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_HIGH));
-      rightBumper.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW));
+      kLeftBumper.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_HIGH));
+      kRightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_KEYPAD));
     }
+    kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW));
 
     /* Operator Buttons */
-    // Disabled cone/cube switch in favor of using keypad to indicate these values
-    //coneOrCube.whileTrue(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CUBE)));
-    //coneOrCube.whileFalse(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CONE)));
-    preventScore.whileTrue(new InstantCommand(() -> sm_armStateMachine.setAllowScore(false)));
-    preventScore.whileFalse(new InstantCommand(() -> sm_armStateMachine.setAllowScore(true)));
-    intake.whileTrue(new InstantCommand(() -> sm_armStateMachine.intake()));
-    intake.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopIntake()));
-    release.whileTrue(new InstantCommand(() -> sm_armStateMachine.release()));
-    release.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopRelease()));
+    kPreventScoreBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setAllowScore(false)));
+    kPreventScoreBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.setAllowScore(true)));
+    kIntakeBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.intake()));
+    kIntakeBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopIntake()));
+    kReleaseBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.release()));
+    kReleaseBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopRelease()));
   }
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
@@ -134,17 +131,17 @@ public class RobotContainer {
       case AutoConstants.k_0_Example:
         return new _0_exampleAuto(s_Swerve, s_poseEstimatorSubsystem);
       case AutoConstants.k_1_11Top_A_13Top_Drive_A:
-        return new _1_11Top_A_13Top_Drive_A(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+        return new _1_11Top_A_13Top_Drive_A(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_2_13Top_B_Engage:
-        return new _2_13Top_B_Engage(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+        return new _2_13Top_B_Engage(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_3_31Top_C_Engage:
-        return new _3_31Top_C_Engage(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+        return new _3_31Top_C_Engage(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_4_33Top_D_31Top_Drive_D:
-        return new _4_33Top_D_31Top_Drive_D(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+        return new _4_33Top_D_31Top_Drive_D(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_5_11Top_A_11Middle_Drive_A:
-        return new _5_11Top_A_11Middle_Drive_A(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+        return new _5_11Top_A_11Middle_Drive_A(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_6_33Top_D_33Middle_Drive_D:
-        return new _6_33Top_D_33Middle_Drive_D(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem);
+        return new _6_33Top_D_33Middle_Drive_D(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_9_Move_Forward:
 				return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
 		}
@@ -188,7 +185,7 @@ public class RobotContainer {
         System.out.println("\n\nSHOWING WHITE\n\n");
      }
      // delegate to FSM
-		 DataLogManager.log("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
+		 MessageLog.add("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
 		}
 	}
 }

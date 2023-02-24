@@ -3,7 +3,7 @@ package frc.robot.commands;
 import frc.robot.Constants;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.Swerve;
-import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
@@ -16,7 +16,7 @@ public class TestArm extends CommandBase {
     private boolean openLoop;
     
     private ArmSubsystem s_armSubsystem;
-    private Joystick controller;
+    private XboxController controller;
     private int proximalAxis;
     private int distalAxis;
 
@@ -24,7 +24,7 @@ public class TestArm extends CommandBase {
     /**
      * Driver control
      */
-    public TestArm(ArmSubsystem s_armSubsystem, Joystick controller, int proximalAxis, int distalAxis) {
+    public TestArm(ArmSubsystem s_armSubsystem, XboxController controller, int proximalAxis, int distalAxis) {
         this.s_armSubsystem = s_armSubsystem;
         addRequirements(s_armSubsystem);
 

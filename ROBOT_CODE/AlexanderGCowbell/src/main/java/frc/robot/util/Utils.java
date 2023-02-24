@@ -1,28 +1,28 @@
 package frc.robot.util;
 
 import edu.wpi.first.math.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.DataLogManager;
+import frc.robot.util.log.MessageLog;
 
 public class Utils {
 	public static void printTrajectory(String name, Trajectory trajectory) {
-		DataLogManager.log("\n" + name + ":");
+		MessageLog.add("\n" + name + ":");
 		double duration = trajectory.getTotalTimeSeconds();
-		DataLogManager.log("trajectory duration " + duration);
+		MessageLog.add("trajectory duration " + duration);
 		for (int i = 0; i <= (int) duration * 2; i++) {
 			Trajectory.State state = trajectory.sample(i / 2.0);
 			System.out
 					.println("state " + i + "                 poseMetersX " + state.poseMeters.getTranslation().getX());
 			System.out
 					.println("state " + i + "                 poseMetersY " + state.poseMeters.getTranslation().getY());
-			DataLogManager.log(
+			MessageLog.add(
 					"state " + i + "         poseMetersTheta Deg " + state.poseMeters.getRotation().getDegrees());
-			DataLogManager.log("state " + i + "     velocityMetersPerSecond " + state.velocityMetersPerSecond);
+			MessageLog.add("state " + i + "     velocityMetersPerSecond " + state.velocityMetersPerSecond);
 		}
 		Trajectory.State state = trajectory.sample(duration);
-		DataLogManager.log("state (end)             poseMetersX " + state.poseMeters.getTranslation().getX());
-		DataLogManager.log("state (end)             poseMetersY " + state.poseMeters.getTranslation().getY());
-		DataLogManager.log("state (end)     poseMetersTheta Deg " + state.poseMeters.getRotation().getDegrees());
-		DataLogManager.log("state (end) velocityMetersPerSecond " + state.velocityMetersPerSecond);
+		MessageLog.add("state (end)             poseMetersX " + state.poseMeters.getTranslation().getX());
+		MessageLog.add("state (end)             poseMetersY " + state.poseMeters.getTranslation().getY());
+		MessageLog.add("state (end)     poseMetersTheta Deg " + state.poseMeters.getRotation().getDegrees());
+		MessageLog.add("state (end) velocityMetersPerSecond " + state.velocityMetersPerSecond);
 	}
 
 	public static int Clamp(int val, int min, int max) {
