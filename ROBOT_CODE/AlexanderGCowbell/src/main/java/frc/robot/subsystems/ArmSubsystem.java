@@ -200,6 +200,10 @@ public class ArmSubsystem extends SubsystemBase {
         distalArmResetting = true;
     }
 
+    public void adjustDistalArm(double targetPosition) {
+        distalMotor.set(ControlMode.MotionMagic, targetPosition);
+    }
+
     public void stopArm() {
         proximalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Hold.value);
         distalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Hold.value);
@@ -368,6 +372,10 @@ public class ArmSubsystem extends SubsystemBase {
     private double getArbitraryFeedForwardForDistalArm(){
         return ArbitraryFeedForward.getArbitraryFeedForwardForDistalArm(distalMotor.getSelectedSensorPosition(0));
     }
+
+    public double getDistalArmPosition() {
+        return distalMotor.getSelectedSensorPosition(0);
+    }
     
     public void doSD() {
         SmartDashboard.putNumber("DistalArm Absolute  ",distalAbsolute.getAverageValue());
@@ -391,7 +399,11 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
 
-    public void setArmMotors(double pAxis, double dAxis) {
+    /*
+     * Used only for testing the arm in percent output
+     */
+
+    public void testArmMotors(double pAxis, double dAxis) {
         proximalMotor.set(ControlMode.PercentOutput, pAxis);
         distalMotor.set(ControlMode.PercentOutput, dAxis);
     }

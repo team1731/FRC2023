@@ -93,6 +93,13 @@ public final class Constants {
         public static final AprilTagPoseValues kAprilTagPose8 = new AprilTagPoseValues(8, 40.45, 42.19, 18.22, 0);
     }
 
+    public static final class OperatorConsoleConstants {
+        public static int kPreventScoreBtnId = 13;
+        public static int kReleaseBtnId = 14;
+        public static int kIntakeBtnId = 15;
+        public static int kDistalAxisId = 4;
+    }
+
     public static final class Swerve {
         public static final int pigeonID = 1;
         public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
@@ -264,6 +271,7 @@ public final class Constants {
         public final static double intakeStartedVelocityThreshold = 1000;
         public final static double intakeHoldingVelocityThreshold = 60;
         public final static double wristResetPostionThreshold = 0.2;
+        public final static double distalMaxAdjustmentTicks = 9233;
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;
@@ -355,8 +363,8 @@ public final class Constants {
             }
         }
 
-        public static final String kCameraMount1Id = "Global_Shutter_Camera";
-        public static final String kCameraMount2Id = "Microsoft_LifeCam_HD-3000";
+        public static final String kCameraMount1Id = "leftcamera";
+        public static final String kCameraMount2Id = "Global_Shutter_Camera";
         public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, 15.5, 5.0, 39.37, 315);
         public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, 15.5, 5.0, 39.37, 45);
 

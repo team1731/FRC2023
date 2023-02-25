@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
@@ -10,8 +11,9 @@ public class ArmScoreCommand extends CommandBase {
     private ArmStateMachine stateMachine;
     private ArmSequence sequence;
 
-    public ArmScoreCommand(ArmStateMachine stateMachine, ArmSequence sequence) {
+    public ArmScoreCommand(ArmStateMachine stateMachine, ArmSequence sequence, Joystick joystick, int distalAxis) {
         this.stateMachine = stateMachine;
+        this.stateMachine.setJoystickControl(joystick, distalAxis);
         this.sequence = sequence;
     }
 

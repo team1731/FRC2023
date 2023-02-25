@@ -1,5 +1,6 @@
 package frc.robot.state.arm;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import frc.data.mp.*;
 import frc.data.mp.ArmPath.Direction;
@@ -26,6 +27,7 @@ public class ArmStateMachine {
   private int pathStartedIndex = 0;
   private double pathStartedTime = 0;
   private QueuedCommand queuedCommand = null;
+  private JoystickControl joystickControl = null;
 
 
   // extended = home pos (palm facing out), flexed = positioned for pickup/scoring (palm facing down/in)
@@ -70,6 +72,27 @@ public class ArmStateMachine {
     }
   }
 
+  class JoystickControl {
+    public Joystick joystick;
+    public int axis;
+    public boolean enabled = false;
+    public double startPosition = 0;
+
+    public JoystickControl(Joystick joystick, int axis) {
+      this.joystick = joystick;
+      this.axis = axis;
+    }
+
+    public void setStartPosition(double startPosition) {
+      this.startPosition = startPosition;
+      enabled = true;
+    }
+
+    public double getRawAxis() {
+      return startPosition + (joystick.getRawAxis(axis) * ArmConstants.distalMaxAdjustmentTicks);
+    }
+  }
+
 
   /*
    * INITIALIZATION/RESET
@@ -87,6 +110,7 @@ public class ArmStateMachine {
     pathStartedTime = 0;
     movementType = null;
     queuedCommand = null;
+    joystickControl = null;
     wristFlexed = false;
     isInAuto = false;
     allowScore = true;
@@ -363,6 +387,17 @@ public class ArmStateMachine {
         transitionArm(Input.RETRACT);
       }
     }
+
+    /*
+     * Allow for joystick adjustment of the distal arm
+     */
+    if(currentArmState == ArmState.EXTENDED && joystickControl != null) {
+      if(!joystickControl.enabled) {
+        joystickControl.setStartPosition(subsystem.getDistalArmPosition());
+      } else {
+        subsystem.adjustDistalArm(joystickControl.getRawAxis());
+      }
+    }
   }
 
 
@@ -506,5 +541,9 @@ public class ArmStateMachine {
 
   public ArmSequence getKeyedSequence() {
     return keyedSequence;
+  }
+
+  public void setJoystickControl(Joystick joystick, int axis) {
+    joystickControl = new JoystickControl(joystick, axis);
   }
 }

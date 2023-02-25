@@ -1,5 +1,6 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.ArmStateConstants;
@@ -12,8 +13,9 @@ public class ArmPickupCommand extends CommandBase {
     private ArmStateMachine stateMachine;
     private ArmSequence sequence;
 
-    public ArmPickupCommand(ArmStateMachine stateMachine, ArmSequence sequence) {
+    public ArmPickupCommand(ArmStateMachine stateMachine, ArmSequence sequence, Joystick joystick, int distalAxis) {
         this.stateMachine = stateMachine;
+        this.stateMachine.setJoystickControl(joystick, distalAxis);
         this.sequence = sequence;
     }
 

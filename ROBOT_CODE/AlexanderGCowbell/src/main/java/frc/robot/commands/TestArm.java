@@ -48,6 +48,6 @@ public class TestArm extends CommandBase {
 
        // translation = new Translation2d(yAxis, xAxis).times(Constants.Swerve.maxSpeed);
         //rotation = rAxis * Constants.Swerve.maxAngularVelocity;
-        s_armSubsystem.setArmMotors(pAxis, dAxis);
+        s_armSubsystem.testArmMotors(pAxis, dAxis);
     }
 }

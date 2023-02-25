@@ -25,6 +25,7 @@ import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.util.log.Logger;
+import frc.robot.util.log.MessageLog;
 import frc.robot.util.log.LogWriter;
 import frc.robot.util.log.LogWriter.Log;
 import frc.robot.util.log.loggers.PoseEstimations;
@@ -68,9 +69,13 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
     // Configure and map cameras using camera names and location on the robot
     if(photonCamera1 != null) {
+      MessageLog.add("PoseEstimatorSubsystem: Adding vision measurement from " + VisionConstants.kCameraMount1Id);
+      System.out.println("PoseEstimatorSubsystem: Adding camera " + VisionConstants.kCameraMount1Id + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       this.cameraMap.put(VisionConstants.kCameraMount1Id, new CameraTransform(photonCamera1, CAMERA_TO_ROBOT_1));
     }
     if(photonCamera2 != null) {
+      MessageLog.add("PoseEstimatorSubsystem: Adding vision measurement from " + VisionConstants.kCameraMount2Id);
+      System.out.println("PoseEstimatorSubsystem: Adding camera " + VisionConstants.kCameraMount2Id + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       this.cameraMap.put(VisionConstants.kCameraMount2Id, new CameraTransform(photonCamera2, CAMERA_TO_ROBOT_2));
     }
     
@@ -125,6 +130,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
           // If the distance between the vision pose estimation and the current swerve pose estimation is too great we will
           // ignore it. This should help filter out bad vision data.
           if(distanceBetweenPoseEstimations < VisionConstants.kMaxDistanceBetweenPoseEstimations) {
+            MessageLog.add("PoseEstimatorSubsystem: Adding vision measurement from " + cameraName);
             poseEstimator.addVisionMeasurement(cameraPose2d, cameraPose.timestampSeconds, VisionConstants.kVisionMeasurementStdDevs);
           }
         }
