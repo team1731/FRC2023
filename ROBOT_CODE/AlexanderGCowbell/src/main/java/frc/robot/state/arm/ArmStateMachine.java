@@ -231,6 +231,9 @@ public class ArmStateMachine {
       transitionArm(Input.RETRACT);
     } else if(currentArmState == ArmState.WRIST_ONLY_FLEXED) {
       transitionArm(Input.EXTEND_WRIST); //e.g., move it back to home
+      if(movementType == MovementType.PICKUP) {
+        transitionIntake(Input.RETRIEVED);
+      }
     }
   }
 
