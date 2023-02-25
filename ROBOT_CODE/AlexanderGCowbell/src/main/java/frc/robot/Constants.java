@@ -248,7 +248,7 @@ public final class Constants {
         public final static int intakeCancoderId = 13;
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
-        public final static int proximalAbsoluteTicsCenter = 3154;
+        public final static int proximalAbsoluteTicsCenter = 3169;
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
         public final static int distalAbsoluteTicsCenter = 1540;
         public final static int pointDurationMS = 10;
