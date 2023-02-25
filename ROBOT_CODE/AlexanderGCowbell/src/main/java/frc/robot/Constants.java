@@ -249,7 +249,7 @@ public final class Constants {
     }
 
     public static final class ArmStateConstants {
-        public final static double pickupLowCubeFlexPosition = 0.3;
+        public final static double pickupLowCubeFlexPosition = 0.38;
         public final static double wristOnlyFlexMaxVelocity = 2000;
     };
 
