@@ -1,9 +1,11 @@
 package frc.robot.state.arm;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.Timer;
 import frc.data.mp.*;
 import frc.data.mp.ArmPath.Direction;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ArmStateConstants;
 import frc.robot.Constants.GamePiece;
 import frc.robot.subsystems.ArmSubsystem;
 
@@ -19,11 +21,14 @@ public class ArmStateMachine {
   private ArmState currentArmState = ArmState.UNKNOWN;
   private IntakeState currentIntakeState = IntakeState.STOPPED;
   private boolean allowScore = true;
+  private boolean extraExtension = false;
 
-  private ArmPath currentPath;
+  private ArmPath currentPath; // used if running full arm path
+  private double currentWristFlexPosition = 0; // used if running wrist only movement
   private int pathStartedIndex = 0;
   private double pathStartedTime = 0;
   private QueuedCommand queuedCommand = null;
+  private JoystickControl joystickControl = null;
 
 
   // extended = home pos (palm facing out), flexed = positioned for pickup/scoring (palm facing down/in)
@@ -40,7 +45,9 @@ public class ArmStateMachine {
 
   public enum Input {
     INITIALIZE, EXTEND, COMPLETED, RETRACT, RESET, START, STARTED, STOP, INTERRUPT,
-    RETRIEVED, RELEASE, RELEASED, FLEX;
+    RETRIEVED, RELEASE, RELEASED, 
+    FLEX_WRIST, // flex for the wrist is palm down, e.g., when picking up/scoring
+    EXTEND_WRIST; // extend for the wrist is palm out/up, e.g., when home
 }
 
   public enum MovementType {
@@ -49,13 +56,41 @@ public class ArmStateMachine {
   
   class QueuedCommand {
     public MovementType type;
-    public ArmPath path;
+    public ArmPath path; // used if running full arm path
+    public double wristFlexPosition; // used if running wrist only movement
     public double queuedTime;
 
     public QueuedCommand(MovementType type, ArmPath path) {
       this.type = type;
       this.path = path;
       this.queuedTime = Timer.getFPGATimestamp();
+    }
+
+    public QueuedCommand(MovementType type, double wristFlexPosition) {
+      this.type = type;
+      this.wristFlexPosition = wristFlexPosition;
+      this.queuedTime = Timer.getFPGATimestamp();
+    }
+  }
+
+  class JoystickControl {
+    public Joystick joystick;
+    public int axis;
+    public boolean enabled = false;
+    public double startPosition = 0;
+
+    public JoystickControl(Joystick joystick, int axis) {
+      this.joystick = joystick;
+      this.axis = axis;
+    }
+
+    public void setStartPosition(double startPosition) {
+      this.startPosition = startPosition;
+      enabled = true;
+    }
+
+    public double getRawAxis() {
+      return startPosition + (joystick.getRawAxis(axis) * ArmConstants.distalMaxAdjustmentTicks);
     }
   }
 
@@ -71,13 +106,16 @@ public class ArmStateMachine {
   public void resetState() {
     status = Status.READY;
     currentPath = null;
+    currentWristFlexPosition = 0;
     pathStartedIndex = 0;
     pathStartedTime = 0;
     movementType = null;
     queuedCommand = null;
+    joystickControl = null;
     wristFlexed = false;
     isInAuto = false;
     allowScore = true;
+    extraExtension = false;
 
     if(isRunningKeypadEntry) {
       keyedSequence = null;
@@ -121,6 +159,23 @@ public class ArmStateMachine {
     transitionIntake(Input.START);
   }
 
+  // PICKUP WITH A WRIST FLEX ONLY
+  public void pickup(double wristFlexPosition) {
+    if(!isReadyToStartMovement()) {
+      if(isInAuto) {
+        queuedCommand = new QueuedCommand(MovementType.PICKUP, wristFlexPosition);
+      }
+      return;
+    }
+
+    System.out.println("ArmStateMachine: STARTING WRIST ONLY PICKUP!!!!!!!!!!!!!!!!!!!!!");
+    currentWristFlexPosition = wristFlexPosition;
+    movementType = MovementType.PICKUP;
+    transitionArm(Input.FLEX_WRIST);
+    transitionIntake(Input.START);
+    status = Status.RUNNING;
+  }
+
   // SCORE
   public void score(ArmPath path) {
     if(path == null) return;
@@ -143,12 +198,18 @@ public class ArmStateMachine {
     if(!isReadyToStartMovement()) return;
 
     ArmPath path = null;
-    if(keyedSequence == ArmSequence.SCORE_HIGH) {
-      path = ScoreHigh.getArmPath();
-    } else if(keyedSequence == ArmSequence.SCORE_MEDIUM) {
-      path = ScoreMedium.getArmPath();
-    } else if(keyedSequence == ArmSequence.SCORE_LOW) {
-      path = ScoreLow.getArmPath();
+    if(keyedSequence == ArmSequence.SCORE_HIGH && gamePiece == GamePiece.CONE) {
+      path = ScoreHighCone.getArmPath();
+    } else if(keyedSequence == ArmSequence.SCORE_HIGH && gamePiece == GamePiece.CUBE) {
+      path = ScoreHighCube.getArmPath();
+    } else if(keyedSequence == ArmSequence.SCORE_MEDIUM && gamePiece == GamePiece.CONE) {
+      path = ScoreMediumCone.getArmPath();
+    } else if(keyedSequence == ArmSequence.SCORE_MEDIUM && gamePiece == GamePiece.CUBE) {
+      path = ScoreMediumCube.getArmPath();
+    } else if(keyedSequence == ArmSequence.SCORE_LOW && gamePiece == GamePiece.CONE) {
+      path = ScoreLowCone.getArmPath();
+    } else if(keyedSequence == ArmSequence.SCORE_LOW && gamePiece == GamePiece.CUBE) {
+      path = ScoreLowCube.getArmPath();
     }
     
     if(path != null) {
@@ -164,8 +225,15 @@ public class ArmStateMachine {
     } else if(currentArmState == ArmState.EXTENDED) {
       if(movementType == MovementType.SCORE && allowScore) {
         transitionIntake(Input.RELEASE);
+      } else if(movementType == MovementType.PICKUP) {
+        transitionIntake(Input.RETRIEVED);
       }
       transitionArm(Input.RETRACT);
+    } else if(currentArmState == ArmState.WRIST_ONLY_FLEXED) {
+      transitionArm(Input.EXTEND_WRIST); //e.g., move it back to home
+      if(movementType == MovementType.PICKUP) {
+        transitionIntake(Input.RETRIEVED);
+      }
     }
   }
 
@@ -263,8 +331,11 @@ public class ArmStateMachine {
      * These commands can get queued when the command is requested while the arm is still reaching a ready state
      */
     if(isInAuto && queuedCommand != null) {
-      if(isReadyToStartMovement() && queuedCommand.type == MovementType.PICKUP) {
+      if(isReadyToStartMovement() && queuedCommand.type == MovementType.PICKUP && queuedCommand.path != null) {
         pickup(queuedCommand.path);
+        queuedCommand = null;
+      } else if(isReadyToStartMovement() && queuedCommand.type == MovementType.PICKUP && queuedCommand.path == null) {
+        pickup(queuedCommand.wristFlexPosition);
         queuedCommand = null;
       } else if(isReadyToStartMovement() && queuedCommand.type == MovementType.SCORE) {
         score(queuedCommand.path);
@@ -306,7 +377,8 @@ public class ArmStateMachine {
       transitionIntake(Input.STARTED);
     }
 
-    if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
+    // currently only doing this in auto, in teleop retrieva continues until button release
+    if(isInAuto && currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
       transitionIntake(Input.RETRIEVED);
     }
 
@@ -319,11 +391,26 @@ public class ArmStateMachine {
     /*
      * Logic for handling special cases for autonomous where we won't receive a button release event
      */
-    if(isInAuto && movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING) {
-      transitionArm(Input.RETRACT);
-    } else if(isInAuto && movementType == MovementType.SCORE && currentArmState == ArmState.EXTENDED) {
-      transitionIntake(Input.RELEASE);
-      transitionArm(Input.RETRACT);
+    if(isInAuto) {
+      if(movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING && currentArmState == ArmState.EXTENDED) {
+        transitionArm(Input.RETRACT);
+      } else if(movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING && currentArmState == ArmState.WRIST_ONLY_FLEXED) {
+        transitionArm(Input.EXTEND_WRIST);
+      } else if(movementType == MovementType.SCORE && currentArmState == ArmState.EXTENDED) {
+        transitionIntake(Input.RELEASE);
+        transitionArm(Input.RETRACT);
+      }
+    }
+
+    /*
+     * Allow for joystick adjustment of the distal arm
+     */
+    if(currentArmState == ArmState.EXTENDED && joystickControl != null) {
+      if(!joystickControl.enabled) {
+        joystickControl.setStartPosition(subsystem.getDistalArmPosition());
+      } else {
+        subsystem.adjustDistalArm(joystickControl.getRawAxis());
+      }
     }
   }
 
@@ -350,6 +437,9 @@ public class ArmStateMachine {
         break;
       case EXTENDED:
         // placeholder for possible check to allow extra extension
+        break;
+      case WRIST_ONLY_FLEXED:
+        subsystem.moveWrist(currentWristFlexPosition, ArmStateConstants.wristOnlyFlexMaxVelocity);
         break;
       case RETRACTING:
         // determine whether to start at current index (midstream) or if completed, at the end
@@ -447,10 +537,19 @@ public class ArmStateMachine {
 
   public void setIsInAuto(boolean inAuto) {
     isInAuto = inAuto;
+    transitionIntake(Input.RETRIEVED);
   }
 
   public void setAllowScore(boolean allow) {
     allowScore = allow;
+  }
+
+  public boolean getExtraExtension() {
+    return extraExtension;
+  }
+
+  public void setExtraExtension(boolean extraExtension) {
+    this.extraExtension = extraExtension;
   }
 
   public void setKeyedSequence(String keypadEntry) {
@@ -465,5 +564,9 @@ public class ArmStateMachine {
 
   public ArmSequence getKeyedSequence() {
     return keyedSequence;
+  }
+
+  public void setJoystickControl(Joystick joystick, int axis) {
+    joystickControl = new JoystickControl(joystick, axis);
   }
 }

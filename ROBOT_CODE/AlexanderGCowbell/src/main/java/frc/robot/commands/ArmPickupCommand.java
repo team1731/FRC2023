@@ -1,7 +1,9 @@
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GamePiece;
+import frc.robot.Constants.ArmStateConstants;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.state.arm.ArmStateMachine.Status;
@@ -11,8 +13,9 @@ public class ArmPickupCommand extends CommandBase {
     private ArmStateMachine stateMachine;
     private ArmSequence sequence;
 
-    public ArmPickupCommand(ArmStateMachine stateMachine, ArmSequence sequence) {
+    public ArmPickupCommand(ArmStateMachine stateMachine, ArmSequence sequence, Joystick joystick, int distalAxis) {
         this.stateMachine = stateMachine;
+        this.stateMachine.setJoystickControl(joystick, distalAxis);
         this.sequence = sequence;
     }
 
@@ -25,14 +28,19 @@ public class ArmPickupCommand extends CommandBase {
 
         // no movement is currently running, load the correct path and start the pickup
         ArmPath path = null;
-        if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {
+        boolean shouldDoExtraExtension = stateMachine.getExtraExtension();
+        if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE && shouldDoExtraExtension) {
+            path = PickupHighConeExtra.getArmPath();
+        } else if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE && !shouldDoExtraExtension) {
             path = PickupHighCone.getArmPath();
-        } else if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE) {
+        } if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE && shouldDoExtraExtension) {
+            path = PickupHighCubeExtra.getArmPath();
+        } else if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE && !shouldDoExtraExtension) {
             path = PickupHighCube.getArmPath();
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = PickupLowCone.getArmPath();
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
-            path = PickupLowCube.getArmPath();
+            stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);
         }
 
         if(path != null) {

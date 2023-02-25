@@ -93,6 +93,14 @@ public final class Constants {
         public static final AprilTagPoseValues kAprilTagPose8 = new AprilTagPoseValues(8, 40.45, 42.19, 18.22, 0);
     }
 
+    public static final class OperatorConsoleConstants {
+        public static int kPreventScoreBtnId = 13;
+        public static int kReleaseBtnId = 14;
+        public static int kIntakeBtnId = 15;
+        public static int kExtraExtensionBtnId = 16;
+        public static int kDistalAxisId = 4;
+    }
+
     public static final class Swerve {
         public static final int pigeonID = 1;
         public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
@@ -239,6 +247,11 @@ public final class Constants {
         public static final String kArmStateMachineId = "ArmStateMachine";
     }
 
+    public static final class ArmStateConstants {
+        public final static double pickupLowCubeFlexPosition = 0.38;
+        public final static double wristOnlyFlexMaxVelocity = 2000;
+    };
+
     public static final class ArmConstants {
         public final static int proximalCancoderId = 11;
         public final static int distalCancoderId = 10;
@@ -246,17 +259,18 @@ public final class Constants {
         public final static int intakeCancoderId = 13;
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
-        public final static int proximalAbsoluteTicsCenter = 3104;
+        public final static int proximalAbsoluteTicsCenter = 3169;
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
-        public final static int distalAbsoluteTicsCenter = 1564;
+        public final static int distalAbsoluteTicsCenter = 1540;
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
-        public final static double distalHomePosition = 10489;
-        public final static double wristHomePosition = 0.60;
+        public final static double distalHomePosition = 10300;
+        public final static double wristHomePosition = 0.56;
         public final static double intakeStartedVelocityThreshold = 1000;
         public final static double intakeHoldingVelocityThreshold = 60;
         public final static double wristResetPostionThreshold = 0.2;
+        public final static double distalMaxAdjustmentTicks = 9233;
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;
@@ -314,7 +328,7 @@ public final class Constants {
         /**
          * PID Gains may have to be adjusted based on the responsiveness of control loop
          * 	                                    			  kP   kI    kD     kF             Iz    PeakOut */
-        public final static Gains kGains_MotProf = new Gains( 0.05, 0.0,  0.0, 1023.0/7200.0,  400,  1.00 ); /* measured 6800 velocity units at full motor output */
+        public final static Gains kGains_MotProf = new Gains( 0.2, 0.0,  0.0, 1023.0/7200.0,  400,  1.00 ); /* measured 6800 velocity units at full motor output */
         public final static int kPrimaryPIDSlot = 0; // any slot [0,3]
     }
 
@@ -348,8 +362,8 @@ public final class Constants {
             }
         }
 
-        public static final String kCameraMount1Id = "Global_Shutter_Camera";
-        public static final String kCameraMount2Id = "Microsoft_LifeCam_HD-3000";
+        public static final String kCameraMount1Id = "leftcamera";
+        public static final String kCameraMount2Id = "Global_Shutter_Camera";
         public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, 15.5, 5.0, 39.37, 315);
         public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, 15.5, 5.0, 39.37, 45);
 

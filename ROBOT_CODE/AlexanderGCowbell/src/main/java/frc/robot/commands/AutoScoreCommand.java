@@ -28,12 +28,18 @@ public class AutoScoreCommand extends CommandBase {
         }
 
         ArmPath path = null;
-        if(sequence == ArmSequence.SCORE_HIGH) {
-            path = ScoreHigh.getArmPath();
-        } else if(sequence == ArmSequence.SCORE_MEDIUM) {
-            path = ScoreMedium.getArmPath();
-        } else {
-            path = ScoreLow.getArmPath();
+        if(sequence == ArmSequence.SCORE_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {
+            path = ScoreHighCone.getArmPath();
+        } else if(sequence == ArmSequence.SCORE_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE) {
+            path = ScoreHighCube.getArmPath();
+        } else if(sequence == ArmSequence.SCORE_MEDIUM && stateMachine.getGamePiece() == GamePiece.CONE) {
+            path = ScoreMediumCone.getArmPath();
+        } else if(sequence == ArmSequence.SCORE_MEDIUM && stateMachine.getGamePiece() == GamePiece.CUBE) {
+            path = ScoreMediumCube.getArmPath();
+        } else if(sequence == ArmSequence.SCORE_LOW && stateMachine.getGamePiece() == GamePiece.CONE) {
+            path = ScoreLowCone.getArmPath();
+        } else if(sequence == ArmSequence.SCORE_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
+            path = ScoreLowCube.getArmPath();
         }
 
         if(path != null) {

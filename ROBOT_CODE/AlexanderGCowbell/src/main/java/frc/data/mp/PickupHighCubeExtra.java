@@ -1,6 +1,6 @@
 package frc.data.mp;
 
-public class PickupHighCube {
+public class PickupHighCubeExtra {
     public static ArmPath getArmPath() {
         return new ArmPath(kNumPoints, proximalPoints, distalPoints, kWristFlexIndex, kWristFlexPosition, kWristExtendIndex, kWristMaxVelocity);
     }

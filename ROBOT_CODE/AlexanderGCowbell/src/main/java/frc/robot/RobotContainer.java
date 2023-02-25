@@ -21,6 +21,7 @@ import frc.robot.subsystems.*;
 import frc.robot.util.log.LogWriter;
 import frc.robot.util.log.MessageLog;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.OperatorConsoleConstants;
 import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.OpConstants.LedOption;
 
@@ -40,7 +41,6 @@ public class RobotContainer {
   private final int translationAxis = XboxController.Axis.kLeftY.value;
   private final int strafeAxis = XboxController.Axis.kLeftX.value;
   private final int rotationAxis = XboxController.Axis.kRightX.value;
-  private final int distalAxis = XboxController.Axis.kRightY.value;
 
   /* Driver Buttons */
   private final Trigger kStart = xboxController.start();
@@ -52,9 +52,11 @@ public class RobotContainer {
   private final Trigger kLeftTrigger = xboxController.leftTrigger();
 
   /* Operator Buttons */
-  private final JoystickButton kPreventScoreBtn = new JoystickButton(operator,13);
-  private final JoystickButton kReleaseBtn = new JoystickButton(operator,14);
-  private final JoystickButton kIntakeBtn = new JoystickButton(operator,15);
+  private final JoystickButton kPreventScoreBtn = new JoystickButton(operator,OperatorConsoleConstants.kPreventScoreBtnId);
+  private final JoystickButton kExtraExtensionBtn = new JoystickButton(operator,OperatorConsoleConstants.kExtraExtensionBtnId);
+  private final JoystickButton kReleaseBtn = new JoystickButton(operator,OperatorConsoleConstants.kReleaseBtnId);
+  private final JoystickButton kIntakeBtn = new JoystickButton(operator,OperatorConsoleConstants.kIntakeBtnId);
+  public final int kDisatalAxis = OperatorConsoleConstants.kDistalAxisId;
 
 
   /* Subsystems */
@@ -78,10 +80,7 @@ public class RobotContainer {
     s_poseEstimatorSubsystem = poseEstimatorSubsystem;
     sm_armStateMachine = armSubsystem.getStateMachine();
 
-    s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, xboxController.getHID(), translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop));
-    //Test command to use joystick control of the arm
-    //s_armSubSystem.setDefaultCommand(new TestArm(s_armSubSystem, xboxController.getHID(), translationAxis, distalAxis)); 
- 
+    s_Swerve.setDefaultCommand(new TeleopSwerve(s_Swerve, xboxController.getHID(), translationAxis, strafeAxis, rotationAxis, fieldRelative, openLoop)); 
 
     this.m_ledstring = m_ledstring;
 
@@ -103,21 +102,23 @@ public class RobotContainer {
       s_Swerve.adjustWheelEncoders(); 
       s_armSubSystem.resetArmEncoders();
     }));
-    ky.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_HIGH)));
-    kb.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_MEDIUM)));
-    ka.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_LOW)));
+    ky.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_HIGH, operator, kDisatalAxis)));
+    kb.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_MEDIUM, operator, kDisatalAxis)));
+    ka.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_LOW, operator, kDisatalAxis)));
     if(LogWriter.isArmRecordingEnabled()) {
       kLeftBumper.onTrue(new InstantCommand(() -> s_armSubSystem.startRecordingArmPath()));
       kRightBumper.onTrue(new InstantCommand(() -> s_armSubSystem.stopRecordingArmPath()));
     } else {
-      kLeftBumper.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_HIGH));
-      kRightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_KEYPAD));
+      kLeftBumper.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_HIGH, operator, kDisatalAxis));
+      kRightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_KEYPAD, operator, kDisatalAxis));
     }
-    kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW));
+    kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDisatalAxis));
 
     /* Operator Buttons */
     kPreventScoreBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setAllowScore(false)));
     kPreventScoreBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.setAllowScore(true)));
+    kExtraExtensionBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setExtraExtension(true)));
+    kExtraExtensionBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.setExtraExtension(false)));
     kIntakeBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.intake()));
     kIntakeBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopIntake()));
     kReleaseBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.release()));
