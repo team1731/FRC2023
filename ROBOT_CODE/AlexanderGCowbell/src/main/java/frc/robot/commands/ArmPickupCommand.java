@@ -2,6 +2,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GamePiece;
+import frc.robot.Constants.ArmStateConstants;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.state.arm.ArmStateMachine.Status;
@@ -32,7 +33,7 @@ public class ArmPickupCommand extends CommandBase {
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = PickupLowCone.getArmPath();
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
-            path = PickupLowCube.getArmPath();
+            stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);
         }
 
         if(path != null) {

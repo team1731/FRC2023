@@ -241,6 +241,11 @@ public final class Constants {
         public static final String kArmStateMachineId = "ArmStateMachine";
     }
 
+    public static final class ArmStateConstants {
+        public final static double pickupLowCubeFlexPosition = 0.3;
+        public final static double wristOnlyFlexMaxVelocity = 2000;
+    };
+
     public static final class ArmConstants {
         public final static int proximalCancoderId = 11;
         public final static int distalCancoderId = 10;
