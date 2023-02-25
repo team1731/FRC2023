@@ -8,6 +8,9 @@ public enum IntakeState {
             switch(input) {
                 case START:
                     return STARTING;
+                case RETRIEVED:
+                    // used in autonomous where we start up in holding
+                    return HOLDING; 
                 case RELEASE:
                     return RELEASING;
                 default:

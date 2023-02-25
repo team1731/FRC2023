@@ -217,6 +217,8 @@ public class ArmStateMachine {
     } else if(currentArmState == ArmState.EXTENDED) {
       if(movementType == MovementType.SCORE && allowScore) {
         transitionIntake(Input.RELEASE);
+      } else if(movementType == MovementType.PICKUP) {
+        transitionIntake(Input.RETRIEVED);
       }
       transitionArm(Input.RETRACT);
     } else if(currentArmState == ArmState.WRIST_ONLY_FLEXED) {
@@ -364,9 +366,12 @@ public class ArmStateMachine {
       transitionIntake(Input.STARTED);
     }
 
+    /*
+    Temp disabled to test alternate approach
     if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
       transitionIntake(Input.RETRIEVED);
     }
+    */
 
     if((currentIntakeState == IntakeState.RETRIEVING || currentIntakeState == IntakeState.RELEASING) && 
         currentArmState == ArmState.HOME) {
@@ -523,6 +528,7 @@ public class ArmStateMachine {
 
   public void setIsInAuto(boolean inAuto) {
     isInAuto = inAuto;
+    transitionIntake(Input.RETRIEVED);
   }
 
   public void setAllowScore(boolean allow) {
