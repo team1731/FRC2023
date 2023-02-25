@@ -130,18 +130,14 @@ public class RobotContainer {
         return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
       case AutoConstants.k_0_Example:
         return new _0_exampleAuto(s_Swerve, s_poseEstimatorSubsystem);
-      case AutoConstants.k_1_11Top_A_13Top_Drive_A:
-        return new _1_11Top_A_13Top_Drive_A(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_2_13Top_B_Engage:
-        return new _2_13Top_B_Engage(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_3_31Top_C_Engage:
-        return new _3_31Top_C_Engage(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_4_33Top_D_31Top_Drive_D:
-        return new _4_33Top_D_31Top_Drive_D(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_5_11Top_A_11Middle_Drive_A:
-        return new _5_11Top_A_11Middle_Drive_A(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_6_33Top_D_33Middle_Drive_D:
-        return new _6_33Top_D_33Middle_Drive_D(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+      case AutoConstants.k_Program_1:
+        return new _Program_1(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+      case AutoConstants.k_Program_2:
+        return new _Program_2(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+      case AutoConstants.k_Program_3:
+        return new _Program_3(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+      case AutoConstants.k_Program_4:
+        return new _Program_4(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_9_Move_Forward:
 				return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
 		}

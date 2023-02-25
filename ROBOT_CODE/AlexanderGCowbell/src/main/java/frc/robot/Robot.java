@@ -106,17 +106,14 @@ public class Robot extends TimedRobot {
 
 	initSubsystems();
 
-	autoChooser.setDefaultOption(AutoConstants.kDefault,                     AutoConstants.kDefault);
-	autoChooser.addOption(       AutoConstants.k_0_Example,                  AutoConstants.k_0_Example);
-	autoChooser.addOption(       AutoConstants.k_1_11Top_A_13Top_Drive_A,    AutoConstants.k_1_11Top_A_13Top_Drive_A);
-	autoChooser.addOption(       AutoConstants.k_2_13Top_B_Engage,           AutoConstants.k_2_13Top_B_Engage);
-	autoChooser.addOption(       AutoConstants.k_3_31Top_C_Engage,           AutoConstants.k_3_31Top_C_Engage);
-	autoChooser.addOption(       AutoConstants.k_4_33Top_D_31Top_Drive_D,    AutoConstants.k_4_33Top_D_31Top_Drive_D);
-	autoChooser.addOption(       AutoConstants.k_5_11Top_A_11Middle_Drive_A, AutoConstants.k_5_11Top_A_11Middle_Drive_A);
-	autoChooser.addOption(       AutoConstants.k_6_33Top_D_33Middle_Drive_D, AutoConstants.k_6_33Top_D_33Middle_Drive_D);
-	autoChooser.addOption(       AutoConstants.k_9_Move_Forward,             AutoConstants.k_9_Move_Forward);
+	autoChooser.setDefaultOption(AutoConstants.kDefault,             AutoConstants.kDefault);
+	autoChooser.addOption(       AutoConstants.k_0_Example,          AutoConstants.k_0_Example);
+	autoChooser.addOption(       AutoConstants.k_Program_1,          AutoConstants.k_Program_1);
+	autoChooser.addOption(       AutoConstants.k_Program_2,          AutoConstants.k_Program_2);
+	autoChooser.addOption(       AutoConstants.k_Program_3,          AutoConstants.k_Program_3);
+	autoChooser.addOption(       AutoConstants.k_Program_4,          AutoConstants.k_Program_4);
+	autoChooser.addOption(       AutoConstants.k_9_Move_Forward,     AutoConstants.k_9_Move_Forward);
     SmartDashboard.putData(AutoConstants.kAutoCodeKey, autoChooser);
-
 	SmartDashboard.putString("Build Info - Branch", "N/A");
 	SmartDashboard.putString("Build Info - Commit Hash", "N/A");
 	SmartDashboard.putString("Build Info - Date", "N/A");
