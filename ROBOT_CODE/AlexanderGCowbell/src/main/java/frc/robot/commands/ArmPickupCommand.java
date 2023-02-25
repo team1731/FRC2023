@@ -28,9 +28,14 @@ public class ArmPickupCommand extends CommandBase {
 
         // no movement is currently running, load the correct path and start the pickup
         ArmPath path = null;
-        if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {
+        boolean shouldDoExtraExtension = stateMachine.getExtraExtension();
+        if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE && shouldDoExtraExtension) {
+            path = PickupHighConeExtra.getArmPath();
+        } else if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE && !shouldDoExtraExtension) {
             path = PickupHighCone.getArmPath();
-        } else if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE) {
+        } if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE && shouldDoExtraExtension) {
+            path = PickupHighCubeExtra.getArmPath();
+        } else if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE && !shouldDoExtraExtension) {
             path = PickupHighCube.getArmPath();
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = PickupLowCone.getArmPath();

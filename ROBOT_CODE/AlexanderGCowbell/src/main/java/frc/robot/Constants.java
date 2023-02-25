@@ -97,6 +97,7 @@ public final class Constants {
         public static int kPreventScoreBtnId = 13;
         public static int kReleaseBtnId = 14;
         public static int kIntakeBtnId = 15;
+        public static int kExtraExtensionBtnId = 16;
         public static int kDistalAxisId = 4;
     }
 

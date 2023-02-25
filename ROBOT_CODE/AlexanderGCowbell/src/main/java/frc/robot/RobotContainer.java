@@ -53,6 +53,7 @@ public class RobotContainer {
 
   /* Operator Buttons */
   private final JoystickButton kPreventScoreBtn = new JoystickButton(operator,OperatorConsoleConstants.kPreventScoreBtnId);
+  private final JoystickButton kExtraExtensionBtn = new JoystickButton(operator,OperatorConsoleConstants.kExtraExtensionBtnId);
   private final JoystickButton kReleaseBtn = new JoystickButton(operator,OperatorConsoleConstants.kReleaseBtnId);
   private final JoystickButton kIntakeBtn = new JoystickButton(operator,OperatorConsoleConstants.kIntakeBtnId);
   public final int kDisatalAxis = OperatorConsoleConstants.kDistalAxisId;
@@ -116,6 +117,8 @@ public class RobotContainer {
     /* Operator Buttons */
     kPreventScoreBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setAllowScore(false)));
     kPreventScoreBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.setAllowScore(true)));
+    kExtraExtensionBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setExtraExtension(true)));
+    kExtraExtensionBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.setExtraExtension(false)));
     kIntakeBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.intake()));
     kIntakeBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopIntake()));
     kReleaseBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.release()));

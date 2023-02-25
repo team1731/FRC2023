@@ -21,6 +21,7 @@ public class ArmStateMachine {
   private ArmState currentArmState = ArmState.UNKNOWN;
   private IntakeState currentIntakeState = IntakeState.STOPPED;
   private boolean allowScore = true;
+  private boolean extraExtension = false;
 
   private ArmPath currentPath; // used if running full arm path
   private double currentWristFlexPosition = 0; // used if running wrist only movement
@@ -114,6 +115,7 @@ public class ArmStateMachine {
     wristFlexed = false;
     isInAuto = false;
     allowScore = true;
+    extraExtension = false;
 
     if(isRunningKeypadEntry) {
       keyedSequence = null;
@@ -196,12 +198,18 @@ public class ArmStateMachine {
     if(!isReadyToStartMovement()) return;
 
     ArmPath path = null;
-    if(keyedSequence == ArmSequence.SCORE_HIGH) {
-      path = ScoreHigh.getArmPath();
-    } else if(keyedSequence == ArmSequence.SCORE_MEDIUM) {
-      path = ScoreMedium.getArmPath();
-    } else if(keyedSequence == ArmSequence.SCORE_LOW) {
-      path = ScoreLow.getArmPath();
+    if(keyedSequence == ArmSequence.SCORE_HIGH && gamePiece == GamePiece.CONE) {
+      path = ScoreHighCone.getArmPath();
+    } else if(keyedSequence == ArmSequence.SCORE_HIGH && gamePiece == GamePiece.CUBE) {
+      path = ScoreHighCube.getArmPath();
+    } else if(keyedSequence == ArmSequence.SCORE_MEDIUM && gamePiece == GamePiece.CONE) {
+      path = ScoreMediumCone.getArmPath();
+    } else if(keyedSequence == ArmSequence.SCORE_MEDIUM && gamePiece == GamePiece.CUBE) {
+      path = ScoreMediumCube.getArmPath();
+    } else if(keyedSequence == ArmSequence.SCORE_LOW && gamePiece == GamePiece.CONE) {
+      path = ScoreLowCone.getArmPath();
+    } else if(keyedSequence == ArmSequence.SCORE_LOW && gamePiece == GamePiece.CUBE) {
+      path = ScoreLowCube.getArmPath();
     }
     
     if(path != null) {
@@ -366,12 +374,10 @@ public class ArmStateMachine {
       transitionIntake(Input.STARTED);
     }
 
-    /*
-    Temp disabled to test alternate approach
-    if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
+    // currently only doing this in auto, in teleop retrieva continues until button release
+    if(isInAuto && currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
       transitionIntake(Input.RETRIEVED);
     }
-    */
 
     if((currentIntakeState == IntakeState.RETRIEVING || currentIntakeState == IntakeState.RELEASING) && 
         currentArmState == ArmState.HOME) {
@@ -533,6 +539,14 @@ public class ArmStateMachine {
 
   public void setAllowScore(boolean allow) {
     allowScore = allow;
+  }
+
+  public boolean getExtraExtension() {
+    return extraExtension;
+  }
+
+  public void setExtraExtension(boolean extraExtension) {
+    this.extraExtension = extraExtension;
   }
 
   public void setKeyedSequence(String keypadEntry) {
