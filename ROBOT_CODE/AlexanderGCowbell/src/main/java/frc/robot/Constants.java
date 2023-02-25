@@ -248,14 +248,14 @@ public final class Constants {
         public final static int intakeCancoderId = 13;
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
-        public final static int proximalAbsoluteTicsCenter = 3104;
+        public final static int proximalAbsoluteTicsCenter = 3154;
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
-        public final static int distalAbsoluteTicsCenter = 1564;
+        public final static int distalAbsoluteTicsCenter = 1540;
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
-        public final static double distalHomePosition = 10489;
-        public final static double wristHomePosition = 0.60;
+        public final static double distalHomePosition = 10300;
+        public final static double wristHomePosition = 0.56;
         public final static double intakeStartedVelocityThreshold = 1000;
         public final static double intakeHoldingVelocityThreshold = 60;
         public final static double wristResetPostionThreshold = 0.2;
@@ -316,7 +316,7 @@ public final class Constants {
         /**
          * PID Gains may have to be adjusted based on the responsiveness of control loop
          * 	                                    			  kP   kI    kD     kF             Iz    PeakOut */
-        public final static Gains kGains_MotProf = new Gains( 0.05, 0.0,  0.0, 1023.0/7200.0,  400,  1.00 ); /* measured 6800 velocity units at full motor output */
+        public final static Gains kGains_MotProf = new Gains( 0.2, 0.0,  0.0, 1023.0/7200.0,  400,  1.00 ); /* measured 6800 velocity units at full motor output */
         public final static int kPrimaryPIDSlot = 0; // any slot [0,3]
     }
 
