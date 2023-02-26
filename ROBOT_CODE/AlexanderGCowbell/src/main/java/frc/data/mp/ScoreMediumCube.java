@@ -5,10 +5,10 @@ public class ScoreMediumCube {
         return new ArmPath(kNumPoints, proximalPoints, distalPoints, kWristFlexIndex, kWristFlexPosition, kWristExtendIndex, kWristMaxVelocity);
     }
 
-    public static final int kNumPoints = 217;
+    public static final int kNumPoints = 195;
     public static final int kWristFlexIndex = 75;
     public static final double kWristFlexPosition = 0.551;
-    public static final int kWristExtendIndex = 112;
+    public static final int kWristExtendIndex = 97;
     public static final double kWristMaxVelocity = 2000;
 
     // Position (ticks)	Velocity (RPM)
@@ -208,29 +208,7 @@ public class ScoreMediumCube {
         {-26997, -270},
         {-26997, -166},
         {-26997, -166},
-        {-27003, -96},
-        {-27003, -96},
-        {-27039, -58},
-        {-27039, -58},
-        {-27112, -106},
-        {-27112, -106},
-        {-27174, -176},
-        {-27174, -176},
-        {-27209, -211},
-        {-27209, -211},
-        {-27252, -247},
-        {-27252, -247},
-        {-27291, -254},
-        {-27291, -254},
-        {-27331, -220},
-        {-27331, -220},
-        {-27411, -234},
-        {-27411, -234},
-        {-27503, -292},
-        {-27503, -292},
-        {-27587, -334},
-        {-27587, -334},
-        {-27650, -357}
+        {-27003, -96}
     };
 
     public static double [][]distalPoints = new double[][]{
@@ -386,28 +364,6 @@ public class ScoreMediumCube {
         {-26252, 1},
         {-26252, 2},
         {-26252, 2},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
         {-26252, 0},
         {-26252, 0},
         {-26252, 0},
@@ -647,28 +603,6 @@ public class ScoreMediumCube {
         0.551385522,
         0.551385522,
         0.551385522,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
-        0.551171064,
         0.551171064,
         0.551171064
     };
