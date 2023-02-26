@@ -44,8 +44,8 @@ public class ArmStateMachine {
   }
 
   public enum Input {
-    INITIALIZE, EXTEND, COMPLETED, RETRACT, RESET, START, STARTED, STOP, INTERRUPT,
-    RETRIEVED, RELEASE, RELEASED, 
+    INITIALIZE, EXTEND, COMPLETED, RETRACT, RESET, INTERRUPT,
+    START, STARTED, STOP, DETECT_PIECE, RETRIEVED, RELEASE, RELEASED, 
     FLEX_WRIST, // flex for the wrist is palm down, e.g., when picking up/scoring
     EXTEND_WRIST; // extend for the wrist is palm out/up, e.g., when home
 }
@@ -220,20 +220,17 @@ public class ArmStateMachine {
 
   // NOTIFY THAT PICKUP/SCORE BUTTON RELEASED
   public void buttonReleased() {
-    if(currentArmState == ArmState.EXTENDING) {
-      interrupt();
-    } else if(currentArmState == ArmState.EXTENDED) {
+    if(currentArmState == ArmState.EXTENDED || isMostlyExtended()) {
       if(movementType == MovementType.SCORE && allowScore) {
         transitionIntake(Input.RELEASE);
+        transitionArm(Input.RETRACT);
       } else if(movementType == MovementType.PICKUP) {
-        transitionIntake(Input.RETRIEVED);
+        transitionIntake(Input.DETECT_PIECE); // note, will retract after completed detecting piece
       }
-      transitionArm(Input.RETRACT);
-    } else if(currentArmState == ArmState.WRIST_ONLY_FLEXED) {
-      transitionArm(Input.EXTEND_WRIST); //e.g., move it back to home
-      if(movementType == MovementType.PICKUP) {
-        transitionIntake(Input.RETRIEVED);
-      }
+    } else if(currentArmState == ArmState.WRIST_ONLY_FLEXED && movementType == MovementType.PICKUP) {
+      transitionIntake(Input.DETECT_PIECE); // note, will move wrist back after completed detecting piece
+    } else if(currentArmState == ArmState.EXTENDING) {
+      interrupt();
     }
   }
 
@@ -318,6 +315,13 @@ public class ArmStateMachine {
     return position;
   }
 
+  private boolean isMostlyExtended() {
+    if(currentArmState == ArmState.EXTENDING) {
+      return ((getPathIndex() / currentPath.getNumberOfPoints()) >= ArmConstants.mostlyExtendedThreshold);
+    }
+    return false;
+  }
+
 
   /*
    * PERIODIC
@@ -377,9 +381,25 @@ public class ArmStateMachine {
       transitionIntake(Input.STARTED);
     }
 
-    // currently only doing this in auto, in teleop retrieva continues until button release
+    // currently only doing this in auto, in teleop retrieve continues until button release
     if(isInAuto && currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
       transitionIntake(Input.RETRIEVED);
+    }
+
+    if(currentIntakeState == IntakeState.DETECTING_PIECE) {
+      if(subsystem.isIntakeAtHoldingVelocity()) {
+        // detected piece
+        transitionIntake(Input.RETRIEVED);
+      } else {
+        transitionIntake(Input.STOP);
+      }
+
+      // deteced or failed to detect, regardless, move back to home
+      if(currentArmState == ArmState.WRIST_ONLY_FLEXED) {
+        transitionArm(Input.EXTEND_WRIST);
+      } else {
+        transitionArm(Input.RETRACT);
+      }
     }
 
     if((currentIntakeState == IntakeState.RETRIEVING || currentIntakeState == IntakeState.RELEASING) && 
