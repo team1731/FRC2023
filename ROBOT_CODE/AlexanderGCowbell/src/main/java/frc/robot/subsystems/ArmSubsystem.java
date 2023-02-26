@@ -325,10 +325,13 @@ public class ArmSubsystem extends SubsystemBase {
         }
 
         if(isMPRunningAtPeriodicStart && !isMotionProfileRunning()) { // arm was moving, but has now stopped
-            stateMachine.completedArmMovement();
             if(currentDirection == Direction.REVERSE) { // we completed retracting
                 currentPath = null;
                 currentDirection = null;
+                // specifically notify that this completion was a retraction
+                stateMachine.completedArmRetraction();
+            } else {
+                stateMachine.completedArmMovement();
             } 
         }
 

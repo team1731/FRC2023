@@ -46,8 +46,7 @@ public class ArmStateMachine {
   public enum Input {
     INITIALIZE, EXTEND, COMPLETED, RETRACT, RESET, INTERRUPT,
     START, STARTED, STOP, DETECT_PIECE, RETRIEVED, RELEASE, RELEASED, 
-    FLEX_WRIST, // flex for the wrist is palm down, e.g., when picking up/scoring
-    EXTEND_WRIST; // extend for the wrist is palm out/up, e.g., when home
+    FLEX_WRIST; // flex for the wrist is palm down, e.g., when picking up/scoring
 }
 
   public enum MovementType {
@@ -155,8 +154,11 @@ public class ArmStateMachine {
     currentPath = path;
     pathStartedIndex = 0;
     movementType = MovementType.PICKUP;
-    transitionArm(Input.EXTEND);
+    // make sure the intake is stopped before attempting to start it
+    transitionIntake(Input.STOP); 
     transitionIntake(Input.START);
+    // start the arm path
+    transitionArm(Input.EXTEND);
   }
 
   // PICKUP WITH A WRIST FLEX ONLY
@@ -171,8 +173,11 @@ public class ArmStateMachine {
     System.out.println("ArmStateMachine: STARTING WRIST ONLY PICKUP!!!!!!!!!!!!!!!!!!!!!");
     currentWristFlexPosition = wristFlexPosition;
     movementType = MovementType.PICKUP;
-    transitionArm(Input.FLEX_WRIST);
+    // make sure the intake is stopped before attempting to start it
+    transitionIntake(Input.STOP);
     transitionIntake(Input.START);
+    // move the wrist into position
+    transitionArm(Input.FLEX_WRIST);
     status = Status.RUNNING;
   }
 
@@ -225,26 +230,14 @@ public class ArmStateMachine {
         transitionIntake(Input.RELEASE);
         transitionArm(Input.RETRACT);
       } else if(movementType == MovementType.PICKUP) {
-        transitionIntake(Input.DETECT_PIECE); // note, will retract after completed detecting piece
+        transitionIntake(Input.RETRIEVED);
+        transitionArm(Input.RETRACT);
       }
     } else if(currentArmState == ArmState.WRIST_ONLY_FLEXED && movementType == MovementType.PICKUP) {
-      transitionIntake(Input.DETECT_PIECE); // note, will move wrist back after completed detecting piece
+      transitionIntake(Input.RETRIEVED);
+      transitionArm(Input.RETRACT);
     } else if(currentArmState == ArmState.EXTENDING) {
       interrupt();
-    }
-  }
-
-  // NOTIFY THAT SUBSYSTEM COMPLETED ARM MOVEMENT
-  public void completedArmMovement() {
-    transitionArm(Input.COMPLETED);
-  }
-
-  // NOTIFY THAT PICKUP/SCORE SHOULD BE STOPPED & RETRACTED W/O SCORE/PICKUP
-  public void interrupt() {
-    subsystem.stopArm();
-    transitionArm(Input.INTERRUPT);
-    if(currentIntakeState == IntakeState.RETRIEVING || currentIntakeState == IntakeState.RELEASING) {
-      transitionIntake(Input.STOP);
     }
   }
 
@@ -328,6 +321,35 @@ public class ArmStateMachine {
 
 
   /*
+   * METHODS TO NOTIFICATIONS FROM OTHER SYSTEMS (e.g., ArmSubsystem)
+   */
+
+  // NOTIFY THAT SUBSYSTEM COMPLETED ARM MOVEMENT
+  public void completedArmMovement() {
+    transitionArm(Input.COMPLETED);
+  }
+
+  // NOTIFY THAT SUBSYSTEM COMPLETED ARM RETRACTION
+  public void completedArmRetraction() {
+    if(currentIntakeState != IntakeState.HOLDING) {
+      // upon retraction the intake should be stopped unless we're holding a piece
+      transitionIntake(Input.STOP);
+    }
+    transitionArm(Input.COMPLETED);
+  }
+
+  // NOTIFY THAT PICKUP/SCORE SHOULD BE STOPPED & RETRACTED W/O SCORE/PICKUP
+  public void interrupt() {
+    subsystem.stopArm();
+    transitionArm(Input.INTERRUPT);
+    if(currentIntakeState != IntakeState.HOLDING) {
+      // cut the movement short, the intake should be stopped unless we're holding a piece
+      transitionIntake(Input.STOP);
+    }
+  }
+
+
+  /*
    * PERIODIC
    *  Note: this periodic should be called each time the subsystem's periodic is called
    */
@@ -357,6 +379,23 @@ public class ArmStateMachine {
       queuedCommand = null;
     }
 
+
+    /*
+     * Logic for handling special cases for autonomous where we won't receive a button release event
+     */
+    if(isInAuto) {
+      if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
+        transitionIntake(Input.RETRIEVED);
+      } else if(movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING && 
+                (currentArmState == ArmState.EXTENDED || currentArmState == ArmState.WRIST_ONLY_FLEXED)) {
+        transitionArm(Input.RETRACT);
+      } else if(movementType == MovementType.SCORE && currentArmState == ArmState.EXTENDED) {
+        transitionIntake(Input.RELEASE);
+        transitionArm(Input.RETRACT);
+      }
+    }
+
+
     /*
      * Logic for flexing/extending wrist
      */
@@ -377,6 +416,7 @@ public class ArmStateMachine {
         wristFlexed = false;
       }
     }
+
     
     /*
      * Logic for handling intake cases
@@ -385,55 +425,17 @@ public class ArmStateMachine {
       transitionIntake(Input.STARTED);
     }
 
-    // currently only doing this in auto, in teleop retrieve continues until button release
-    if(isInAuto && currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
-      transitionIntake(Input.RETRIEVED);
-    }
-
-    if(currentIntakeState == IntakeState.DETECTING_PIECE) {
-      if(subsystem.isIntakeAtHoldingVelocity()) {
-        // detected piece
-        transitionIntake(Input.RETRIEVED);
-      } else {
-        transitionIntake(Input.STOP);
-      }
-
-      // deteced or failed to detect, regardless, move back to home
-      if(currentArmState == ArmState.WRIST_ONLY_FLEXED) {
-        transitionArm(Input.EXTEND_WRIST);
-      } else {
-        transitionArm(Input.RETRACT);
-      }
-    }
-
-    if((currentIntakeState == IntakeState.RETRIEVING || currentIntakeState == IntakeState.RELEASING) && 
-        currentArmState == ArmState.HOME) {
-      // path has completed in reverse, make sure intake is stopped
-      transitionIntake(Input.STOP);
-    }
-    
-    /*
-     * Logic for handling special cases for autonomous where we won't receive a button release event
-     */
-    if(isInAuto) {
-      if(movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING && currentArmState == ArmState.EXTENDED) {
-        transitionArm(Input.RETRACT);
-      } else if(movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING && currentArmState == ArmState.WRIST_ONLY_FLEXED) {
-        transitionArm(Input.EXTEND_WRIST);
-      } else if(movementType == MovementType.SCORE && currentArmState == ArmState.EXTENDED) {
-        transitionIntake(Input.RELEASE);
-        transitionArm(Input.RETRACT);
-      }
-    }
 
     /*
      * Allow for joystick adjustment of the distal arm
      */
     if(currentArmState == ArmState.EXTENDED && joystickControl != null) {
       if(!joystickControl.enabled) {
+        System.out.println("ArmStateMachine: Enabling distal arm adjustment!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         joystickControl.setStartPosition(subsystem.getDistalArmPosition());
       } else {
-        subsystem.adjustDistalArm(joystickControl.getRawAxis());
+        System.out.println("ArmStateMachine: Distal adj raw axis value: " + joystickControl.getRawAxis());
+        //subsystem.adjustDistalArm(joystickControl.getRawAxis());
       }
     }
   }

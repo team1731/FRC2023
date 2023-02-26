@@ -57,7 +57,7 @@ public enum ArmState {
   WRIST_ONLY_FLEXED {
     public ArmState next(Input input) {
       switch(input) {
-        case EXTEND_WRIST: // extends (moves home) wrist only w/o moving arm
+        case RETRACT: // extends (moves home) wrist only w/o moving arm
         case INTERRUPT:
           return RESETTING;
         default:

@@ -12,6 +12,7 @@ public enum IntakeState {
                     // used in autonomous where we start up in holding
                     return HOLDING; 
                 case RELEASE:
+                    // used to allow drivers to initiate an eject at any time
                     return RELEASING;
                 default:
                     return this;
@@ -35,21 +36,6 @@ public enum IntakeState {
     RETRIEVING {
         public IntakeState next(Input input) {
             switch(input) {
-                case DETECT_PIECE:
-                    return DETECTING_PIECE;
-                case RETRIEVED:
-                    return HOLDING;
-                case STOP:
-                    return STOPPED;
-                default:
-                    return this;
-            }
-        }
-    },
-
-    DETECTING_PIECE {
-        public IntakeState next(Input input) {
-            switch(input) {
                 case RETRIEVED:
                     return HOLDING;
                 case STOP:
@@ -65,6 +51,8 @@ public enum IntakeState {
             switch(input) {
                 case RELEASE:
                     return RELEASING;
+                case STOP:
+                    return STOPPED;
                 default:
                     return this;
             }
