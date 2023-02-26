@@ -28,7 +28,7 @@ public class PathPlannerCommandGroup extends SequentialCommandGroup {
 
         // This will load the file "FullAuto.path" and generate it with a max velocity of 4 m/s and a max acceleration of 3 m/s^2
         // for every path in the group
-        PathConstraints pathConstraints = new PathConstraints(0.25, 0.25); //Constants.AutoConstants.kMaxSpeedMetersPerSecond, Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared);
+        PathConstraints pathConstraints = new PathConstraints(1, 1); //Constants.AutoConstants.kMaxSpeedMetersPerSecond, Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared);
         List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(pathPlannerFile, pathConstraints); // "A1"
     
         // This is just an example event map. It would be better to have a constant, global event map

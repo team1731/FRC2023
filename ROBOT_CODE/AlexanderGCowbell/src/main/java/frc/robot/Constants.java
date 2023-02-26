@@ -152,8 +152,8 @@ public final class Constants {
         public static final double driveKA = (0.27 / 12);
 
         /* Swerve Profiling Values */
-        public static final double maxSpeed = 0.5; // disabled for testing = 3.0; //meters per second
-        public static final double maxAngularVelocity = 11.5; // disabled for testing = 3.0;
+        public static final double maxSpeed = 3.0; // disabled for testing = 3.0; //meters per second
+        public static final double maxAngularVelocity = 2.7; // disabled for testing = 3.0;
 
         /* Neutral Modes */
         public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
@@ -259,9 +259,9 @@ public final class Constants {
         public final static int intakeCancoderId = 13;
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
-        public final static int proximalAbsoluteTicsCenter = 3169;
+        public final static int proximalAbsoluteTicsCenter = 3216;
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
-        public final static int distalAbsoluteTicsCenter = 1540;
+        public final static int distalAbsoluteTicsCenter = 1510;
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
@@ -296,7 +296,7 @@ public final class Constants {
         public final static double wristAllowedErr = 0;
 
          // Hand limits
-        public static final int INTAKE_CURRENT_LIMIT_A = 20;
+        public static final int INTAKE_CURRENT_LIMIT_A = 27;
         public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
         public static final double INTAKE_OUTPUT_POWER = 1.0;
         public static final double INTAKE_HOLD_POWER = 0.07;
