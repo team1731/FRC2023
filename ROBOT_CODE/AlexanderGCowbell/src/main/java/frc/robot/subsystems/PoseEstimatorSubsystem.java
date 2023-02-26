@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.FieldConstants;
@@ -122,6 +123,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
         if(estimatedPose.isPresent()) {
           EstimatedRobotPose cameraPose = estimatedPose.get();
           Pose2d cameraPose2d = cameraPose.estimatedPose.toPose2d();
+          
 
           // determine difference between estimated pose and current pose
           Pose2d poseError = currentPose.relativeTo(cameraPose2d);
@@ -129,10 +131,15 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
           // If the distance between the vision pose estimation and the current swerve pose estimation is too great we will
           // ignore it. This should help filter out bad vision data.
-          if(distanceBetweenPoseEstimations < VisionConstants.kMaxDistanceBetweenPoseEstimations) {
+       //   if(distanceBetweenPoseEstimations < VisionConstants.kMaxDistanceBetweenPoseEstimations) {
             MessageLog.add("PoseEstimatorSubsystem: Adding vision measurement from " + cameraName);
+            field2d.getObject("MyRobot"  + cameraName).setPose(cameraPose2d);
+            SmartDashboard.putString("Vision pose", String.format("(%.2f, %.2f) %.2f",
+              cameraPose2d.getTranslation().getX(),
+              cameraPose2d.getTranslation().getY(),
+              cameraPose2d.getRotation().getDegrees()));
             poseEstimator.addVisionMeasurement(cameraPose2d, cameraPose.timestampSeconds, VisionConstants.kVisionMeasurementStdDevs);
-          }
+      //    }
         }
       }
 
