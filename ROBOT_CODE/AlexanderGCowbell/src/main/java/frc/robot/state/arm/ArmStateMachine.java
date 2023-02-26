@@ -272,8 +272,12 @@ public class ArmStateMachine {
     subsystem.intake();
   }
 
-  public void stopIntake() {
+  public void releaseIntake() {
     System.out.println("ArmStateMachine: Releasing full intake!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    setIntakeHolding();
+  }
+
+  public void setIntakeHolding() {
     currentIntakeState = IntakeState.HOLDING;
     subsystem.holdIntake();
   }
@@ -557,7 +561,6 @@ public class ArmStateMachine {
 
   public void setIsInAuto(boolean inAuto) {
     isInAuto = inAuto;
-    transitionIntake(Input.RETRIEVED);
   }
 
   public void setAllowScore(boolean allow) {

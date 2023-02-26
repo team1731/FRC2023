@@ -104,7 +104,7 @@ public class SwerveModule {
     }
 
     public SwerveModulePosition getPosition(){
-        double position = (mDriveMotor.getSelectedSensorPosition()/2048.0) * Constants.Swerve.wheelCircumference;
+        double position = ((mDriveMotor.getSelectedSensorPosition()/2048.0) * Constants.Swerve.wheelCircumference) / Constants.Swerve.driveGearRatio;
         Rotation2d angle = Rotation2d.fromDegrees(Conversions.falconToDegrees(mAngleMotor.getSelectedSensorPosition(), Constants.Swerve.angleGearRatio));
         return new SwerveModulePosition(position, angle);
     }

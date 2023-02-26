@@ -120,7 +120,7 @@ public class RobotContainer {
     kExtraExtensionBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setExtraExtension(true)));
     kExtraExtensionBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.setExtraExtension(false)));
     kIntakeBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.intake()));
-    kIntakeBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopIntake()));
+    kIntakeBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.releaseIntake()));
     kReleaseBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.release()));
     kReleaseBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopRelease()));
   }

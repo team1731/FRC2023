@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.LogConstants;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.util.log.LogWriter;
@@ -317,6 +318,8 @@ public class Robot extends TimedRobot {
 	} else {
         MessageLog.add("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand.getClass().getSimpleName() + " <----------");
 		m_robotContainer.zeroHeading();
+		sm_armStateMachine.setGamePiece(GamePiece.CONE);
+		sm_armStateMachine.setIntakeHolding();
 		m_autonomousCommand.schedule();
 	}
     MessageLog.add("autonomousInit: End");
