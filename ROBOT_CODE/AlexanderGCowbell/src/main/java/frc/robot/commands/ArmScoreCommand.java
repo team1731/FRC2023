@@ -11,11 +11,14 @@ import frc.data.mp.*;
 public class ArmScoreCommand extends CommandBase {
     private ArmStateMachine stateMachine;
     private ArmSequence sequence;
+    private Joystick joystick;
+    private int distalAxis;
 
     public ArmScoreCommand(ArmStateMachine stateMachine, ArmSequence sequence, Joystick joystick, int distalAxis) {
         this.stateMachine = stateMachine;
-        this.stateMachine.setJoystickControl(joystick, distalAxis);
         this.sequence = sequence;
+        this.joystick = joystick;
+        this.distalAxis = distalAxis;
     }
 
     @Override
@@ -24,6 +27,8 @@ public class ArmScoreCommand extends CommandBase {
             System.out.println("WARNING: cannot command a score when arm state is already running a movement");
             return;
         }
+
+        stateMachine.setJoystickControl(joystick, distalAxis);
 
         ArmPath path = null;
         if(sequence == ArmSequence.SCORE_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {

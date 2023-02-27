@@ -28,7 +28,7 @@ public class ArmStateMachine {
   private int pathStartedIndex = 0;
   private double pathStartedTime = 0;
   private QueuedCommand queuedCommand = null;
-  private JoystickControl joystickControl = null;
+  private JoystickControl joystickControl;
 
 
   // extended = home pos (palm facing out), flexed = positioned for pickup/scoring (palm facing down/in)
@@ -434,8 +434,7 @@ public class ArmStateMachine {
         System.out.println("ArmStateMachine: Enabling distal arm adjustment!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         joystickControl.setStartPosition(subsystem.getDistalArmPosition());
       } else {
-        System.out.println("ArmStateMachine: Distal adj raw axis value: " + joystickControl.getRawAxis());
-        //subsystem.adjustDistalArm(joystickControl.getRawAxis());
+        subsystem.adjustDistalArm(joystickControl.getRawAxis());
       }
     }
   }
@@ -562,6 +561,7 @@ public class ArmStateMachine {
   }
 
   public void setIsInAuto(boolean inAuto) {
+    System.out.println("ArmStateMachine: Setting utonomous mode " + inAuto + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     isInAuto = inAuto;
   }
 

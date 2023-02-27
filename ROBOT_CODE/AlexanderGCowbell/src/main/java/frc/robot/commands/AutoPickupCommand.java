@@ -11,14 +11,14 @@ import frc.data.mp.*;
 public class AutoPickupCommand extends CommandBase {
     private ArmStateMachine stateMachine;
     private ArmSequence sequence;
+    private GamePiece pieceType;
     private boolean started = false;
     private boolean isFinished = false;
 
     public AutoPickupCommand(ArmStateMachine stateMachine, ArmSequence sequence, GamePiece pieceType) {
         this.stateMachine = stateMachine;
         this.sequence = sequence;
-        stateMachine.setGamePiece(pieceType);
-        stateMachine.setIsInAuto(true);
+        this.pieceType = pieceType;
     }
 
     @Override
@@ -27,6 +27,9 @@ public class AutoPickupCommand extends CommandBase {
             System.out.println("WARNING: autonomous cannot command a pickup when arm state is already running a movement");
             return;
         }
+
+        stateMachine.setGamePiece(pieceType);
+        stateMachine.setIsInAuto(true);
 
         ArmPath path = null;
         if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {

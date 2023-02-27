@@ -12,11 +12,14 @@ import frc.data.mp.*;
 public class ArmPickupCommand extends CommandBase {
     private ArmStateMachine stateMachine;
     private ArmSequence sequence;
+    private Joystick joystick;
+    private int distalAxis;
 
     public ArmPickupCommand(ArmStateMachine stateMachine, ArmSequence sequence, Joystick joystick, int distalAxis) {
         this.stateMachine = stateMachine;
-        this.stateMachine.setJoystickControl(joystick, distalAxis);
         this.sequence = sequence;
+        this.joystick = joystick;
+        this.distalAxis = distalAxis;
     }
 
     @Override
@@ -25,6 +28,8 @@ public class ArmPickupCommand extends CommandBase {
             System.out.println("WARNING: cannot command a pickup when arm state is already running a movement");
             return;
         }
+
+        stateMachine.setJoystickControl(joystick, distalAxis);
 
         // no movement is currently running, load the correct path and start the pickup
         ArmPath path = null;

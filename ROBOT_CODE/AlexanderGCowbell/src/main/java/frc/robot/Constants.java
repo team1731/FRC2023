@@ -152,8 +152,8 @@ public final class Constants {
         public static final double driveKA = (0.27 / 12);
 
         /* Swerve Profiling Values */
-        public static final double maxSpeed = 3.0; // disabled for testing = 3.0; //meters per second
-        public static final double maxAngularVelocity = 2.7; // disabled for testing = 3.0;
+        public static final double maxSpeed = 1.0; // disabled for testing = 3.0; //meters per second
+        public static final double maxAngularVelocity = 1.0; // disabled for testing = 2.7;
 
         /* Neutral Modes */
         public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
@@ -365,8 +365,8 @@ public final class Constants {
 
         public static final String kCameraMount1Id = "leftcamera";  //camera on the left looking back
         public static final String kCameraMount2Id = "Global_Shutter_Camera";  // camera on the right looking back
-        public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, -3.0,11.5, 17.5, 225);
-        public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, -3.0, -11.5, 17.5, 135);
+        public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, -4.0,11.5, 17.5, 135);
+        public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, -4.0, -11.5, 17.5, 225);
 
 		// #region TurnPID
 		public static final double kTurnP = 0.12;

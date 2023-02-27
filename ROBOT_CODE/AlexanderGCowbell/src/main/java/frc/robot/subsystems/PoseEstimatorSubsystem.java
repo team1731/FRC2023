@@ -138,7 +138,10 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
               cameraPose2d.getTranslation().getX(),
               cameraPose2d.getTranslation().getY(),
               cameraPose2d.getRotation().getDegrees()));
-            poseEstimator.addVisionMeasurement(cameraPose2d, cameraPose.timestampSeconds, VisionConstants.kVisionMeasurementStdDevs);
+
+            if(currentPose.getX() < 2.5) { // test hack, throwing away values when moving away from AT
+              poseEstimator.addVisionMeasurement(cameraPose2d, cameraPose.timestampSeconds, VisionConstants.kVisionMeasurementStdDevs);
+            }
       //    }
         }
       }

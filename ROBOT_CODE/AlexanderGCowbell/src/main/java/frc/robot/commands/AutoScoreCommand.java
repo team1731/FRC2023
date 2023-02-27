@@ -10,14 +10,14 @@ import frc.data.mp.*;
 public class AutoScoreCommand extends CommandBase {
     private ArmStateMachine stateMachine;
     private ArmSequence sequence;
+    private GamePiece pieceType;
     private boolean started = false;
     private boolean isFinished = false;
 
     public AutoScoreCommand(ArmStateMachine stateMachine, ArmSequence sequence, GamePiece pieceType) {
         this.stateMachine = stateMachine;
         this.sequence = sequence;
-        stateMachine.setGamePiece(pieceType);
-        stateMachine.setIsInAuto(true);
+        this.pieceType = pieceType;
     }
 
     @Override
@@ -26,6 +26,9 @@ public class AutoScoreCommand extends CommandBase {
             System.out.println("WARNING: autonomous cannot command a score when arm state is already running a movement");
             return;
         }
+
+        stateMachine.setGamePiece(pieceType);
+        stateMachine.setIsInAuto(true);
 
         ArmPath path = null;
         if(sequence == ArmSequence.SCORE_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {
