@@ -147,9 +147,9 @@ public final class Constants {
         public static final double driveKF = 0.0;
 
         /* Drive Motor Characterization Values */
-        public static final double driveKS = (0.667 / 12); //divide by 12 to convert from volts to percent output for CTRE
-        public static final double driveKV = (2.44 / 12);
-        public static final double driveKA = (0.27 / 12);
+        public static final double driveKS = (0.18576/ 12); //divide by 12 to convert from volts to percent output for CTRE  was .667/12
+        public static final double driveKV = (2.3317 / 12);
+        public static final double driveKA = (0.25916 / 12);
 
         /* Swerve Profiling Values */
         public static final double maxSpeed = 3.5; // disabled for testing = 3.0; //meters per second
