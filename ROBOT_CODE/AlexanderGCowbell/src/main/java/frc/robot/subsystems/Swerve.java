@@ -41,6 +41,50 @@ public class Swerve extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+
+        boolean useLockHeadingCode = false;
+
+        if(useLockHeadingCode){ //TODO FIXME: debug this block!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            double xSpeedAdjusted = translation.getX();
+            double ySpeedAdjusted = translation.getY();
+    
+            double rotationalOutput = rotation;
+    
+    
+    
+            // If the right stick is neutral - this code should lock onto the last known
+            // heading
+            if (Math.abs(rotationalOutput) < 0.11) {
+                headingOverride = true;
+                if (lockedHeading == null) {
+                    headingController.reset(getHeading());
+                    desiredHeading = getHeading();
+                    lockedHeading = desiredHeading;
+                } else {
+                    desiredHeading = lockedHeading;
+                }
+            } else {
+                headingOverride = false;
+                lockedHeading = null;
+                rotationalOutput *= Math.PI;
+            }
+    
+            if (visionHeadingOverride || headingOverride) {
+    
+                if (visionHeadingOverride) {
+                    rotationalOutput = headingController.calculate(getHeading());
+                    desiredHeading = getHeading();
+                    lockedHeading = getHeading();
+                    SmartDashboard.putNumber("headingController Output", rotationalOutput);
+                } else {
+                    // headingController.reset(getHeading());
+                    // desiredHeading += rotationalOutput*2.5;
+                    rotationalOutput = headingController.calculate(getHeading(), desiredHeading);
+                    SmartDashboard.putNumber("desiredHeading", desiredHeading);
+                    SmartDashboard.putNumber("headingController Output", rotationalOutput);
+                }
+            }
+        }
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
