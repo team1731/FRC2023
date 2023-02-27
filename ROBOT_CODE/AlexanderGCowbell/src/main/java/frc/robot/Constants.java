@@ -106,8 +106,8 @@ public final class Constants {
         public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(21.5);
-        public static final double wheelBase = Units.inchesToMeters(26.75);
+        public static final double trackWidth = Units.inchesToMeters(20.375);
+        public static final double wheelBase = Units.inchesToMeters(20.375);
         public static final double wheelDiameter = Units.inchesToMeters(3.94);
         public static final double wheelCircumference = wheelDiameter * Math.PI;
 
@@ -152,8 +152,8 @@ public final class Constants {
         public static final double driveKA = (0.27 / 12);
 
         /* Swerve Profiling Values */
-        public static final double maxSpeed = 1.0; // disabled for testing = 3.0; //meters per second
-        public static final double maxAngularVelocity = 1.0; // disabled for testing = 2.7;
+        public static final double maxSpeed = 3.5; // disabled for testing = 3.0; //meters per second
+        public static final double maxAngularVelocity = 3.0; // disabled for testing = 2.7;
 
         /* Neutral Modes */
         public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
@@ -172,7 +172,7 @@ public final class Constants {
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
             public static final int canCoderID = 1;
-            public static final double angleOffset = 348.486;
+            public static final double angleOffset = 343.6;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -182,7 +182,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 2;
-            public static final double angleOffset = 24.082;
+            public static final double angleOffset = 23.99;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -192,7 +192,7 @@ public final class Constants {
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 3;
-            public static final double angleOffset = 265.5;
+            public static final double angleOffset = 265.69;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -202,7 +202,7 @@ public final class Constants {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 4;
-            public static final double angleOffset = 134.4;
+            public static final double angleOffset = 134.6;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -369,11 +369,11 @@ public final class Constants {
         public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, -5.3033, -10.253, 17.0, 225);
 
 		// #region TurnPID
-		public static final double kTurnP = 0.12;
+		public static final double kTurnP = 0.05;
 		public static final double kTurnI = 0;
-		public static final double kTurnD = 0.01;
-		public static final double kMaxTurnVelocity = 360;
-		public static final double kMaxTurnAcceleration = 360;
+		public static final double kTurnD = 0.00;
+	//	public static final double kMaxTurnVelocity = 360;
+	//	public static final double kMaxTurnAcceleration = 360;
 		public static final double kTurnToleranceDeg = 5;
 		public static final double kTurnRateToleranceDegPerS = 10; // degrees per second
 		// #endregion
