@@ -51,21 +51,21 @@ public class TeleopSwerve extends CommandBase {
 
     @Override
     public void execute() {
-        double yAxis = -controller.getRawAxis(translationAxis) * Math.abs(controller.getRawAxis(translationAxis));
-        double xAxis = -controller.getRawAxis(strafeAxis) * Math.abs(controller.getRawAxis(strafeAxis));
-        double rAxis = -controller.getRawAxis(rotationAxis) * Math.abs(controller.getRawAxis(rotationAxis));
+        double yAxis = -controller.getRawAxis(translationAxis) ;
+        double xAxis = -controller.getRawAxis(strafeAxis) ;
+        double rAxis = -controller.getRawAxis(rotationAxis) ;
         
         /* Deadbands */
-        yAxis = (Math.abs(yAxis) < Constants.stickDeadband) ? 0 : yAxis;
-        xAxis = (Math.abs(xAxis) < Constants.stickDeadband) ? 0 : xAxis;
-        rAxis = (Math.abs(rAxis) < Constants.stickDeadband) ? 0 : rAxis;
+        yAxis = (Math.abs(yAxis) < Constants.stickDeadband) ? 0 : (yAxis - Constants.stickDeadband)*Math.abs(yAxis - Constants.stickDeadband);
+        xAxis = (Math.abs(xAxis) < Constants.stickDeadband) ? 0 : (xAxis- Constants.stickDeadband)*Math.abs(yAxis - Constants.stickDeadband);
+        rAxis = (Math.abs(rAxis) < Constants.stickDeadband) ? 0 : (rAxis- Constants.stickDeadband)*Math.abs(yAxis - Constants.stickDeadband);
 
-        translation = new Translation2d(yAxis, xAxis).times(Constants.Swerve.maxSpeed);
+        translation = new Translation2d(yAxis , xAxis).times(Constants.Swerve.maxSpeed);
 
 
             // If the right stick is neutral - this code should lock onto the last known
             // heading
-            if (Math.abs(rAxis) < 0.11) {
+            if (Math.abs(rAxis) == 0) {
                 headingOverride = true;
                 if (lockedHeading == null) {
                     headingController.reset(s_Swerve.getHeading());
