@@ -23,9 +23,6 @@ import frc.robot.util.log.LogWriter.Log;
 import frc.robot.util.log.LogWriter.LogMode;
 
 
-import java.util.HashMap;
-import java.util.Map;
-
 public final class Constants {
     public static final double stickDeadband = 0.1;
 	public static final int kTICKS = 33024; // 16.125 * 2048;
@@ -98,7 +95,10 @@ public final class Constants {
         public static int kReleaseBtnId = 14;
         public static int kIntakeBtnId = 15;
         public static int kExtraExtensionBtnId = 16;
+        public static int kProximalAxisId = 1;
         public static int kDistalAxisId = 4;
+        public static int kKillSwitchId = 6;
+        public static int kAutoRecoverySwitchId = 8;
     }
 
     public static final class Swerve {
@@ -270,7 +270,7 @@ public final class Constants {
         public final static double intakeStartedVelocityThreshold = 1000;
         public final static double intakeHoldingVelocityThreshold = 60;
         public final static double wristResetPostionThreshold = 0.2;
-        public final static double distalMaxAdjustmentTicks = 9233;
+        public final static double armManualAdjustmentTicks = 9233;
         public final static double mostlyExtendedThreshold = 0.5; // percentage of the path completed to consider mostly extended
 
         // Arm PID constants
@@ -384,7 +384,7 @@ public final class Constants {
         public static final int kPWM_LedSting = 6;         // Addressable Led String
 
         public enum LedOption {
-            INIT, YELLOW, PURPLE, BLACK, WHITE, BLUE
+            INIT, YELLOW, PURPLE, BLACK, WHITE, BLUE, RED
           }
     }
 }

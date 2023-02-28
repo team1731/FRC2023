@@ -20,6 +20,7 @@ public class LEDStringSubsystem extends SubsystemBase{
     private static final int[] WHITE = {100, 100, 100};
     private static final int[] BLUE = {0, 0, 64};
     private static final int[] BLACK = {0, 0, 0};
+    private static final int[] RED = {255, 0, 0};
     private Timer mTimer;
     // Var to store last hue of first pixel
     private AddressableLED m_led;
@@ -116,6 +117,9 @@ public class LEDStringSubsystem extends SubsystemBase{
             }  
           case BLACK:
             setFullColor(BLACK[0], BLACK[1], BLACK[2]);
+            break;
+          case RED:
+            setFullColor(RED[0], RED[1], RED[2]);
             break;
         }
       }

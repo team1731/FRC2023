@@ -24,12 +24,7 @@ public class ArmPickupCommand extends CommandBase {
 
     @Override
 	public void initialize() {
-        if(stateMachine.getStatus() == Status.RUNNING) {
-            System.out.println("WARNING: cannot command a pickup when arm state is already running a movement");
-            return;
-        }
-
-        stateMachine.setJoystickControl(joystick, distalAxis);
+        stateMachine.addJoystickControl(joystick, distalAxis);
 
         // no movement is currently running, load the correct path and start the pickup
         ArmPath path = null;

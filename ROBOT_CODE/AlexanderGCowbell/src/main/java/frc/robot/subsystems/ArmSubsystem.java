@@ -79,24 +79,6 @@ public class ArmSubsystem extends SubsystemBase {
         return currentDirection;
     }
 
-    // home for any logic needed to reset, especially when robot moves to disabled state
-    // ensures motion profiles are cleared so motor doesn't try to process last profile when re-enabled
-    // moves the arm into a home (safe) position
-    public void initializeArmPositions() {
-        System.out.println("ArmSubsystem: Intializing arm positions!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        if(LogWriter.isArmRecordingEnabled()) {
-            // disengage the arm and wrist motors so both can be moved freely for recording
-            stopIntake();
-            stopWrist();
-            proximalMotor.set(ControlMode.PercentOutput, 0);
-            distalMotor.set(ControlMode.PercentOutput, 0);
-        } else {
-            // move the arm into normal home (safe) position
-            stopIntake();
-            stateMachine.initializeArm();
-        }        
-    }
-
     public void resetToHome() {
         System.out.println("ArmSubsystem: Resetting to home position!!!!!!!!!!!!!!!!!!!");
         moveWrist(ArmConstants.wristHomePosition, ArmConstants.wristMaxVel);
@@ -200,6 +182,10 @@ public class ArmSubsystem extends SubsystemBase {
         distalArmResetting = true;
     }
 
+    public void adjustProximalArm(double targetPosition) {
+        proximalMotor.set(ControlMode.MotionMagic, targetPosition);
+    }
+
     public void adjustDistalArm(double targetPosition) {
         distalMotor.set(ControlMode.MotionMagic, targetPosition);
     }
@@ -209,8 +195,23 @@ public class ArmSubsystem extends SubsystemBase {
         distalMotor.set(TalonFXControlMode.MotionProfile, SetValueMotionProfile.Hold.value);
     }
 
+    public void allowArmManipulation() {
+        stopIntake();
+        proximalMotor.set(ControlMode.PercentOutput, 0);
+        distalMotor.set(ControlMode.PercentOutput, 0);
+        wristPIDController.setReference(0.0, CANSparkMax.ControlType.kVoltage);
+    }
+
     public boolean isMotionProfileRunning() {
         return proximalMPRunning || distalMPRunning;
+    }
+
+    public double getProximalArmPosition() {
+        return proximalMotor.getSelectedSensorPosition(0);
+    }
+
+    public double getDistalArmPosition() {
+        return distalMotor.getSelectedSensorPosition(0);
     }
 
 
@@ -264,10 +265,9 @@ public class ArmSubsystem extends SubsystemBase {
         wristResetting = true;
     }
 
-    public void stopWrist() {
-        wristPIDController.setReference(0.0, CANSparkMax.ControlType.kVoltage);
+    public double getWristPosition() {
+        return wristEncoder.getPosition();
     }
-
 
     /*
      * INTAKE MOTOR MOVEMENT
@@ -374,10 +374,6 @@ public class ArmSubsystem extends SubsystemBase {
 
     private double getArbitraryFeedForwardForDistalArm(){
         return ArbitraryFeedForward.getArbitraryFeedForwardForDistalArm(distalMotor.getSelectedSensorPosition(0));
-    }
-
-    public double getDistalArmPosition() {
-        return distalMotor.getSelectedSensorPosition(0);
     }
     
     public void doSD() {

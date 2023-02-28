@@ -23,11 +23,6 @@ public class AutoPickupCommand extends CommandBase {
 
     @Override
 	public void initialize() {
-        if(stateMachine.getStatus() == Status.RUNNING) {
-            System.out.println("WARNING: autonomous cannot command a pickup when arm state is already running a movement");
-            return;
-        }
-
         stateMachine.setGamePiece(pieceType);
         stateMachine.setIsInAuto(true);
 

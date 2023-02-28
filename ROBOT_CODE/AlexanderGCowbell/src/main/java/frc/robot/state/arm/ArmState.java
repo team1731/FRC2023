@@ -86,43 +86,29 @@ public enum ArmState {
           return this;
       }
     }
-  };
+  },
 
-  /* 
-  Temporarily disabling these states until we revise this process
+  EMERGENCY_RECOVERY {
+    public ArmState next(Input input) {
+      switch(input) {
+        case AUTO_RECOVER:
+          return RESETTING_WRIST;
+        default:
+          return this;
+      }
+    }
+  },
+
   RESETTING_WRIST {
     public ArmState next(Input input) {
       switch(input) {
         case COMPLETED:
-          return RESETTING_PROXIMAL;
-        default:
-          return this;
-      }
-    }
-  },
-
-  RESETTING_PROXIMAL {
-    public ArmState next(Input input) {
-      switch(input) {
-        case COMPLETED:
-          return RESETTING_DISTAL;
-        default:
-          return this;
-      }
-    }
-  },
-
-  RESETTING_DISTAL {
-    public ArmState next(Input input) {
-      switch(input) {
-        case COMPLETED:
-          return HOME;
+          return RESETTING;
         default:
           return this;
       }
     }
   };
-  */
   
   public ArmState next(Input input) {
     return this;

@@ -13,19 +13,16 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.LogConstants;
+import frc.robot.Constants.OpConstants;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.util.log.LogWriter;
 import frc.robot.util.log.MessageLog;
@@ -69,10 +66,11 @@ public class Robot extends TimedRobot {
   // SUBSYSTEM DECLARATION
   private LEDStringSubsystem m_ledstring;
   private boolean ledBlinking;
+  private boolean armEmergencyStatus = false;
 
   // NOTE: FOR TESTING PURPOSES ONLY!
-  private final Joystick driver = new Joystick(0);
-  private final JoystickButton blinker = null; //new JoystickButton(driver, XboxController.Button.kX.value);
+  //private final Joystick driver = new Joystick(0);
+  //private final JoystickButton blinker = null; //new JoystickButton(driver, XboxController.Button.kX.value);
 
 
   /**
@@ -260,8 +258,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
 	keypad.putValue("driver entry", NetworkTableValue.makeString(""));
-	sm_armStateMachine.disabledInit();
-	s_armSubSystem.initializeArmPositions();
+	sm_armStateMachine.disable();
 	s_armSubSystem.resetArmEncoders();
 
   }
@@ -318,6 +315,7 @@ public class Robot extends TimedRobot {
 	} else {
         MessageLog.add("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand.getClass().getSimpleName() + " <----------");
 		m_robotContainer.zeroHeading();
+		sm_armStateMachine.initializeArm();
 		sm_armStateMachine.setGamePiece(GamePiece.CONE);
 		sm_armStateMachine.setIntakeHolding();
 		m_autonomousCommand.schedule();
@@ -350,6 +348,7 @@ public class Robot extends TimedRobot {
     MessageLog.add("TELEOP INIT");
 	CommandScheduler.getInstance().cancelAll();
 	initSubsystems();
+	sm_armStateMachine.initializeArm();
     // This makes sure that the autonomous stops running when
 	// teleop starts running. If you want the autonomous to
 	// continue until interrupted by another command, remove
@@ -394,12 +393,34 @@ public class Robot extends TimedRobot {
 		currentKeypadCommand = newKeypadCommand;
 	}
 
+	/*
+	 * Change LED blinking status depending on whether holding a game piece or not
+	 */
 	if(!ledBlinking && sm_armStateMachine.isHoldingGamePiece()) {
 		m_ledstring.setBlink(true);
 		ledBlinking = true;
 	} else if(ledBlinking && !sm_armStateMachine.isHoldingGamePiece()) {
 		m_ledstring.setBlink(false);
 		ledBlinking = false;
+	}
+
+	/*
+	 * Change LED to indicate emergency status entry or exit
+	 */
+	if(!armEmergencyStatus && sm_armStateMachine.isInEmergencyRecovery()) {
+		armEmergencyStatus = true;
+		m_ledstring.setBlink(false);
+		m_ledstring.setColor(OpConstants.LedOption.RED);
+	} else if(armEmergencyStatus && !sm_armStateMachine.isInEmergencyRecovery()) {
+		armEmergencyStatus = false;
+		// if the SM has a record of a game piece setting revert to that color, otherwise just go to default color
+		if(sm_armStateMachine.getGamePiece() == GamePiece.CONE) {
+			m_ledstring.setColor(OpConstants.LedOption.YELLOW);
+		} else if(sm_armStateMachine.getGamePiece() == GamePiece.CUBE) {
+			m_ledstring.setColor(OpConstants.LedOption.PURPLE);
+		} else {
+			m_ledstring.setColor(OpConstants.LedOption.WHITE);
+		}
 	}
   }
 

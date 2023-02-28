@@ -23,12 +23,7 @@ public class ArmScoreCommand extends CommandBase {
 
     @Override
 	public void initialize() {
-        if(stateMachine.getStatus() == Status.RUNNING) {
-            System.out.println("WARNING: cannot command a score when arm state is already running a movement");
-            return;
-        }
-
-        stateMachine.setJoystickControl(joystick, distalAxis);
+        stateMachine.addJoystickControl(joystick, distalAxis);
 
         ArmPath path = null;
         if(sequence == ArmSequence.SCORE_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {

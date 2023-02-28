@@ -56,7 +56,10 @@ public class RobotContainer {
   private final JoystickButton kExtraExtensionBtn = new JoystickButton(operator,OperatorConsoleConstants.kExtraExtensionBtnId);
   private final JoystickButton kReleaseBtn = new JoystickButton(operator,OperatorConsoleConstants.kReleaseBtnId);
   private final JoystickButton kIntakeBtn = new JoystickButton(operator,OperatorConsoleConstants.kIntakeBtnId);
+  private final JoystickButton kKillSwitch = new JoystickButton(operator,OperatorConsoleConstants.kKillSwitchId);
+  private final JoystickButton kAutoRecoverySwitch = new JoystickButton(operator,OperatorConsoleConstants.kAutoRecoverySwitchId);
   public final int kDisatalAxis = OperatorConsoleConstants.kDistalAxisId;
+  public final int kProximalAxis = OperatorConsoleConstants.kProximalAxisId;
 
 
   /* Subsystems */
@@ -65,6 +68,7 @@ public class RobotContainer {
   private ArmSubsystem s_armSubSystem;
   private ArmStateMachine sm_armStateMachine;
   private final LEDStringSubsystem m_ledstring;
+  private boolean confirmingKillSwitch = false; // used to force operator to confirm kill command
 
   // The container for the robot. Contains subsystems, OI devices, and commands. 
   public RobotContainer(
@@ -123,6 +127,20 @@ public class RobotContainer {
     kIntakeBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.releaseIntake()));
     kReleaseBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.release()));
     kReleaseBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopRelease()));
+    kKillSwitch.onTrue(new InstantCommand(() -> {
+      if(!confirmingKillSwitch) {
+        System.out.println("RobotContainer: Hit kill switch!!!!!!!!!!!!!!!!!!!!!!");
+        confirmingKillSwitch = true; // force operator to confirm to prevent accidents
+      } else {
+        // confirmed, move into emergency mode
+        System.out.println("RobotContainer: Kill switch confirmed!!!!!!!!!!!!!!!!!!!!!!");
+        sm_armStateMachine.addJoystickControl(operator, kProximalAxis);
+        sm_armStateMachine.addJoystickControl(operator, kDisatalAxis);
+        sm_armStateMachine.emergencyInterrupt();
+        confirmingKillSwitch = false;
+      }
+    }));
+    kAutoRecoverySwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.attemptAutoRecovery()));
   }
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {

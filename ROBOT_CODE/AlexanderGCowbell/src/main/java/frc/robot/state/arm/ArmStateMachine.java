@@ -6,8 +6,10 @@ import frc.data.mp.*;
 import frc.data.mp.ArmPath.Direction;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmStateConstants;
+import frc.robot.Constants.OperatorConsoleConstants;
 import frc.robot.Constants.GamePiece;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.util.log.LogWriter;
 
 public class ArmStateMachine {
   private ArmSubsystem subsystem;
@@ -28,7 +30,8 @@ public class ArmStateMachine {
   private int pathStartedIndex = 0;
   private double pathStartedTime = 0;
   private QueuedCommand queuedCommand = null;
-  private JoystickControl joystickControl;
+  private JoystickControl proximalJoystickControl;
+  private JoystickControl distalJoystickControl;
 
 
   // extended = home pos (palm facing out), flexed = positioned for pickup/scoring (palm facing down/in)
@@ -40,13 +43,14 @@ public class ArmStateMachine {
    */
 
   public enum Status {
-    READY, RUNNING
+    READY, RUNNING, EMERGENCY_RECOVERY
   }
 
   public enum Input {
     INITIALIZE, EXTEND, COMPLETED, RETRACT, RESET, INTERRUPT,
     START, STARTED, STOP, DETECT_PIECE, RETRIEVED, RELEASE, RELEASED, 
-    FLEX_WRIST; // flex for the wrist is palm down, e.g., when picking up/scoring
+    FLEX_WRIST, // flex for the wrist is palm down, e.g., when picking up/scoring
+    AUTO_RECOVER; // attempts to take the bot out of emergency mode and recovery automatically
 }
 
   public enum MovementType {
@@ -75,7 +79,6 @@ public class ArmStateMachine {
   class JoystickControl {
     public Joystick joystick;
     public int axis;
-    public boolean enabled = false;
     public double startPosition = 0;
 
     public JoystickControl(Joystick joystick, int axis) {
@@ -85,11 +88,10 @@ public class ArmStateMachine {
 
     public void setStartPosition(double startPosition) {
       this.startPosition = startPosition;
-      enabled = true;
     }
 
     public double getRawAxis() {
-      return startPosition + (joystick.getRawAxis(axis) * ArmConstants.distalMaxAdjustmentTicks);
+      return startPosition + (joystick.getRawAxis(axis) * ArmConstants.armManualAdjustmentTicks);
     }
   }
 
@@ -110,7 +112,8 @@ public class ArmStateMachine {
     pathStartedTime = 0;
     movementType = null;
     queuedCommand = null;
-    joystickControl = null;
+    proximalJoystickControl = null;
+    distalJoystickControl = null;
     wristFlexed = false;
     isInAuto = false;
     allowScore = true;
@@ -123,16 +126,43 @@ public class ArmStateMachine {
   }
 
   // put arm into unknown state whenever disabled
-  public void disabledInit() {
+  public void disable() {
     System.out.println("ArmStateMachine: DISABLED!!!!!!!!!!!!!!!!!!!!!!!!!");
     resetState();
     currentArmState = ArmState.UNKNOWN;
+    subsystem.allowArmManipulation();
   }
 
-  // kick off a sequence to get us into our Home position safely
+  // kick off a sequence to get the arm into the proper initial state
   public void initializeArm() {
     System.out.println("ArmStateMachine: INITIALIZING!!!!!!!!!!!!!!!!!!!!!");
-    transitionArm(Input.INITIALIZE);
+    if(LogWriter.isArmRecordingEnabled()) {
+      // ensure the arm and wrist motors so both can be moved freely for recording
+      subsystem.allowArmManipulation();
+    } else if(isArmOutOfPosition()) {
+      emergencyInterrupt();
+    } else {
+      transitionIntake(Input.STOP);
+      transitionArm(Input.INITIALIZE);
+    }
+  }
+
+  // determine if the arm is out of safe position to be moved automatically to home
+  public boolean isArmOutOfPosition() {
+    boolean isProximalOutOfPosition = armDistanceFromHome(subsystem.getProximalArmPosition(), ArmConstants.proximalHomePosition) > Math.abs(ArmConstants.proximalHomePosition);
+    boolean isDistalOutOfPosition = armDistanceFromHome(subsystem.getDistalArmPosition(), ArmConstants.distalHomePosition) > Math.abs(ArmConstants.distalHomePosition);
+    boolean isWristOutOfPosition = (subsystem.getWristPosition() / ArmConstants.wristHomePosition <= 0.5);
+    return (isProximalOutOfPosition || isDistalOutOfPosition || isWristOutOfPosition);
+  }
+
+  private double armDistanceFromHome(double currentPositon, double homePosition) {
+    boolean currentPositionIsPositive = currentPositon > 0;
+    boolean homePositionIsPositive = homePosition > 0;
+    if((currentPositionIsPositive && homePositionIsPositive) || (!currentPositionIsPositive && !homePositionIsPositive)) {
+      return Math.abs(Math.abs(currentPositon) - Math.abs(homePosition));
+    } else {
+      return Math.abs(currentPositon) + Math.abs(homePosition);
+    }
   }
 
 
@@ -321,7 +351,39 @@ public class ArmStateMachine {
 
 
   /*
-   * METHODS TO NOTIFICATIONS FROM OTHER SYSTEMS (e.g., ArmSubsystem)
+   * INTERRUPTION/RECOVERY METHODS
+   */
+
+  // NOTIFY THAT PICKUP/SCORE SHOULD BE STOPPED & RETRACTED W/O SCORE/PICKUP
+  public void interrupt() {
+    subsystem.stopArm();
+    transitionArm(Input.INTERRUPT);
+    if(currentIntakeState != IntakeState.HOLDING) {
+      // cut the movement short, the intake should be stopped unless we're holding a piece
+      transitionIntake(Input.STOP);
+    }
+  }
+
+  // EITHER THE SYSTEM HAS DETECTED ITS OUT OF POSITION OR OPERATOR HAS HIT THE KILL SWITCH
+  public void emergencyInterrupt() {
+    System.out.println("ArmStateMachine: Moved into EMERGENCY RECOVERY!!!!!!!!!!!!!!!!!!!!!!!!");
+    subsystem.allowArmManipulation(); // arm and wrist will go limp
+    status = Status.EMERGENCY_RECOVERY;
+    currentArmState = ArmState.EMERGENCY_RECOVERY;
+  }
+
+  // OPERATOR INDICATED ARM IS READY FOR AUTO RECOVERY ATTEMPT
+  public void attemptAutoRecovery() {
+    // ignore this if the arm is not acutally in recovery mode
+    if(currentArmState == ArmState.EMERGENCY_RECOVERY) {
+      System.out.println("ArmStateMachine: Attempting AUTO RECOVERY!!!!!!!!!!!!!!!!!!!!!!!!");
+      transitionArm(Input.AUTO_RECOVER);
+    }
+  }
+
+
+  /*
+   * NOTIFICATIONS FROM SUBSYSTEM
    */
 
   // NOTIFY THAT SUBSYSTEM COMPLETED ARM MOVEMENT
@@ -336,16 +398,6 @@ public class ArmStateMachine {
       transitionIntake(Input.STOP);
     }
     transitionArm(Input.COMPLETED);
-  }
-
-  // NOTIFY THAT PICKUP/SCORE SHOULD BE STOPPED & RETRACTED W/O SCORE/PICKUP
-  public void interrupt() {
-    subsystem.stopArm();
-    transitionArm(Input.INTERRUPT);
-    if(currentIntakeState != IntakeState.HOLDING) {
-      // cut the movement short, the intake should be stopped unless we're holding a piece
-      transitionIntake(Input.STOP);
-    }
   }
 
 
@@ -427,14 +479,29 @@ public class ArmStateMachine {
 
 
     /*
-     * Allow for joystick adjustment of the distal arm
+     * Allow for joystick adjustment of the distal arm when extended
      */
-    if(currentArmState == ArmState.EXTENDED && joystickControl != null) {
-      if(!joystickControl.enabled) {
+    if(currentArmState == ArmState.EXTENDED && distalJoystickControl != null) {
+      if(distalJoystickControl.startPosition == 0) {
         System.out.println("ArmStateMachine: Enabling distal arm adjustment!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        joystickControl.setStartPosition(subsystem.getDistalArmPosition());
-      } else {
-        subsystem.adjustDistalArm(joystickControl.getRawAxis());
+        // set the position only once, we want to stay within reasonable range of the final extended position
+        distalJoystickControl.setStartPosition(subsystem.getDistalArmPosition());
+      }
+      subsystem.adjustDistalArm(distalJoystickControl.getRawAxis());
+    }
+
+    /*
+     * Handling emergency status including joystick control of the proximal and distal arms
+     */
+    if(currentArmState == ArmState.EMERGENCY_RECOVERY) {
+      // set the position continuously, we want to allow the operator to move the arm as much as they need to
+      if(proximalJoystickControl != null) {
+        proximalJoystickControl.setStartPosition(subsystem.getProximalArmPosition());
+        subsystem.adjustProximalArm(proximalJoystickControl.getRawAxis());
+      }
+      if(distalJoystickControl != null) {
+        distalJoystickControl.setStartPosition(subsystem.getDistalArmPosition());
+        subsystem.adjustDistalArm(distalJoystickControl.getRawAxis());
       }
     }
   }
@@ -475,18 +542,9 @@ public class ArmStateMachine {
       case RESETTING:
         subsystem.resetToHome();
         break;
-      /*
-      Temporarily disabling these states until we revise this process
       case RESETTING_WRIST:
         subsystem.moveWristHome();
         break;
-      case RESETTING_PROXIMAL:
-        subsystem.moveProximalArmHome();
-        break;
-      case RESETTING_DISTAL:
-        subsystem.moveDistalArmHome();
-        break;
-      */
       case HOME:
         resetState();
         break;
@@ -530,7 +588,7 @@ public class ArmStateMachine {
 
 
   /*
-   * GETTERS/SETTERS
+   * GETTERS/SETTERS, AND HELPER METHODS FOR OTHER SYSTEMS
    */
 
   public Status getStatus() {
@@ -554,6 +612,10 @@ public class ArmStateMachine {
 
   public boolean isHoldingGamePiece() {
     return (currentIntakeState == IntakeState.HOLDING);
+  }
+
+  public boolean isInEmergencyRecovery() {
+    return (status == Status.EMERGENCY_RECOVERY);
   }
 
   public MovementType getMovementType() {
@@ -591,7 +653,11 @@ public class ArmStateMachine {
     return keyedSequence;
   }
 
-  public void setJoystickControl(Joystick joystick, int axis) {
-    joystickControl = new JoystickControl(joystick, axis);
+  public void addJoystickControl(Joystick joystick, int axis) {
+    if(axis == OperatorConsoleConstants.kProximalAxisId) {
+      proximalJoystickControl = new JoystickControl(joystick, axis);
+    } else {
+      distalJoystickControl = new JoystickControl(joystick, axis);
+    }
   }
 }
