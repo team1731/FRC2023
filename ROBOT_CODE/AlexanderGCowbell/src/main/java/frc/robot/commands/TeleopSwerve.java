@@ -16,7 +16,7 @@ public class TeleopSwerve extends CommandBase {
 
     private boolean headingOverride = true;
 	private boolean visionHeadingOverride = false;
-    private Double lockedHeading = null;
+
     private Double desiredHeading;
 	private double m_heading;
     
@@ -78,18 +78,18 @@ public class TeleopSwerve extends CommandBase {
             // If the right stick is neutral - this code should lock onto the last known
             // heading
             if (Math.abs(rAxis) == 0.0) {
-                if (lockedHeading == null) {
+                if (s_Swerve.lockedHeading == null) {
                 //    System.out.println("Resetting the heading");
                     headingController.reset();
-                    lockedHeading = s_Swerve.getHeading();
+                    s_Swerve.lockedHeading = s_Swerve.getHeading().getDegrees();
                 }
 
-                rotation = headingController.calculate(s_Swerve.getHeading(), lockedHeading);
+                rotation = headingController.calculate(s_Swerve.getHeading().getDegrees(), s_Swerve.lockedHeading);
             //    System.out.println("rotation from controller"+ rotation);
                 rotation  = (Math.abs(rotation) < .1) ? 0 : rotation;
             } else {
 
-                lockedHeading = null;
+                s_Swerve.lockedHeading = null;
                 rotation = rAxis * Constants.Swerve.maxAngularVelocity;
              //   System.out.println("rotation from stick" + rotation);
             }

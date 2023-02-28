@@ -66,7 +66,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
   public PoseEstimatorSubsystem( Swerve m_swerve) {
     this.m_swerve = m_swerve;
-    poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, m_swerve.getYaw(), m_swerve.getPositions(), new Pose2d());
+    poseEstimator = new SwerveDrivePoseEstimator(Constants.Swerve.swerveKinematics, m_swerve.getHeading(), m_swerve.getPositions(), new Pose2d());
 
     // Configure and map cameras using camera names and location on the robot
     if(photonCamera1 != null) {
@@ -147,7 +147,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       }
 
       // Update pose estimator with drivetrain sensors
-      poseEstimator.updateWithTime(Timer.getFPGATimestamp(), m_swerve.getYaw(), m_swerve.getPositions());
+      poseEstimator.updateWithTime(Timer.getFPGATimestamp(), m_swerve.getHeading(), m_swerve.getPositions());
       field2d.setRobotPose(getCurrentPose());
     }
 
@@ -179,7 +179,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
    */
   public void setCurrentPose(Pose2d newPose) {
     m_swerve.zeroGyro();
-    poseEstimator.resetPosition( m_swerve.getYaw(), m_swerve.getPositions(), newPose);
+    poseEstimator.resetPosition( m_swerve.getHeading(), m_swerve.getPositions(), newPose);
   }
 
   /**
@@ -189,6 +189,6 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   public void resetFieldPosition() {
     m_swerve.zeroGyro();
     poseEstimator.resetPosition(
-       m_swerve.getYaw(), m_swerve.getPositions(), new Pose2d());
+       m_swerve.getHeading(), m_swerve.getPositions(), new Pose2d());
   }
 }

@@ -152,7 +152,7 @@ public final class Constants {
         public static final double driveKA = (0.25916 / 12);
 
         /* Swerve Profiling Values */
-        public static final double maxSpeed = 3.5; // disabled for testing = 3.0; //meters per second
+        public static final double maxSpeed = 5.0; // disabled for testing = 3.0; //meters per second
         public static final double maxAngularVelocity = 3.0; // disabled for testing = 2.7;
 
         /* Neutral Modes */
@@ -248,7 +248,7 @@ public final class Constants {
     }
 
     public static final class ArmStateConstants {
-        public final static double pickupLowCubeFlexPosition = 0.38;
+        public final static double pickupLowCubeFlexPosition = 0.37;
         public final static double wristOnlyFlexMaxVelocity = 2000;
     };
 
@@ -259,9 +259,9 @@ public final class Constants {
         public final static int intakeCancoderId = 13;
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
-        public final static int proximalAbsoluteTicsCenter = 3264;
+        public final static int proximalAbsoluteTicsCenter = 3326;
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
-        public final static int distalAbsoluteTicsCenter = 1504;
+        public final static int distalAbsoluteTicsCenter = 1482;
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
