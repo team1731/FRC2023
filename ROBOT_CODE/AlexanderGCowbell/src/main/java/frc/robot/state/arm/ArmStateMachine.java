@@ -344,7 +344,7 @@ public class ArmStateMachine {
 
   private boolean isMostlyExtended() {
     if(currentArmState == ArmState.EXTENDING) {
-      return ((getPathIndex() / currentPath.getNumberOfPoints()) >= ArmConstants.mostlyExtendedThreshold);
+      return ((double)getPathIndex() / currentPath.getNumberOfPoints()) >= ArmConstants.mostlyExtendedThreshold;
     }
     return false;
   }
