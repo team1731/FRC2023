@@ -46,6 +46,9 @@ public class ArmPickupCommand extends CommandBase {
             path = PickupLowCone.getArmPath();
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
             stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);
+        } else if(sequence == ArmSequence.PICKUP_LOW_CUBE) {
+            // can be fired individually, also used to flip downed cone
+            stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);
         }
 
         if(path != null) {

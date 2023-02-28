@@ -47,9 +47,11 @@ public class RobotContainer {
   private final Trigger ky = xboxController.y();
   private final Trigger kb = xboxController.b();
   private final Trigger ka = xboxController.a();
+  private final Trigger kx = xboxController.x();
   private final Trigger kLeftBumper = xboxController.leftBumper();
   private final Trigger kRightBumper = xboxController.rightBumper();
   private final Trigger kLeftTrigger = xboxController.leftTrigger();
+  private final Trigger kRightTrigger = xboxController.rightTrigger();
 
   /* Operator Buttons */
   private final JoystickButton kPreventScoreBtn = new JoystickButton(operator,OperatorConsoleConstants.kPreventScoreBtnId);
@@ -105,6 +107,7 @@ public class RobotContainer {
     ky.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_HIGH, operator, kDisatalAxis)));
     kb.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_MEDIUM, operator, kDisatalAxis)));
     ka.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_LOW, operator, kDisatalAxis)));
+    kx.whileTrue(new InstantCommand(() -> sm_armStateMachine.clearCurrentPath()));
     if(LogWriter.isArmRecordingEnabled()) {
       kLeftBumper.onTrue(new InstantCommand(() -> s_armSubSystem.startRecordingArmPath()));
       kRightBumper.onTrue(new InstantCommand(() -> s_armSubSystem.stopRecordingArmPath()));
@@ -113,6 +116,7 @@ public class RobotContainer {
       kRightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_KEYPAD, operator, kDisatalAxis));
     }
     kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDisatalAxis));
+    kRightTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW_CUBE, operator, kDisatalAxis));
 
     /* Operator Buttons */
     kPreventScoreBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setAllowScore(false)));
