@@ -28,17 +28,17 @@ public class PathPlannerCommandGroup extends SequentialCommandGroup {
 
         // This will load the file "FullAuto.path" and generate it with a max velocity of 4 m/s and a max acceleration of 3 m/s^2
         // for every path in the group
-        PathConstraints pathConstraints = new PathConstraints(1, 1); //Constants.AutoConstants.kMaxSpeedMetersPerSecond, Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared);
+        PathConstraints pathConstraints = new PathConstraints(3, 2); //Constants.AutoConstants.kMaxSpeedMetersPerSecond, Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared);
         List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(pathPlannerFile, pathConstraints); // "A1"
     
         // This is just an example event map. It would be better to have a constant, global event map
         // in your code that will be used by all path following commands.
         HashMap<String, Command> eventMap = new HashMap<>();
         //eventMap.put("ScoreCone", new PrintCommand("Passed marker 1"));
-        eventMap.put("ScoreConeHigh", new SequentialCommandGroup(new WaitCommand(2), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CONE)));
+        eventMap.put("ScoreConeHigh", new SequentialCommandGroup(new WaitCommand(1), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CONE)));
         eventMap.put("StartIntakeCone", new AutoPickupCommand(sm_ArmStateMachine, ArmSequence.PICKUP_LOW, GamePiece.CONE));
         eventMap.put("StartIntakeCube", new AutoPickupCommand(sm_ArmStateMachine, ArmSequence.PICKUP_LOW, GamePiece.CUBE));
-        eventMap.put("ScoreCubeHigh", new SequentialCommandGroup(new WaitCommand(0), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CUBE)));
+        eventMap.put("ScoreCubeHigh", new SequentialCommandGroup(new WaitCommand(1), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CUBE)));
         //eventMap.put("intakeDown", new IntakeDown());
     
         // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.

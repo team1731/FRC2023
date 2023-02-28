@@ -5,7 +5,7 @@ public class ScoreHighCone {
         return new ArmPath(kNumPoints, proximalPoints, distalPoints, kWristFlexIndex, kWristFlexPosition, kWristExtendIndex, kWristMaxVelocity);
     }
 
-    public static final int kNumPoints = 239;
+    public static final int kNumPoints = 190;
     public static final int kWristFlexIndex = 75;
     public static final double kWristFlexPosition = 0.44;
     public static final int kWristExtendIndex = 234;

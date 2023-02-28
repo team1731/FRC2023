@@ -5,7 +5,7 @@ public class ScoreMediumCube {
         return new ArmPath(kNumPoints, proximalPoints, distalPoints, kWristFlexIndex, kWristFlexPosition, kWristExtendIndex, kWristMaxVelocity);
     }
 
-    public static final int kNumPoints = 195;
+    public static final int kNumPoints = 148;
     public static final int kWristFlexIndex = 75;
     public static final double kWristFlexPosition = 0.551;
     public static final int kWristExtendIndex = 97;
@@ -360,53 +360,7 @@ public class ScoreMediumCube {
         {-26252, -67},
         {-26252, -25},
         {-26252, -25},
-        {-26252, 1},
-        {-26252, 1},
-        {-26252, 2},
-        {-26252, 2},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0},
-        {-26252, 0}
+     
     };
 
     public static double []wristPoints = new double[]{

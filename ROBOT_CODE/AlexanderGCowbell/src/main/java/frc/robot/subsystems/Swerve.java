@@ -26,7 +26,7 @@ public class Swerve extends SubsystemBase {
     public SwerveModule[] mSwerveMods;
   //  public PigeonIMU gyro;
     private final AHRS m_gyro = new AHRS(SPI.Port.kMXP, (byte) 200); // NavX connected over MXP
-
+    public Double lockedHeading = null;
 
     public Swerve() {
 
@@ -51,7 +51,7 @@ public class Swerve extends SubsystemBase {
                                     translation.getX(), 
                                     translation.getY(), 
                                     rotation, 
-                                    getYaw()
+                                    getHeading()
                                 )
                                 : new ChassisSpeeds(
                                     translation.getX(), 
@@ -95,17 +95,20 @@ public class Swerve extends SubsystemBase {
 	 *
 	 * @return the robot's heading in degrees, from -180 to 180
 	 */
-	public double getHeading() {	
+	public Rotation2d getHeading() {	
 		double m_heading = 0.0;
         if (m_gyro != null) {
 			m_heading = Math.IEEEremainder(m_gyro.getAngle(), 360) * -1.0;
 		}
-		return m_heading;
+        return Rotation2d.fromDegrees(m_heading);
+
 	}
 
     public void zeroGyro(){
 
-        m_gyro.zeroYaw();
+        lockedHeading = null;
+        m_gyro.reset();
+       // m_gyro.zeroYaw();
  
     }
 
@@ -128,13 +131,15 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic(){
-
+        SmartDashboard.putNumber("Yaw in degrees" , getYaw().getDegrees()) ; 
+        SmartDashboard.putNumber("getHeading",getHeading().getDegrees());
  
         if (Robot.doSD()) {
             for(SwerveModule mod : mSwerveMods){
                 SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
                 SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getState().angle.getDegrees());
-                SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
+                SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);  
+
             }
         }
     }
