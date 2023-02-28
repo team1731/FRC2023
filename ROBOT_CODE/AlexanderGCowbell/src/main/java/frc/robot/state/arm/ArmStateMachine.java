@@ -259,6 +259,8 @@ public class ArmStateMachine {
       if(movementType == MovementType.SCORE && allowScore) {
         transitionIntake(Input.RELEASE);
         transitionArm(Input.RETRACT);
+      } else if(movementType == MovementType.SCORE && !allowScore) {
+        transitionArm(Input.RETRACT);
       } else if(movementType == MovementType.PICKUP) {
         transitionIntake(Input.RETRIEVED);
         transitionArm(Input.RETRACT);
@@ -324,6 +326,14 @@ public class ArmStateMachine {
   public void startedPath() {
     status = Status.RUNNING;
     pathStartedTime = Timer.getFPGATimestamp();
+  }
+
+  public void clearCurrentPath() {
+    if(currentArmState == ArmState.HOME) {
+      resetState();
+    } else {
+      interrupt();
+    }
   }
 
   public int getPathIndex() {

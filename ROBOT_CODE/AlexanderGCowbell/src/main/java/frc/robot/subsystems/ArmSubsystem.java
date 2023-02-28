@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonFXConfiguration;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motion.*;
 
 import com.revrobotics.SparkMaxPIDController;
@@ -121,12 +122,13 @@ public class ArmSubsystem extends SubsystemBase {
         talonConfig.slot0.kD = ArmConstants.kGains_MotProf.kD;
         talonConfig.slot0.integralZone = (int) ArmConstants.kGains_MotProf.kIzone;
         talonConfig.slot0.closedLoopPeakOutput = ArmConstants.kGains_MotProf.kPeakOutput;
+
         motor.configAllSettings(talonConfig);
 
         // Note: these two lines required for motion magic to work
         motor.configMotionCruiseVelocity(15000, 30);
 		motor.configMotionAcceleration(6000, 30);
-
+        motor.setNeutralMode(NeutralMode.Brake);
         motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 30);
         motor.configNominalOutputForward(0, 30);
 		motor.configNominalOutputReverse(0, 30);

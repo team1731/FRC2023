@@ -4,27 +4,29 @@ package frc.robot.subsystems;
 import com.kauailabs.navx.frc.AHRS;
 
 import frc.robot.SwerveModule;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
 
-
+  
 
     public SwerveModule[] mSwerveMods;
   //  public PigeonIMU gyro;
     private final AHRS m_gyro = new AHRS(SPI.Port.kMXP, (byte) 200); // NavX connected over MXP
-
+    public Double lockedHeading = null;
 
     public Swerve() {
 
@@ -41,13 +43,15 @@ public class Swerve extends SubsystemBase {
     }
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
+
+ 
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
                                     translation.getX(), 
                                     translation.getY(), 
                                     rotation, 
-                                    getYaw()
+                                    getHeading()
                                 )
                                 : new ChassisSpeeds(
                                     translation.getX(), 
@@ -86,9 +90,25 @@ public class Swerve extends SubsystemBase {
         return positions;
     }
 
+        /**
+	 * Returns the heading of the robot.
+	 *
+	 * @return the robot's heading in degrees, from -180 to 180
+	 */
+	public Rotation2d getHeading() {	
+		double m_heading = 0.0;
+        if (m_gyro != null) {
+			m_heading = Math.IEEEremainder(m_gyro.getAngle(), 360) * -1.0;
+		}
+        return Rotation2d.fromDegrees(m_heading);
+
+	}
+
     public void zeroGyro(){
 
-        m_gyro.zeroYaw();
+        lockedHeading = null;
+        m_gyro.reset();
+       // m_gyro.zeroYaw();
  
     }
 
@@ -111,13 +131,15 @@ public class Swerve extends SubsystemBase {
 
     @Override
     public void periodic(){
-
+        SmartDashboard.putNumber("Yaw in degrees" , getYaw().getDegrees()) ; 
+        SmartDashboard.putNumber("getHeading",getHeading().getDegrees());
  
         if (Robot.doSD()) {
             for(SwerveModule mod : mSwerveMods){
                 SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Cancoder", mod.getCanCoder().getDegrees());
                 SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Integrated", mod.getState().angle.getDegrees());
-                SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);    
+                SmartDashboard.putNumber("Mod " + mod.moduleNumber + " Velocity", mod.getState().speedMetersPerSecond);  
+
             }
         }
     }

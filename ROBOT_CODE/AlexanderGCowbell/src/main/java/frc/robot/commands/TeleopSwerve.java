@@ -1,13 +1,28 @@
 package frc.robot.commands;
 
 import frc.robot.Constants;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 
 public class TeleopSwerve extends CommandBase {
+
+    private boolean headingOverride = true;
+	private boolean visionHeadingOverride = false;
+
+    private Double desiredHeading;
+	private double m_heading;
+    
+    private final PIDController headingController = 
+        new PIDController(VisionConstants.kTurnP, VisionConstants.kTurnI, VisionConstants.kTurnD);
+       
 
     private double rotation;
     private Translation2d translation;
@@ -37,17 +52,54 @@ public class TeleopSwerve extends CommandBase {
 
     @Override
     public void execute() {
-        double yAxis = -controller.getRawAxis(translationAxis) * Math.abs(controller.getRawAxis(translationAxis));
-        double xAxis = -controller.getRawAxis(strafeAxis) * Math.abs(controller.getRawAxis(strafeAxis));
-        double rAxis = -controller.getRawAxis(rotationAxis) * Math.abs(controller.getRawAxis(rotationAxis));
-        
+        double yAxis = -controller.getRawAxis(translationAxis) ;
+        double xAxis = -controller.getRawAxis(strafeAxis) ;
+        double rAxis = -controller.getRawAxis(rotationAxis) ;
+        SmartDashboard.putNumber("yaxis before ",yAxis);
+        SmartDashboard.putNumber("xaxis before ",xAxis);
+        SmartDashboard.putNumber("raxis before ",rAxis);
         /* Deadbands */
-        yAxis = (Math.abs(yAxis) < Constants.stickDeadband) ? 0 : yAxis;
-        xAxis = (Math.abs(xAxis) < Constants.stickDeadband) ? 0 : xAxis;
-        rAxis = (Math.abs(rAxis) < Constants.stickDeadband) ? 0 : rAxis;
+        yAxis = (Math.abs(yAxis) < Constants.stickDeadband) ? 0 : (yAxis > 0? (yAxis - Constants.stickDeadband ): (yAxis + Constants.stickDeadband));
+        yAxis *= Math.abs(yAxis);
+        yAxis = yAxis/(1-Constants.stickDeadband);
+        xAxis = (Math.abs(xAxis) < Constants.stickDeadband) ? 0 : (xAxis > 0? (xAxis - Constants.stickDeadband ): (xAxis + Constants.stickDeadband));
+        xAxis *= Math.abs(xAxis);
+        xAxis = xAxis/(1-Constants.stickDeadband);
+        rAxis = (Math.abs(rAxis) < Constants.stickDeadband) ? 0 : (rAxis > 0? (rAxis - Constants.stickDeadband ): (rAxis + Constants.stickDeadband));
+        rAxis *= Math.abs(rAxis);
+        rAxis = rAxis/(1-Constants.stickDeadband);
 
-        translation = new Translation2d(yAxis, xAxis).times(Constants.Swerve.maxSpeed);
-        rotation = rAxis * Constants.Swerve.maxAngularVelocity;
+        SmartDashboard.putNumber("yaxis after ",yAxis);
+        SmartDashboard.putNumber("xaxis after ",xAxis);
+        SmartDashboard.putNumber("raxis after ",rAxis);
+        translation = new Translation2d(yAxis , xAxis).times(Constants.Swerve.maxSpeed);
+
+
+            // If the right stick is neutral - this code should lock onto the last known
+            // heading
+            if (Math.abs(rAxis) == 0.0) {
+                if (s_Swerve.lockedHeading == null) {
+                //    System.out.println("Resetting the heading");
+                    headingController.reset();
+                    s_Swerve.lockedHeading = s_Swerve.getHeading().getDegrees();
+                }
+
+                rotation = headingController.calculate(s_Swerve.getHeading().getDegrees(), s_Swerve.lockedHeading);
+            //    System.out.println("rotation from controller"+ rotation);
+                rotation  = (Math.abs(rotation) < .1) ? 0 : rotation;
+            } else {
+
+                s_Swerve.lockedHeading = null;
+                rotation = rAxis * Constants.Swerve.maxAngularVelocity;
+             //   System.out.println("rotation from stick" + rotation);
+            }
+    
+          
+   
+
+
+
+
         s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
     }
 }

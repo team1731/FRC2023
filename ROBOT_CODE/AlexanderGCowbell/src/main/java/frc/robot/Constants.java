@@ -106,8 +106,8 @@ public final class Constants {
         public static final boolean invertGyro = false; // Always ensure Gyro is CCW+ CW-
 
         /* Drivetrain Constants */
-        public static final double trackWidth = Units.inchesToMeters(21.5);
-        public static final double wheelBase = Units.inchesToMeters(26.75);
+        public static final double trackWidth = Units.inchesToMeters(20.375);
+        public static final double wheelBase = Units.inchesToMeters(20.375);
         public static final double wheelDiameter = Units.inchesToMeters(3.94);
         public static final double wheelCircumference = wheelDiameter * Math.PI;
 
@@ -147,13 +147,13 @@ public final class Constants {
         public static final double driveKF = 0.0;
 
         /* Drive Motor Characterization Values */
-        public static final double driveKS = (0.667 / 12); //divide by 12 to convert from volts to percent output for CTRE
-        public static final double driveKV = (2.44 / 12);
-        public static final double driveKA = (0.27 / 12);
+        public static final double driveKS = (0.18576/ 12); //divide by 12 to convert from volts to percent output for CTRE  was .667/12
+        public static final double driveKV = (2.3317 / 12);
+        public static final double driveKA = (0.25916 / 12);
 
         /* Swerve Profiling Values */
-        public static final double maxSpeed = 1.0; // disabled for testing = 3.0; //meters per second
-        public static final double maxAngularVelocity = 1.0; // disabled for testing = 2.7;
+        public static final double maxSpeed = 5.0; // disabled for testing = 3.0; //meters per second
+        public static final double maxAngularVelocity = 3.0; // disabled for testing = 2.7;
 
         /* Neutral Modes */
         public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
@@ -172,7 +172,7 @@ public final class Constants {
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
             public static final int canCoderID = 1;
-            public static final double angleOffset = 348.486;
+            public static final double angleOffset = 343.6;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -182,7 +182,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 2;
-            public static final double angleOffset = 24.082;
+            public static final double angleOffset = 23.99;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -192,7 +192,7 @@ public final class Constants {
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 3;
-            public static final double angleOffset = 265.5;
+            public static final double angleOffset = 265.69;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -202,7 +202,7 @@ public final class Constants {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 4;
-            public static final double angleOffset = 134.4;
+            public static final double angleOffset = 134.6;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -248,7 +248,7 @@ public final class Constants {
     }
 
     public static final class ArmStateConstants {
-        public final static double pickupLowCubeFlexPosition = 0.38;
+        public final static double pickupLowCubeFlexPosition = 0.37;
         public final static double wristOnlyFlexMaxVelocity = 2000;
     };
 
@@ -259,9 +259,9 @@ public final class Constants {
         public final static int intakeCancoderId = 13;
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
-        public final static int proximalAbsoluteTicsCenter = 3264;
+        public final static int proximalAbsoluteTicsCenter = 3326;
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
-        public final static int distalAbsoluteTicsCenter = 1504;
+        public final static int distalAbsoluteTicsCenter = 1482;
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
@@ -365,15 +365,15 @@ public final class Constants {
 
         public static final String kCameraMount1Id = "leftcamera";  //camera on the left looking back
         public static final String kCameraMount2Id = "Global_Shutter_Camera";  // camera on the right looking back
-        public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, -4.0,11.5, 17.5, 135);
-        public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, -4.0, -11.5, 17.5, 225);
+        public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, -5.3033,10.253, 17.0, 135);
+        public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, -5.3033, -10.253, 17.0, 225);
 
 		// #region TurnPID
-		public static final double kTurnP = 0.12;
+		public static final double kTurnP = 0.05;
 		public static final double kTurnI = 0;
-		public static final double kTurnD = 0.01;
-		public static final double kMaxTurnVelocity = 360;
-		public static final double kMaxTurnAcceleration = 360;
+		public static final double kTurnD = 0.00;
+	//	public static final double kMaxTurnVelocity = 360;
+	//	public static final double kMaxTurnAcceleration = 360;
 		public static final double kTurnToleranceDeg = 5;
 		public static final double kTurnRateToleranceDegPerS = 10; // degrees per second
 		// #endregion
