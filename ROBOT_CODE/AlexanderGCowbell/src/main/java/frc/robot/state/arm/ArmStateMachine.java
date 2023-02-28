@@ -24,6 +24,7 @@ public class ArmStateMachine {
   private IntakeState currentIntakeState = IntakeState.STOPPED;
   private boolean allowScore = true;
   private boolean extraExtension = false;
+  private boolean emergencyModeTriggeredNotConfirmed = false;
 
   private ArmPath currentPath; // used if running full arm path
   private double currentWristFlexPosition = 0; // used if running wrist only movement
@@ -118,6 +119,7 @@ public class ArmStateMachine {
     isInAuto = false;
     allowScore = true;
     extraExtension = false;
+    emergencyModeTriggeredNotConfirmed = false;
 
     if(isRunningKeypadEntry) {
       keyedSequence = null;
@@ -376,7 +378,14 @@ public class ArmStateMachine {
 
   // EITHER THE SYSTEM HAS DETECTED ITS OUT OF POSITION OR OPERATOR HAS HIT THE KILL SWITCH
   public void emergencyInterrupt() {
+    if(!emergencyModeTriggeredNotConfirmed) {
+      // the operator will need to confirm emergency mode before it will take effect
+      emergencyModeTriggeredNotConfirmed = true; 
+      return;
+    }
+
     System.out.println("ArmStateMachine: Moved into EMERGENCY RECOVERY!!!!!!!!!!!!!!!!!!!!!!!!");
+    emergencyModeTriggeredNotConfirmed = false; // it has been confirmed now
     subsystem.allowArmManipulation(); // arm and wrist will go limp
     status = Status.EMERGENCY_RECOVERY;
     currentArmState = ArmState.EMERGENCY_RECOVERY;

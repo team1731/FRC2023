@@ -70,7 +70,6 @@ public class RobotContainer {
   private ArmSubsystem s_armSubSystem;
   private ArmStateMachine sm_armStateMachine;
   private final LEDStringSubsystem m_ledstring;
-  private boolean confirmingKillSwitch = false; // used to force operator to confirm kill command
 
   // The container for the robot. Contains subsystems, OI devices, and commands. 
   public RobotContainer(
@@ -132,17 +131,9 @@ public class RobotContainer {
     kReleaseBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.release()));
     kReleaseBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopRelease()));
     kKillSwitch.onTrue(new InstantCommand(() -> {
-      if(!confirmingKillSwitch) {
-        System.out.println("RobotContainer: Hit kill switch!!!!!!!!!!!!!!!!!!!!!!");
-        confirmingKillSwitch = true; // force operator to confirm to prevent accidents
-      } else {
-        // confirmed, move into emergency mode
-        System.out.println("RobotContainer: Kill switch confirmed!!!!!!!!!!!!!!!!!!!!!!");
-        sm_armStateMachine.addJoystickControl(operator, kProximalAxis);
-        sm_armStateMachine.addJoystickControl(operator, kDisatalAxis);
-        sm_armStateMachine.emergencyInterrupt();
-        confirmingKillSwitch = false;
-      }
+      sm_armStateMachine.addJoystickControl(operator, kProximalAxis);
+      sm_armStateMachine.addJoystickControl(operator, kDisatalAxis);
+      sm_armStateMachine.emergencyInterrupt();
     }));
     kAutoRecoverySwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.attemptAutoRecovery()));
   }
