@@ -243,6 +243,9 @@ public class ArmStateMachine {
       }
     } else if(currentArmState == ArmState.WRIST_ONLY_FLEXED && movementType == MovementType.PICKUP) {
       transitionArm(Input.RETRACT);
+      if(currentIntakeState != IntakeState.HOLDING) {
+        transitionIntake(Input.STOP);
+      }
     } else if(currentArmState == ArmState.EXTENDING) {
       interrupt();
     }
