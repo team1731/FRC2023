@@ -44,15 +44,12 @@ public class ArmPickupCommand extends CommandBase {
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = PickupLowCone.getArmPath();
             adjustWrist = true;
-        } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
+        } else if((sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) || sequence == ArmSequence.PICKUP_LOW_CUBE) {
             stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);
-            adjustWrist = true;
-        } else if(sequence == ArmSequence.PICKUP_LOW_CUBE) {
-            // can be fired individually, also used to flip downed cone
-            stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);
-            stateMachine.setJoystickControl(joystick, distalAxis, adjustWrist);
             adjustWrist = true;
         }
+
+        stateMachine.setJoystickControl(joystick, distalAxis, adjustWrist);
 
         if(path != null) {
             stateMachine.pickup(path);

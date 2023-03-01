@@ -270,6 +270,10 @@ public class ArmSubsystem extends SubsystemBase {
         wristPIDController.setReference(0.0, CANSparkMax.ControlType.kVoltage);
     }
 
+    public double getWristPosition() {
+        return wristEncoder.getPosition();
+    }
+
 
     /*
      * INTAKE MOTOR MOVEMENT
