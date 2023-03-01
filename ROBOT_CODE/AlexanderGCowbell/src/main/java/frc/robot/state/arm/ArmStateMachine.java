@@ -277,12 +277,13 @@ public class ArmStateMachine {
       } else if(movementType == MovementType.SCORE && !allowScore) {
         transitionArm(Input.RETRACT);
       } else if(movementType == MovementType.PICKUP) {
-        transitionIntake(Input.RETRIEVED);
         transitionArm(Input.RETRACT);
       }
     } else if(currentArmState == ArmState.WRIST_ONLY_FLEXED && movementType == MovementType.PICKUP) {
-      transitionIntake(Input.RETRIEVED);
       transitionArm(Input.RETRACT);
+      if(currentIntakeState != IntakeState.HOLDING) {
+        transitionIntake(Input.STOP);
+      }
     } else if(currentArmState == ArmState.EXTENDING) {
       interrupt();
     }
@@ -432,7 +433,6 @@ public class ArmStateMachine {
     transitionArm(Input.COMPLETED);
   }
 
-
   /*
    * PERIODIC
    *  Note: this periodic should be called each time the subsystem's periodic is called
@@ -463,15 +463,18 @@ public class ArmStateMachine {
       queuedCommand = null;
     }
 
+    if(wristMovementStartedTime != 0 && Timer.getFPGATimestamp() - wristMovementStartedTime > 0.75) {
+      wristMovementStartedTime = 0;
+      transitionArm(Input.COMPLETED);
+    }
+
 
     /*
      * Logic for handling special cases for autonomous where we won't receive a button release event
      */
     if(isInAuto) {
-      if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
-        transitionIntake(Input.RETRIEVED);
-      } else if(movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING && 
-                (currentArmState == ArmState.EXTENDED || currentArmState == ArmState.WRIST_ONLY_FLEXED)) {
+      if(movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING && 
+         (currentArmState == ArmState.EXTENDED || currentArmState == ArmState.WRIST_ONLY_FLEXED)) {
         transitionArm(Input.RETRACT);
       } else if(movementType == MovementType.SCORE && currentArmState == ArmState.EXTENDED) {
         transitionIntake(Input.RELEASE);
@@ -512,6 +515,10 @@ public class ArmStateMachine {
      */
     if(currentIntakeState == IntakeState.STARTING && subsystem.isIntakeAtStartedVelocity()) {
       transitionIntake(Input.STARTED);
+    }
+
+    if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
+      transitionIntake(Input.RETRIEVED);
     }
 
 
@@ -571,11 +578,9 @@ public class ArmStateMachine {
       case EXTENDING:
         subsystem.startArmMovement(currentPath);
         break;
-      case EXTENDED:
-        // placeholder for possible check to allow extra extension
-        break;
-      case WRIST_ONLY_FLEXED:
+      case WRIST_ONLY_FLEXING:
         subsystem.moveWrist(currentWristFlexPosition, ArmStateConstants.wristOnlyFlexMaxVelocity);
+        wristMovementStartedTime = Timer.getFPGATimestamp();
         break;
       case RETRACTING:
         // determine whether to start at current index (midstream) or if completed, at the end

@@ -21,7 +21,7 @@ public enum ArmState {
         case EXTEND:
           return EXTENDING;
         case FLEX_WRIST: // flexes the wrist only, w/o moving arm
-          return WRIST_ONLY_FLEXED;
+          return WRIST_ONLY_FLEXING;
         default:
           return this;
       }
@@ -48,6 +48,19 @@ public enum ArmState {
           return RETRACTING;
         case INTERRUPT:
           return RETRACTING;
+        default:
+          return this;
+      }
+    }
+  },
+
+  WRIST_ONLY_FLEXING {
+    public ArmState next(Input input) {
+      switch(input) {
+        case COMPLETED:
+          return WRIST_ONLY_FLEXED;
+        case INTERRUPT:
+          return RESETTING;
         default:
           return this;
       }

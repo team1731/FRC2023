@@ -103,7 +103,7 @@ public class Swerve extends SubsystemBase {
 			m_heading = Math.IEEEremainder(m_gyro.getAngle(), 360) * -1.0;
             if(Robot.doSD()){
                 SmartDashboard.putNumber("Gyro -> HEADING", m_heading);
-                System.out.println("\n\nGyro -> Heading " + m_heading + "\n\n");
+
             }
 		}
         return Rotation2d.fromDegrees(m_heading);

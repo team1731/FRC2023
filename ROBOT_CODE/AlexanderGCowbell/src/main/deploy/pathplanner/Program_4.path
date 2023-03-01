@@ -7,8 +7,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8153615404617973,
-        "y": 1.5994430088622649
+        "x": 1.8754704782136837,
+        "y": 2.4959706283048937
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -26,16 +26,16 @@
     },
     {
       "anchorPoint": {
-        "x": 3.900349748442966,
-        "y": 2.380123525092656
+        "x": 3.9159720137622096,
+        "y": 2.85123652065486
       },
       "prevControl": {
-        "x": 1.8629640109636525,
-        "y": 2.475328466096362
+        "x": 2.4402521532315795,
+        "y": 2.9332209573510064
       },
       "nextControl": {
-        "x": 4.899259734820847,
-        "y": 2.3334454883460256
+        "x": 4.914432366967592,
+        "y": 2.7957665010323387
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -55,33 +55,35 @@
         "y": 3.406908813817628
       },
       "prevControl": {
-        "x": 6.068707192262149,
-        "y": 3.3878678256168864
+        "x": 6.402833260211975,
+        "y": 2.960549102916388
       },
       "nextControl": {
-        "x": 6.068707192262149,
-        "y": 3.3878678256168864
+        "x": 6.402833260211975,
+        "y": 2.960549102916388
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 1.1934894239821199,
       "isReversal": true,
       "velOverride": null,
       "isLocked": false,
-      "isStopPoint": false,
+      "isStopPoint": true,
       "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
+        "names": [
+          "AutoPickupCube"
+        ],
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
     },
     {
       "anchorPoint": {
-        "x": 3.909870242543336,
-        "y": 3.189365523624159
+        "x": 3.8704251044865727,
+        "y": 2.0313921536933996
       },
       "prevControl": {
-        "x": 5.556915721907453,
-        "y": 3.2464884882263836
+        "x": 7.778349920336204,
+        "y": 1.9494077169972535
       },
       "nextControl": null,
       "holonomicAngle": 0,
@@ -90,13 +92,18 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
+        "names": [
+          "AutoBalanceSwerve"
+        ],
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }
     }
   ],
+  "maxVelocity": 1.5,
+  "maxAcceleration": null,
+  "isReversed": null,
   "markers": [
     {
       "position": 1.7018181818181102,
