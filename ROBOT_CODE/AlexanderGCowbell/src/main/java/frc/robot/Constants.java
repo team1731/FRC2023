@@ -93,6 +93,36 @@ public final class Constants {
         public static final AprilTagPoseValues kAprilTagPose8 = new AprilTagPoseValues(8, 40.45, 42.19, 18.22, 0);
     }
 
+
+    //Operator controls List
+
+    //AXES = JOYSTICKS/BACK WHEEL CONTROLS
+    /*
+    getRawAxis(0) = left joystick(L/R): 
+    getRawAxis(1) = left joystick(U/D): 
+    getRawAxis(2) = left back wheel:
+    getRawAxis(3) = right joystick(L/R): 
+    getRawAxis(4) = right joystick(U/D): 
+    getRawAxis(5) = right back wheel: 
+
+    //BUTTONS
+    Button(1) = top Left back toggle:                                   (Toggled towards Driver);
+    Button(2) = top Left front toggle:                                  (Toggled away from Driver)
+    Button(3) = top Left front toggle:                                  (Toggled towards Driver)
+    Button(4) = front Left front toggle(L):                             (Toggled away from Driver)
+    Button(5) = front Left front toggle(L):                             (Toggled towards Driver)
+    Button(6) = front Left front toggle(R):                             (Toggled away from Driver)
+    Button(7) = front Left front toggle(R):                             (Toggled towards Driver)
+    Button(8) = front Right front toggle(R):                            (Toggled towards Driver)
+    Button(9) = front Right front toggle(R):                            (Toggled away from Driver)
+    Button(10) = top Right front toggle:                                (Toggled towards Driver)
+    Button(11) = top Right front toggle:                                (Toggled away from Driver)
+    Button(12) = top Right back toggle:                                 (Toggled towards Driver)
+    Button(14) = Front Left Bottom(1):                                  (Top Button)
+    Button(15) = front Left Bottom(2):                                  (Bottom Button)
+    Button(16) = front Right Bottom:                                    (Clicking the scrollwheel)
+    */
+
     public static final class OperatorConsoleConstants {
         public static int kPreventScoreBtnId = 13;
         public static int kReleaseBtnId = 14;
