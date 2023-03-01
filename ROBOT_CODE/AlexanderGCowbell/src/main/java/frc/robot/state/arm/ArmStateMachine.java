@@ -169,7 +169,7 @@ public class ArmStateMachine {
 
 
   /*
-   * METHODS TO HANDLE PICKUP/SCORE
+   * METHODS TO HANDLE RUN PATHS, PICKUP, SCORE
    */
   
   // PICKUP
@@ -260,11 +260,11 @@ public class ArmStateMachine {
     if(currentArmState == ArmState.EXTENDED || isMostlyExtended()) {
       if(movementType == MovementType.SCORE && allowScore) {
         transitionIntake(Input.RELEASE);
-        transitionArm(Input.RETRACT);
+        initiateRetraction();
       } else if(movementType == MovementType.SCORE && !allowScore) {
-        transitionArm(Input.RETRACT);
+        initiateRetraction();
       } else if(movementType == MovementType.PICKUP) {
-        transitionArm(Input.RETRACT);
+        initiateRetraction();
       }
     } else if(currentArmState == ArmState.WRIST_ONLY_FLEXED && movementType == MovementType.PICKUP) {
       transitionArm(Input.RETRACT);
@@ -287,6 +287,16 @@ public class ArmStateMachine {
       return false;
     }
     return true;
+  }
+
+  private void initiateRetraction() {
+    if(currentArmState == ArmState.EXTENDED) {
+      transitionArm(Input.RETRACT);
+    } else {
+      // we are initiating a midstream retraction
+      subsystem.stopArm();
+      transitionArm(Input.INTERRUPT);
+    }
   }
 
 
@@ -369,10 +379,9 @@ public class ArmStateMachine {
 
   // NOTIFY THAT PICKUP/SCORE SHOULD BE STOPPED & RETRACTED W/O SCORE/PICKUP
   public void interrupt() {
-    subsystem.stopArm();
-    transitionArm(Input.INTERRUPT);
+    initiateRetraction();
     if(currentIntakeState != IntakeState.HOLDING) {
-      // cut the movement short, the intake should be stopped unless we're holding a piece
+      // movement was cut short, the intake should be stopped unless we're holding a piece
       transitionIntake(Input.STOP);
     }
   }
