@@ -15,14 +15,14 @@ import frc.robot.Constants.OpConstants;
 import frc.robot.Constants.OpConstants.LedOption;
 
 public class LEDStringSubsystem extends SubsystemBase{
-    private static final int[] YELLOW = {120, 80, 0};
-    private static final int[] PURPLE = {70, 0, 120};
-    private static final int[] WHITE = {100, 100, 100};
-    private static final int[] BLUE = {0, 0, 64};
+    //WITH NEW LED STRIP, COLORS ARE IN RBG not RGB
+    private static final int[] YELLOW = {255, 0, 120};
+    private static final int[] PURPLE = {120, 150, 0};
+    private static final int[] WHITE = {255, 255, 255};
+    private static final int[] BLUE = {64, 0, 0};
     private static final int[] BLACK = {0, 0, 0};
     private static final int[] RED = {255, 0, 0};
     private Timer mTimer;
-    // Var to store last hue of first pixel
     private AddressableLED m_led;
     private AddressableLEDBuffer m_ledBuffer;
     private int length;
@@ -39,7 +39,7 @@ public class LEDStringSubsystem extends SubsystemBase{
         // Reuse buffer
         // Default to a length of 60, start empty output
         // Length is expensive to set, so only set it once, then just update data
-        m_ledBuffer = new AddressableLEDBuffer(60);
+        m_ledBuffer = new AddressableLEDBuffer(65);
         length = m_ledBuffer.getLength();
         m_led.setLength(length);
     
@@ -83,6 +83,33 @@ public class LEDStringSubsystem extends SubsystemBase{
   
       } 
 
+      /**
+       * 5 LED blocks of Yellow/Blue for team colors 
+       */
+      void setTeamColorBlocks(){
+        for(int i = 0; i < m_ledBuffer.getLength(); i++){
+          if(i%5 >= 0 && i%5 <= 4%5 && (i/5)%2 != 0){
+            m_ledBuffer.setRGB(i, BLUE[0], BLUE[1], BLUE[2]);
+          }else{
+            m_ledBuffer.setRGB(i, YELLOW[0], YELLOW[1], YELLOW[2]);
+          }
+        }
+      }
+
+
+      /**
+       * Blue to Yellow Gradient for team colors
+       */
+      /*void setTeamColorGradient(){
+        int r=160, g=160, b=0;
+        for(int i = 0; i < m_ledBuffer.getLength(); i++){
+          m_ledBuffer.setRGB(i, r, g, b);
+          r-=160/m_ledBuffer.getLength();
+          g-=160/m_ledBuffer.getLength();
+          b+=160/m_ledBuffer.getLength();
+        }
+      }*/
+
       public void setBlink(boolean blink){
         this.blink = blink; 
         this.startBlink = mTimer.get();
@@ -92,6 +119,10 @@ public class LEDStringSubsystem extends SubsystemBase{
         // Fill the buffer with selection
         switch (color) {
           case INIT:
+          setTeamColorBlocks();
+          if (!blink){
+              this.currentColor = LedOption.WHITE;
+            }
           case WHITE:
             setFullColor(WHITE[0], WHITE[1], WHITE[2]);
             if (!blink){

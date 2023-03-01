@@ -270,7 +270,7 @@ public class ArmSubsystem extends SubsystemBase {
     public double getWristPosition() {
         return wristEncoder.getPosition();
     }
-
+    
     /*
      * INTAKE MOTOR MOVEMENT
      */

@@ -14,6 +14,7 @@ public class ArmPickupCommand extends CommandBase {
     private ArmSequence sequence;
     private Joystick joystick;
     private int distalAxis;
+    private boolean adjustWrist = false;
 
     public ArmPickupCommand(ArmStateMachine stateMachine, ArmSequence sequence, Joystick joystick, int distalAxis) {
         this.stateMachine = stateMachine;
@@ -24,9 +25,6 @@ public class ArmPickupCommand extends CommandBase {
 
     @Override
 	public void initialize() {
-        stateMachine.addJoystickControl(joystick, distalAxis);
-
-        // no movement is currently running, load the correct path and start the pickup
         ArmPath path = null;
         boolean shouldDoExtraExtension = stateMachine.getExtraExtension();
         if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE && shouldDoExtraExtension) {
@@ -39,12 +37,14 @@ public class ArmPickupCommand extends CommandBase {
             path = PickupHighCube.getArmPath();
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = PickupLowCone.getArmPath();
-        } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
+            adjustWrist = true;
+        } else if((sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) || sequence == ArmSequence.PICKUP_LOW_CUBE) {
             stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);
-        } else if(sequence == ArmSequence.PICKUP_LOW_CUBE) {
-            // can be fired individually, also used to flip downed cone
-            stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);
+            adjustWrist = true;
         }
+
+        // Note: distal joystick doubles for distal arm and wrist adjustment dependending on the path being run
+        stateMachine.addJoystickControl(joystick, distalAxis, adjustWrist);
 
         if(path != null) {
             stateMachine.pickup(path);
