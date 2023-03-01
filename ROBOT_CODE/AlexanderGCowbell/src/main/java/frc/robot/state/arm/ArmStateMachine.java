@@ -454,7 +454,8 @@ public class ArmStateMachine {
         }
       }
 
-      if(joystickControl.adjustWrist){
+      if(joystickControl.adjustWrist) {
+        System.out.println("ArmStateMachine: Feeding joystick position adjustment to the wrist: " + joystickControl.getRawAxis());
         subsystem.moveWrist(joystickControl.getRawAxis(), ArmConstants.wristMaxVel);
       } else {
         subsystem.adjustDistalArm(joystickControl.getRawAxis());
