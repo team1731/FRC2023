@@ -48,7 +48,7 @@ public class ArmPickupCommand extends CommandBase {
             stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);
             adjustWrist = true;
         }
-
+        
         stateMachine.setJoystickControl(joystick, distalAxis, adjustWrist);
 
         if(path != null) {
