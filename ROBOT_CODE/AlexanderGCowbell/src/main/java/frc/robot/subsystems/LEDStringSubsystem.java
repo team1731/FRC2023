@@ -15,13 +15,13 @@ import frc.robot.Constants.OpConstants;
 import frc.robot.Constants.OpConstants.LedOption;
 
 public class LEDStringSubsystem extends SubsystemBase{
-    private static final int[] YELLOW = {120, 80, 0};
-    private static final int[] PURPLE = {70, 0, 120};
-    private static final int[] WHITE = {100, 100, 100};
-    private static final int[] BLUE = {0, 0, 64};
+    //WITH NEW LED STRIP, COLORS ARE IN RBG not RGB
+    private static final int[] YELLOW = {255, 0, 120};
+    private static final int[] PURPLE = {120, 150, 0};
+    private static final int[] WHITE = {255, 255, 255};
+    private static final int[] BLUE = {64, 0, 0};
     private static final int[] BLACK = {0, 0, 0};
     private Timer mTimer;
-    // Var to store last hue of first pixel
     private AddressableLED m_led;
     private AddressableLEDBuffer m_ledBuffer;
     private int length;
