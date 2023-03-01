@@ -30,7 +30,7 @@ public class ArmStateMachine {
   private double currentWristFlexPosition = 0; // used if running wrist only movement
   private int pathStartedIndex = 0;
   private double pathStartedTime = 0;
-  private double wristResetStartedTime = 0;
+  private double wristMovementStartedTime = 0;
   private QueuedCommand queuedCommand = null;
   private JoystickControl proximalJoystickControl;
   private JoystickControl distalJoystickControl;
@@ -123,7 +123,7 @@ public class ArmStateMachine {
     currentWristFlexPosition = 0;
     pathStartedIndex = 0;
     pathStartedTime = 0;
-    wristResetStartedTime = 0;
+    wristMovementStartedTime = 0;
     movementType = null;
     queuedCommand = null;
     proximalJoystickControl = null;
@@ -501,6 +501,11 @@ public class ArmStateMachine {
       }
     }
 
+    if(wristMovementStartedTime != 0 && Timer.getFPGATimestamp() - wristMovementStartedTime > 0.75) {
+      wristMovementStartedTime = 0;
+      transitionArm(Input.COMPLETED);
+    }
+
     
     /*
      * Logic for handling intake cases
@@ -543,14 +548,6 @@ public class ArmStateMachine {
         subsystem.adjustDistalArmVelocity(distalJoystickControl.getVelocityAdjustment());
       }
     }
-
-    /*
-     * Auto recovery logic
-     */
-    if(wristResetStartedTime != 0 && Timer.getFPGATimestamp() - wristResetStartedTime > 0.75) {
-      wristResetStartedTime = 0;
-      transitionArm(Input.COMPLETED);
-    }
   }
 
 
@@ -591,7 +588,7 @@ public class ArmStateMachine {
         break;
       case RESETTING_WRIST:
         subsystem.moveWristHome();
-        wristResetStartedTime = Timer.getFPGATimestamp();
+        wristMovementStartedTime = Timer.getFPGATimestamp();
         break;
       case HOME:
         resetState();
