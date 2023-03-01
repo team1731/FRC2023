@@ -6,8 +6,10 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.GamePiece;
+import frc.robot.commands.AutoCheckRemainingTime;
 import frc.robot.commands.AutoPickupCommand;
 import frc.robot.commands.AutoScoreCommand;
+import frc.robot.commands.AutoWaitForGamePiece;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.subsystems.PoseEstimatorSubsystem;
@@ -35,10 +37,11 @@ public class PathPlannerCommandGroup extends SequentialCommandGroup {
         // in your code that will be used by all path following commands.
         HashMap<String, Command> eventMap = new HashMap<>();
         //eventMap.put("ScoreCone", new PrintCommand("Passed marker 1"));
-        eventMap.put("ScoreConeHigh", new SequentialCommandGroup(new WaitCommand(1), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CONE)));
+        eventMap.put("ScoreConeHigh", new SequentialCommandGroup(new AutoCheckRemainingTime(), new WaitCommand(1), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CONE)));
         eventMap.put("StartIntakeCone", new AutoPickupCommand(sm_ArmStateMachine, ArmSequence.PICKUP_LOW, GamePiece.CONE));
         eventMap.put("StartIntakeCube", new AutoPickupCommand(sm_ArmStateMachine, ArmSequence.PICKUP_LOW, GamePiece.CUBE));
-        eventMap.put("ScoreCubeHigh", new SequentialCommandGroup(new WaitCommand(1), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CUBE)));
+        eventMap.put("AutoWaitForGamePiece", new AutoWaitForGamePiece(sm_ArmStateMachine));
+        eventMap.put("ScoreCubeHigh", new SequentialCommandGroup(new AutoCheckRemainingTime(), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CUBE)));
         //eventMap.put("intakeDown", new IntakeDown());
     
         // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.

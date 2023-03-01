@@ -7,7 +7,9 @@ import frc.robot.SwerveModule;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -123,20 +125,26 @@ public class Swerve extends SubsystemBase {
         }  
     }
 
-    public Rotation2d getYaw() {
-    if (m_gyro.isMagnetometerCalibrated()) {
-      // We will only get valid fused headings if the magnetometer is calibrated
-      return Rotation2d.fromDegrees(m_gyro.getFusedHeading());
+    public double getPitch() {
+        return m_gyro.getRoll(); // pitch is roll given the way the board is mounted.
     }
 
+  //  public Rotation2d getYaw() {
+  //  if (m_gyro.isMagnetometerCalibrated()) {
+      // We will only get valid fused headings if the magnetometer is calibrated
+  //    return Rotation2d.fromDegrees(m_gyro.getFusedHeading());
+  //  }
+
     // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
-    return Rotation2d.fromDegrees(360.0 - m_gyro.getYaw());
-    }
+   // return Rotation2d.fromDegrees(360.0 - m_gyro.getYaw());
+   // }
 
     @Override
     public void periodic(){
-        SmartDashboard.putNumber("Yaw in degrees" , getYaw().getDegrees()) ; 
+    //    SmartDashboard.putNumber("Yaw in degrees" , getYaw().getDegrees()) ; 
         SmartDashboard.putNumber("getHeading",getHeading().getDegrees());
+        SmartDashboard.putNumber("Pitch", getPitch());
+        SmartDashboard.putString("Alliance Color", DriverStation.getAlliance().toString());
  
         if (Robot.doSD()) {
             for(SwerveModule mod : mSwerveMods){
