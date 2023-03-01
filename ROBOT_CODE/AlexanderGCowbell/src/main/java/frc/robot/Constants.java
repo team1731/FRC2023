@@ -271,6 +271,7 @@ public final class Constants {
         public final static double intakeHoldingVelocityThreshold = 60;
         public final static double wristResetPostionThreshold = 0.2;
         public final static double distalMaxAdjustmentTicks = 9233;
+        public final static double wristMaxAdjustment = 0.5;
         public final static double mostlyExtendedThreshold = 0.5; // percentage of the path completed to consider mostly extended
 
         // Arm PID constants

@@ -77,10 +77,12 @@ public class ArmStateMachine {
     public int axis;
     public boolean enabled = false;
     public double startPosition = 0;
+    public boolean adjustWrist = false;
 
-    public JoystickControl(Joystick joystick, int axis) {
+    public JoystickControl(Joystick joystick, int axis, boolean adjustWrist) {
       this.joystick = joystick;
       this.axis = axis;
+      this.adjustWrist = adjustWrist;
     }
 
     public void setStartPosition(double startPosition) {
@@ -89,7 +91,11 @@ public class ArmStateMachine {
     }
 
     public double getRawAxis() {
-      return startPosition + (joystick.getRawAxis(axis) * ArmConstants.distalMaxAdjustmentTicks);
+      if (adjustWrist = true){
+        return startPosition + (joystick.getRawAxis(axis) * ArmConstants.wristMaxAdjustment);
+      } else {
+        return startPosition + (joystick.getRawAxis(axis) * ArmConstants.distalMaxAdjustmentTicks);
+      }
     }
   }
 
@@ -441,10 +447,18 @@ public class ArmStateMachine {
      */
     if(currentArmState == ArmState.EXTENDED && joystickControl != null) {
       if(!joystickControl.enabled) {
-        System.out.println("ArmStateMachine: Enabling distal arm adjustment!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-        joystickControl.setStartPosition(subsystem.getDistalArmPosition());
-      } else {
-        subsystem.adjustDistalArm(joystickControl.getRawAxis());
+        if (joystickControl.adjustWrist = true){
+          joystickControl.setStartPosition(currentPath.getWristFlexPosition());
+        } else {
+          subsystem.moveWrist(joystickControl.getRawAxis(), ArmConstants.wristMaxVel);
+        }
+
+        if (joystickControl.adjustWrist = false){
+          System.out.println("ArmStateMachine: Enabling distal arm adjustment!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+          joystickControl.setStartPosition(subsystem.getDistalArmPosition());
+        } else {
+          subsystem.adjustDistalArm(joystickControl.getRawAxis());
+        }
       }
     }
   }
@@ -601,7 +615,7 @@ public class ArmStateMachine {
     return keyedSequence;
   }
 
-  public void setJoystickControl(Joystick joystick, int axis) {
-    joystickControl = new JoystickControl(joystick, axis);
+  public void setJoystickControl(Joystick joystick, int axis, boolean adjustWrist) {
+    joystickControl = new JoystickControl(joystick, axis, adjustWrist);
   }
 }

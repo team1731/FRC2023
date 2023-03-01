@@ -13,6 +13,7 @@ public class ArmScoreCommand extends CommandBase {
     private ArmSequence sequence;
     private Joystick joystick;
     private int distalAxis;
+    private boolean adjustWrist = false;
 
     public ArmScoreCommand(ArmStateMachine stateMachine, ArmSequence sequence, Joystick joystick, int distalAxis) {
         this.stateMachine = stateMachine;
@@ -28,7 +29,7 @@ public class ArmScoreCommand extends CommandBase {
             return;
         }
 
-        stateMachine.setJoystickControl(joystick, distalAxis);
+        stateMachine.setJoystickControl(joystick, distalAxis, adjustWrist);
 
         ArmPath path = null;
         if(sequence == ArmSequence.SCORE_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {
