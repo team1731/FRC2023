@@ -27,6 +27,7 @@ public class ArmStateMachine {
   private double currentWristFlexPosition = 0; // used if running wrist only movement
   private int pathStartedIndex = 0;
   private double pathStartedTime = 0;
+  private double wristMovementStartedTime = 0;
   private QueuedCommand queuedCommand = null;
   private JoystickControl joystickControl;
 
@@ -113,6 +114,7 @@ public class ArmStateMachine {
     currentWristFlexPosition = 0;
     pathStartedIndex = 0;
     pathStartedTime = 0;
+    wristMovementStartedTime = 0;
     movementType = null;
     queuedCommand = null;
     joystickControl = null;
@@ -353,6 +355,7 @@ public class ArmStateMachine {
 
   // NOTIFY THAT PICKUP/SCORE SHOULD BE STOPPED & RETRACTED W/O SCORE/PICKUP
   public void interrupt() {
+    System.out.println("ArmStateMachine: running an interrupt: ArmState: " + currentArmState + ", IntakeState: " + currentIntakeState);
     subsystem.stopArm();
     transitionArm(Input.INTERRUPT);
     if(currentIntakeState != IntakeState.HOLDING) {
@@ -390,6 +393,11 @@ public class ArmStateMachine {
     } else if(!isInAuto && queuedCommand != null) {
       // we are no longer in auto, this command no longer applies, clear the queued command
       queuedCommand = null;
+    }
+
+    if(wristMovementStartedTime != 0 && Timer.getFPGATimestamp() - wristMovementStartedTime > 0.75) {
+      wristMovementStartedTime = 0;
+      transitionArm(Input.COMPLETED);
     }
 
 
@@ -444,7 +452,7 @@ public class ArmStateMachine {
     /*
      * Allow for joystick adjustment of the distal arm
      */
-    if(currentArmState == ArmState.EXTENDED && joystickControl != null) {
+    if((currentArmState == ArmState.EXTENDED || currentArmState == ArmState.WRIST_ONLY_FLEXED) && joystickControl != null) {
       if(joystickControl.startPosition == 0) {
         System.out.println("ArmStateMachine: Enabling arm/hand position adjustment!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         if(joystickControl.adjustWrist) {
@@ -455,7 +463,6 @@ public class ArmStateMachine {
       }
 
       if(joystickControl.adjustWrist) {
-        System.out.println("ArmStateMachine: Feeding joystick position adjustment to the wrist: " + joystickControl.getRawAxis());
         subsystem.moveWrist(joystickControl.getRawAxis(), ArmConstants.wristMaxVel);
       } else {
         subsystem.adjustDistalArm(joystickControl.getRawAxis());
@@ -484,11 +491,9 @@ public class ArmStateMachine {
       case EXTENDING:
         subsystem.startArmMovement(currentPath);
         break;
-      case EXTENDED:
-        // placeholder for possible check to allow extra extension
-        break;
-      case WRIST_ONLY_FLEXED:
+      case WRIST_ONLY_FLEXING:
         subsystem.moveWrist(currentWristFlexPosition, ArmStateConstants.wristOnlyFlexMaxVelocity);
+        wristMovementStartedTime = Timer.getFPGATimestamp();
         break;
       case RETRACTING:
         // determine whether to start at current index (midstream) or if completed, at the end
