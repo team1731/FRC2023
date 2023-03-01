@@ -49,7 +49,6 @@ public class ArmSubsystem extends SubsystemBase {
     private CANSparkMax intakeMotor;
     private SparkMaxPIDController wristPIDController; 
     private AbsoluteEncoder wristEncoder;
-    private boolean wristResetting = false;
 
     // arm recording
     Logger armPathLogger;
@@ -59,8 +58,6 @@ public class ArmSubsystem extends SubsystemBase {
     private Direction currentDirection = null;
     private boolean proximalMPRunning = false;
     private boolean distalMPRunning = false;
-    private boolean proximalArmResetting = false;
-    private boolean distalArmResetting = false;
 
 
     public ArmSubsystem() {
@@ -174,22 +171,20 @@ public class ArmSubsystem extends SubsystemBase {
         stateMachine.startedPath();
     }
 
-    public void moveProximalArmHome() {
-        proximalMotor.set(ControlMode.MotionMagic, ArmConstants.proximalHomePosition);
-        proximalArmResetting = true;
-    }
-
-    public void moveDistalArmHome() {
-        distalMotor.set(ControlMode.MotionMagic, ArmConstants.distalHomePosition);
-        distalArmResetting = true;
-    }
-
     public void adjustProximalArm(double targetPosition) {
         proximalMotor.set(ControlMode.MotionMagic, targetPosition);
     }
 
+    public void adjustProximalArmVelocity(double velocity) {
+        proximalMotor.set(ControlMode.Velocity, velocity);
+    }
+
     public void adjustDistalArm(double targetPosition) {
         distalMotor.set(ControlMode.MotionMagic, targetPosition);
+    }
+
+    public void adjustDistalArmVelocity(double velocity) {
+        distalMotor.set(ControlMode.Velocity, velocity);
     }
 
     public void stopArm() {
@@ -264,7 +259,6 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void moveWristHome() {
         moveWrist(ArmConstants.wristHomePosition, ArmConstants.wristMaxVel);
-        wristResetting = true;
     }
 
     public double getWristPosition() {
@@ -335,23 +329,6 @@ public class ArmSubsystem extends SubsystemBase {
             } else {
                 stateMachine.completedArmMovement();
             } 
-        }
-
-        if(wristResetting && Math.abs(ArmConstants.wristHomePosition - wristMotor.getEncoder().getPosition()) < ArmConstants.wristResetPostionThreshold) {
-            wristResetting = false;
-            stateMachine.completedArmMovement();
-        }
-
-        // Note: the difference between the current position and home is less than the difference between home and 0 position
-        if(proximalArmResetting && Math.abs(proximalMotor.getSelectedSensorPosition() - ArmConstants.proximalHomePosition) < Math.abs(ArmConstants.proximalHomePosition)) {
-            proximalArmResetting = false;
-            stateMachine.completedArmMovement();
-        }
-
-        // Note: the difference between the current position and home is less than the difference between home and 0 position
-        if(distalArmResetting && Math.abs(distalMotor.getSelectedSensorPosition() - ArmConstants.distalHomePosition) < Math.abs(ArmConstants.distalHomePosition)) {
-            distalArmResetting = false;
-            stateMachine.completedArmMovement();
         }
 
         doSD();
