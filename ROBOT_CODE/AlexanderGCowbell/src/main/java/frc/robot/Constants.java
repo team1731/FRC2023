@@ -127,7 +127,7 @@ public final class Constants {
         public static int kExtraExtensionBtnId = 16;
         public static int kProximalAxisId = 1;
         public static int kDistalAxisId = 4;
-        public static int kKillSwitchId = 6;
+        public static int kKillSwitchId = 9;
         public static int kAutoRecoverySwitchId = 8;
     }
 
