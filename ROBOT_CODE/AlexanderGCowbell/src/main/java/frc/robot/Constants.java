@@ -304,6 +304,7 @@ public final class Constants {
         public final static double wristMaxAdjustment = 0.05;
         public final static double emergencyModeMaxArmVelocity = 2000; // max for Falcon motors is 6800 velocity units
         public final static double mostlyExtendedThreshold = 0.5; // percentage of the path completed to consider mostly extended
+        public final static double proximalOutOfPositionThreshold = -27000;
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;

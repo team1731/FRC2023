@@ -155,7 +155,7 @@ public class ArmStateMachine {
       // ensure the arm and wrist motors so both can be moved freely for recording
       subsystem.allowArmManipulation();
     } else if(isArmOutOfPosition()) {
-      emergencyInterrupt();
+      status = Status.EMERGENCY_RECOVERY; // will still require operator to set kill switch
     } else {
       transitionIntake(Input.STOP);
       transitionArm(Input.INITIALIZE);
@@ -164,20 +164,7 @@ public class ArmStateMachine {
 
   // determine if the arm is out of safe position to be moved automatically to home
   public boolean isArmOutOfPosition() {
-    boolean isProximalOutOfPosition = armDistanceFromHome(subsystem.getProximalArmPosition(), ArmConstants.proximalHomePosition) > Math.abs(ArmConstants.proximalHomePosition);
-    boolean isDistalOutOfPosition = armDistanceFromHome(subsystem.getDistalArmPosition(), ArmConstants.distalHomePosition) > Math.abs(ArmConstants.distalHomePosition);
-    boolean isWristOutOfPosition = (subsystem.getWristPosition() / ArmConstants.wristHomePosition <= 0.5);
-    return (isProximalOutOfPosition || isDistalOutOfPosition || isWristOutOfPosition);
-  }
-
-  private double armDistanceFromHome(double currentPositon, double homePosition) {
-    boolean currentPositionIsPositive = currentPositon > 0;
-    boolean homePositionIsPositive = homePosition > 0;
-    if((currentPositionIsPositive && homePositionIsPositive) || (!currentPositionIsPositive && !homePositionIsPositive)) {
-      return Math.abs(Math.abs(currentPositon) - Math.abs(homePosition));
-    } else {
-      return Math.abs(currentPositon) + Math.abs(homePosition);
-    }
+    return subsystem.getProximalArmPosition() < ArmConstants.proximalOutOfPositionThreshold;
   }
 
 
@@ -409,7 +396,7 @@ public class ArmStateMachine {
   // OPERATOR INDICATED ARM IS READY FOR AUTO RECOVERY ATTEMPT
   public void attemptAutoRecovery() {
     // ignore this if the arm is not acutally in recovery mode
-    if(currentArmState == ArmState.EMERGENCY_RECOVERY) {
+    if(status == Status.EMERGENCY_RECOVERY) {
       System.out.println("ArmStateMachine: Attempting AUTO RECOVERY!!!!!!!!!!!!!!!!!!!!!!!!");
       transitionArm(Input.AUTO_RECOVER);
     }

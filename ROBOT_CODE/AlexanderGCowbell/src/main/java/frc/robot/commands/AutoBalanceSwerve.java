@@ -49,6 +49,8 @@ public class AutoBalanceSwerve extends CommandBase {
             translation = new Translation2d(-0.5 , 0.0); // Speed is in Meters/s
         } else if (s_Swerve.getPitch() < -10) {
             translation = new Translation2d(0.5, -1.0);
+        } else {
+            translation = new Translation2d(0 , 0);
         }
 
 
