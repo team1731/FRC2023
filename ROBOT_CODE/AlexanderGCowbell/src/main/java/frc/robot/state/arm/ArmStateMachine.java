@@ -98,7 +98,7 @@ public class ArmStateMachine {
       if(adjustWrist){
         return startPosition + (joystick.getRawAxis(axis) * ArmConstants.wristMaxAdjustment);
       } else {
-        return startPosition + (joystick.getRawAxis(axis) * ArmConstants.armManualAdjustmentTicks);
+        return startPosition + (joystick.getRawAxis(axis) * ArmConstants.distalMaxAdjustmentTicks);
       }
     }
   }
