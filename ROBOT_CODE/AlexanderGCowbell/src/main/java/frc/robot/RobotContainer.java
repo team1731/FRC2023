@@ -131,8 +131,8 @@ public class RobotContainer {
     kReleaseBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.release()));
     kReleaseBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopRelease()));
     kKillSwitch.onTrue(new InstantCommand(() -> {
-      sm_armStateMachine.addJoystickControl(operator, kProximalAxis);
-      sm_armStateMachine.addJoystickControl(operator, kDisatalAxis);
+      sm_armStateMachine.addJoystickControl(operator, kProximalAxis, false);
+      sm_armStateMachine.addJoystickControl(operator, kDisatalAxis, false);
       sm_armStateMachine.emergencyInterrupt();
     }));
     kAutoRecoverySwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.attemptAutoRecovery()));
