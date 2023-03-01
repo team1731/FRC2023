@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.Constants.GamePiece;
+import frc.robot.commands.AutoBalanceSwerve;
 import frc.robot.commands.AutoCheckRemainingTime;
 import frc.robot.commands.AutoPickupCommand;
 import frc.robot.commands.AutoScoreCommand;
@@ -41,6 +42,7 @@ public class PathPlannerCommandGroup extends SequentialCommandGroup {
         eventMap.put("StartIntakeCone", new AutoPickupCommand(sm_ArmStateMachine, ArmSequence.PICKUP_LOW, GamePiece.CONE));
         eventMap.put("StartIntakeCube", new AutoPickupCommand(sm_ArmStateMachine, ArmSequence.PICKUP_LOW, GamePiece.CUBE));
         eventMap.put("AutoWaitForGamePiece", new AutoWaitForGamePiece(sm_ArmStateMachine));
+        eventMap.put("AutoBalanceSwerve", new AutoBalanceSwerve(s_Swerve));
         eventMap.put("ScoreCubeHigh", new SequentialCommandGroup(new AutoCheckRemainingTime(), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CUBE)));
         //eventMap.put("intakeDown", new IntakeDown());
     
