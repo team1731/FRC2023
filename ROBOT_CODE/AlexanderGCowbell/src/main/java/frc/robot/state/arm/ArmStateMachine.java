@@ -237,11 +237,9 @@ public class ArmStateMachine {
       } else if(movementType == MovementType.SCORE && !allowScore) {
         transitionArm(Input.RETRACT);
       } else if(movementType == MovementType.PICKUP) {
-        transitionIntake(Input.RETRIEVED);
         transitionArm(Input.RETRACT);
       }
     } else if(currentArmState == ArmState.WRIST_ONLY_FLEXED && movementType == MovementType.PICKUP) {
-      transitionIntake(Input.RETRIEVED);
       transitionArm(Input.RETRACT);
     } else if(currentArmState == ArmState.EXTENDING) {
       interrupt();
@@ -399,10 +397,8 @@ public class ArmStateMachine {
      * Logic for handling special cases for autonomous where we won't receive a button release event
      */
     if(isInAuto) {
-      if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
-        transitionIntake(Input.RETRIEVED);
-      } else if(movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING && 
-                (currentArmState == ArmState.EXTENDED || currentArmState == ArmState.WRIST_ONLY_FLEXED)) {
+      if(movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING && 
+         (currentArmState == ArmState.EXTENDED || currentArmState == ArmState.WRIST_ONLY_FLEXED)) {
         transitionArm(Input.RETRACT);
       } else if(movementType == MovementType.SCORE && currentArmState == ArmState.EXTENDED) {
         transitionIntake(Input.RELEASE);
@@ -438,6 +434,10 @@ public class ArmStateMachine {
      */
     if(currentIntakeState == IntakeState.STARTING && subsystem.isIntakeAtStartedVelocity()) {
       transitionIntake(Input.STARTED);
+    }
+
+    if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
+      transitionIntake(Input.RETRIEVED);
     }
 
 
