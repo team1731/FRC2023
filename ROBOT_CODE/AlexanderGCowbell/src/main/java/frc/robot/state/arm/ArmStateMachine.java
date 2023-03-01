@@ -87,11 +87,10 @@ public class ArmStateMachine {
 
     public void setStartPosition(double startPosition) {
       this.startPosition = startPosition;
-      enabled = true;
     }
 
     public double getRawAxis() {
-      if (adjustWrist = true){
+      if(adjustWrist){
         return startPosition + (joystick.getRawAxis(axis) * ArmConstants.wristMaxAdjustment);
       } else {
         return startPosition + (joystick.getRawAxis(axis) * ArmConstants.distalMaxAdjustmentTicks);
@@ -446,19 +445,19 @@ public class ArmStateMachine {
      * Allow for joystick adjustment of the distal arm
      */
     if(currentArmState == ArmState.EXTENDED && joystickControl != null) {
-      if(!joystickControl.enabled) {
-        if (joystickControl.adjustWrist = true){
-          joystickControl.setStartPosition(currentPath.getWristFlexPosition());
+      if(joystickControl.startPosition == 0) {
+        System.out.println("ArmStateMachine: Enabling arm/hand position adjustment!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        if(joystickControl.adjustWrist) {
+          joystickControl.setStartPosition(subsystem.getWristPosition());
         } else {
-          subsystem.moveWrist(joystickControl.getRawAxis(), ArmConstants.wristMaxVel);
-        }
-
-        if (joystickControl.adjustWrist = false){
-          System.out.println("ArmStateMachine: Enabling distal arm adjustment!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
           joystickControl.setStartPosition(subsystem.getDistalArmPosition());
-        } else {
-          subsystem.adjustDistalArm(joystickControl.getRawAxis());
         }
+      }
+
+      if(joystickControl.adjustWrist){
+        subsystem.moveWrist(joystickControl.getRawAxis(), ArmConstants.wristMaxVel);
+      } else {
+        subsystem.adjustDistalArm(joystickControl.getRawAxis());
       }
     }
   }
