@@ -60,6 +60,7 @@ public class RobotContainer {
   private final JoystickButton kIntakeBtn = new JoystickButton(operator,OperatorConsoleConstants.kIntakeBtnId);
   private final JoystickButton kKillSwitch = new JoystickButton(operator,OperatorConsoleConstants.kKillSwitchId);
   private final JoystickButton kAutoRecoverySwitch = new JoystickButton(operator,OperatorConsoleConstants.kAutoRecoverySwitchId);
+  private final JoystickButton kTestBalanceCommand = new JoystickButton(operator,4);
   public final int kDisatalAxis = OperatorConsoleConstants.kDistalAxisId;
   public final int kProximalAxis = OperatorConsoleConstants.kProximalAxisId;
 
@@ -136,6 +137,7 @@ public class RobotContainer {
       sm_armStateMachine.emergencyInterrupt();
     }));
     kAutoRecoverySwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.attemptAutoRecovery()));
+    kTestBalanceCommand.onTrue(new AutoBalanceSwerve(s_Swerve));
   }
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {

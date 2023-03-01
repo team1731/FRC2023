@@ -25,7 +25,7 @@ public class AutoBalanceSwerve extends CommandBase {
        
 
     private double rotation;
-    private Translation2d translation;
+    private Translation2d translation = new Translation2d(0 , 0);
 
     
     private Swerve s_Swerve;

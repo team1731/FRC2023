@@ -146,11 +146,14 @@ public class LEDStringSubsystem extends SubsystemBase{
             if (!blink){
               this.currentColor = LedOption.BLUE;
             }  
-          case BLACK:
-            setFullColor(BLACK[0], BLACK[1], BLACK[2]);
-            break;
           case RED:
             setFullColor(RED[0], RED[1], RED[2]);
+            if(!blink) {
+              this.currentColor = LedOption.RED;
+            }
+            break;
+          case BLACK:
+            setFullColor(BLACK[0], BLACK[1], BLACK[2]);
             break;
         }
       }

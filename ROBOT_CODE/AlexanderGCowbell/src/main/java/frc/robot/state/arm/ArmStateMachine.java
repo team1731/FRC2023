@@ -401,6 +401,7 @@ public class ArmStateMachine {
     System.out.println("ArmStateMachine: Moved into EMERGENCY RECOVERY!!!!!!!!!!!!!!!!!!!!!!!!");
     emergencyModeTriggeredNotConfirmed = false; // it has been confirmed now
     subsystem.allowArmManipulation(); // arm and wrist will go limp
+    subsystem.moveWristHome(); // snap the wrist home first to get it out of the way
     status = Status.EMERGENCY_RECOVERY;
     currentArmState = ArmState.EMERGENCY_RECOVERY;
   }
