@@ -125,7 +125,7 @@ public class ArmSubsystem extends SubsystemBase {
         // Note: these two lines required for motion magic to work
         motor.configMotionCruiseVelocity(15000, 30);
 		motor.configMotionAcceleration(6000, 30);
-        motor.setNeutralMode(NeutralMode.Brake);
+        motor.setNeutralMode(LogWriter.isArmRecordingEnabled()? NeutralMode.Coast : NeutralMode.Brake);
         motor.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, 0, 30);
         motor.configNominalOutputForward(0, 30);
 		motor.configNominalOutputReverse(0, 30);
