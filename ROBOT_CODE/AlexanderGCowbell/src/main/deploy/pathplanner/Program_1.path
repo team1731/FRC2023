@@ -7,8 +7,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9938924423303392,
-        "y": 2.1498141178100543
+        "x": 2.13258644764159,
+        "y": 1.735182432797783
       },
       "holonomicAngle": 0.0,
       "isReversal": false,
@@ -26,16 +26,16 @@
     },
     {
       "anchorPoint": {
-        "x": 3.1234557923661304,
-        "y": 2.632611356131804
+        "x": 3.3228355544367627,
+        "y": 2.2370947067475537
       },
       "prevControl": {
-        "x": 1.590527734587075,
-        "y": 2.6638956022089277
+        "x": 1.7899074966577073,
+        "y": 2.2683789528246776
       },
       "nextControl": {
-        "x": 4.90889463597109,
-        "y": 2.596173828711294
+        "x": 5.108274398041723,
+        "y": 2.200657179327044
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -51,16 +51,16 @@
     },
     {
       "anchorPoint": {
-        "x": 7.386646500565727,
-        "y": 2.1407047359549276
+        "x": 8.671786359672899,
+        "y": 2.1367122519575994
       },
       "prevControl": {
-        "x": 5.838051585194079,
-        "y": 2.9696584847715157
+        "x": 6.859410470975766,
+        "y": 2.261782924118784
       },
       "nextControl": {
-        "x": 5.838051585194079,
-        "y": 2.9696584847715157
+        "x": 6.859410470975766,
+        "y": 2.261782924118784
       },
       "holonomicAngle": 0,
       "isReversal": true,
@@ -76,22 +76,24 @@
     },
     {
       "anchorPoint": {
-        "x": 3.934190777472464,
-        "y": 2.5870644468561674
+        "x": 4.369681154389142,
+        "y": 2.179733304010438
       },
       "prevControl": {
-        "x": 5.105211551818051,
-        "y": 2.5680234586554262
+        "x": 5.602951313237153,
+        "y": 2.079350849220485
       },
       "nextControl": null,
-      "holonomicAngle": -2.4895529219992114,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
-        "executionBehavior": "parallel",
+        "names": [
+          "AutoBalanceSwerve"
+        ],
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
         "waitTime": 0
       }

@@ -116,6 +116,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       Pose2d currentPose = getCurrentPose();
 
       var visionResult = camera.getLatestResult();
+
       if(visionResult.hasTargets()) {
         PhotonPoseEstimator photonPoseEstimator = new PhotonPoseEstimator(aprilTagFieldLayout, PoseStrategy.AVERAGE_BEST_TARGETS, camera, robotToCamera);
         photonPoseEstimator.setReferencePose(currentPose);
@@ -140,7 +141,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
               cameraPose2d.getRotation().getDegrees()));
 
             if(currentPose.getX() < 2.5) { // test hack, throwing away values when moving away from AT
-              poseEstimator.addVisionMeasurement(cameraPose2d, cameraPose.timestampSeconds, VisionConstants.kVisionMeasurementStdDevs);
+        //      poseEstimator.addVisionMeasurement(cameraPose2d, cameraPose.timestampSeconds, VisionConstants.kVisionMeasurementStdDevs);
             }
       //    }
         }
