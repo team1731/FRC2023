@@ -127,12 +127,12 @@ public class RobotContainer {
     kRightTrigger.whileTrue(new SequentialCommandGroup(
       new InstantCommand(() -> {
         storedPiece = sm_armStateMachine.getGamePiece(); // store the current game piece setting
-        System.out.println("Storing current piece: " + storedPiece);
+        System.out.println("RobotContainer: Storing current piece: " + storedPiece);
         sm_armStateMachine.setGamePiece(GamePiece.CUBE); // set to cube, so intake will run in the right direction
       }),
       new ArmPickupCommand(sm_armStateMachine, ArmSequence.FLIP_CONE, operator, kDisatalAxis),
       new InstantCommand(() -> {
-        System.out.println("Setting back to stored piece: " + storedPiece);
+        System.out.println("RobotContainer: Setting back to stored piece: " + storedPiece);
         sm_armStateMachine.setGamePiece(storedPiece); // reset FSM to previous game piece setting
         storedPiece = null;
       })
@@ -153,8 +153,18 @@ public class RobotContainer {
       sm_armStateMachine.emergencyInterrupt();
     }));
     kAutoRecoverySwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.attemptAutoRecovery()));
-    kConeSwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CONE)));
-    kCubeSwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.setGamePiece(GamePiece.CUBE)));
+    kConeSwitch.onTrue(new InstantCommand(() -> {
+      System.out.println("RobotContainer: Setting game piece to cone: " + storedPiece);
+      sm_armStateMachine.setGamePiece(GamePiece.CONE);
+      m_ledstring.setBlink(false);
+      m_ledstring.setColor(LedOption.YELLOW);
+    }));
+    kCubeSwitch.onTrue(new InstantCommand(() -> {
+      System.out.println("RobotContainer: Setting game piece to cube: " + storedPiece);
+      sm_armStateMachine.setGamePiece(GamePiece.CUBE);
+      m_ledstring.setBlink(false);
+      m_ledstring.setColor(LedOption.PURPLE);
+    }));
   }
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
