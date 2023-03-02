@@ -125,11 +125,9 @@ public class ArmStateMachine {
     pathStartedTime = 0;
     wristMovementStartedTime = 0;
     movementType = null;
-    queuedCommand = null;
     proximalJoystickControl = null;
     distalJoystickControl = null;
     wristFlexed = false;
-    isInAuto = false;
     allowScore = true;
     extraExtension = false;
     emergencyModeTriggeredNotConfirmed = false;
@@ -450,9 +448,6 @@ public class ArmStateMachine {
         queuedCommand = null;
       } else if(isReadyToStartMovement() && queuedCommand.type == MovementType.SCORE) {
         score(queuedCommand.path);
-        queuedCommand = null;
-      } else if(Timer.getFPGATimestamp() - queuedCommand.queuedTime > 2.0) {
-        // something is wrong, we should have been home by now, clear the queued command
         queuedCommand = null;
       }
     } else if(!isInAuto && queuedCommand != null) {

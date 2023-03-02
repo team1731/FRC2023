@@ -26,7 +26,6 @@ public class AutoPickupCommand extends CommandBase {
 	public void initialize() {
         System.out.println("Starting the pickup..........................................................*****************************88");
         stateMachine.setGamePiece(pieceType);
-        stateMachine.setIsInAuto(true);
 
         ArmPath path = null;
         if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {

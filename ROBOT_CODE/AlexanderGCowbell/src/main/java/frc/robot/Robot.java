@@ -315,6 +315,7 @@ public class Robot extends TimedRobot {
 	} else {
         MessageLog.add("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand.getClass().getSimpleName() + " <----------");
 		m_robotContainer.zeroHeading();
+		sm_armStateMachine.setIsInAuto(true);
 		sm_armStateMachine.initializeArm();
 		sm_armStateMachine.setGamePiece(GamePiece.CONE);
 		sm_armStateMachine.setIntakeHolding();
@@ -348,6 +349,7 @@ public class Robot extends TimedRobot {
     MessageLog.add("TELEOP INIT");
 	CommandScheduler.getInstance().cancelAll();
 	initSubsystems();
+	sm_armStateMachine.setIsInAuto(false);
 	sm_armStateMachine.initializeArm();
     // This makes sure that the autonomous stops running when
 	// teleop starts running. If you want the autonomous to

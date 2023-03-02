@@ -23,7 +23,6 @@ public class AutoScoreCommand extends CommandBase {
     @Override
 	public void initialize() {
         stateMachine.setGamePiece(pieceType);
-        stateMachine.setIsInAuto(true);
 
         ArmPath path = null;
         if(sequence == ArmSequence.SCORE_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {
