@@ -129,6 +129,8 @@ public final class Constants {
         public static int kDistalAxisId = 4;
         public static int kKillSwitchId = 9;
         public static int kAutoRecoverySwitchId = 8;
+        public static int kConeSwitchId = 4;
+        public static int kCubeSwitchId = 5;
     }
 
     public static final class Swerve {
