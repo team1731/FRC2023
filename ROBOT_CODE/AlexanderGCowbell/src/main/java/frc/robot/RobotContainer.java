@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -140,14 +138,7 @@ public class RobotContainer {
     }));
     kAutoRecoverySwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.attemptAutoRecovery()));
     //kTestBalanceCommand.onTrue(new AutoBalanceSwerve(s_Swerve));
-    kTestBalanceCommand.onTrue(new InstantCommand(() -> {
-      s_Swerve.setModuleStates(new SwerveModuleState[] {
-        new SwerveModuleState(0.0, new Rotation2d(45.0)),
-        new SwerveModuleState(0.0, new Rotation2d(315.0)),
-        new SwerveModuleState(0.0, new Rotation2d(135.0)),
-        new SwerveModuleState(0.0, new Rotation2d(225.0))
-      });
-    }));
+    kTestBalanceCommand.onTrue(new TestWheelLockCommand(s_Swerve));
   }
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
