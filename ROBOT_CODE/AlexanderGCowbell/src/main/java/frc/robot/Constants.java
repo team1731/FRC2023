@@ -289,9 +289,9 @@ public final class Constants {
         public final static int intakeCancoderId = 13;
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
-        public final static int proximalAbsoluteTicsCenter = 3329;
+        public final static int proximalAbsoluteTicsCenter = 2682;
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
-        public final static int distalAbsoluteTicsCenter = 1487;
+        public final static int distalAbsoluteTicsCenter = 1812;
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
@@ -398,8 +398,8 @@ public final class Constants {
 
         public static final String kCameraMount1Id = "leftcamera";  //camera on the left looking back
         public static final String kCameraMount2Id = "Global_Shutter_Camera";  // camera on the right looking back
-        public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, -5.3033,10.253, 17.0, 225);
-        public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, -5.3033, -10.253, 17.0, 135);
+        public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, -5.3033,10.253, 17.0, 135);
+        public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, -5.3033, -10.253, 17.0, 225);
 
 		// #region TurnPID
 		public static final double kTurnP = 0.05;

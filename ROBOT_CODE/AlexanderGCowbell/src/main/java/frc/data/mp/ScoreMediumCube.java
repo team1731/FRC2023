@@ -7,7 +7,7 @@ public class ScoreMediumCube {
 
     public static final int kNumPoints = 148;
     public static final int kWristFlexIndex = 75;
-    public static final double kWristFlexPosition = 0.551;
+    public static final double kWristFlexPosition = 0.438;
     public static final int kWristExtendIndex = 97;
     public static final double kWristMaxVelocity = 2000;
 
