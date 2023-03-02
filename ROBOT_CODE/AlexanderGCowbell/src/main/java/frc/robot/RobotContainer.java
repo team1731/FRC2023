@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -72,6 +73,8 @@ public class RobotContainer {
   private ArmStateMachine sm_armStateMachine;
   private final LEDStringSubsystem m_ledstring;
 
+  private GamePiece storedPiece; // used to temporarily store game piece setting when using cone flip feature
+
   // The container for the robot. Contains subsystems, OI devices, and commands. 
   public RobotContainer(
           Swerve swerve,
@@ -120,7 +123,17 @@ public class RobotContainer {
       kRightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_KEYPAD, operator, kDisatalAxis));
     }
     kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDisatalAxis));
-    kRightTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW_CUBE, operator, kDisatalAxis));
+    kRightTrigger.whileTrue(new SequentialCommandGroup(
+      new InstantCommand(() -> {
+        storedPiece = sm_armStateMachine.getGamePiece(); // store the current game piece setting
+        sm_armStateMachine.setGamePiece(GamePiece.CUBE); // set to cube, so intake will run in the right direction
+      }),
+      new ArmPickupCommand(sm_armStateMachine, ArmSequence.FLIP_CONE, operator, kDisatalAxis),
+      new InstantCommand(() -> {
+        sm_armStateMachine.setGamePiece(storedPiece); // reset FSM to previous game piece setting
+        storedPiece = null;
+      })
+    ));
 
     /* Operator Buttons */
     kPreventScoreBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setAllowScore(false)));

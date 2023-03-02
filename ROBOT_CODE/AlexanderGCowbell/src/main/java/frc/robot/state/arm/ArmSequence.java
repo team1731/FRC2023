@@ -12,7 +12,7 @@ public enum ArmSequence {
     SCORE_LOW("DEPLOY_LOW"),
     PICKUP_HIGH,
     PICKUP_LOW,
-    PICKUP_LOW_CUBE; // allow this to be kicked off individually, also used to flip a downed cone
+    FLIP_CONE;
 
     public String code = null;
 

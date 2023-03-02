@@ -34,8 +34,7 @@ public class AutoPickupCommand extends CommandBase {
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = PickupLowCone.getArmPath();
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
-            stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);
-            return;
+            path = PickupLowCone.getArmPath();
         }
 
         if(path != null) {

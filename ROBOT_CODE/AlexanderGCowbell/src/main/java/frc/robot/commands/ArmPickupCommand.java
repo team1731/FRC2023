@@ -38,8 +38,11 @@ public class ArmPickupCommand extends CommandBase {
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = PickupLowCone.getArmPath();
             adjustWrist = true;
-        } else if((sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) || sequence == ArmSequence.PICKUP_LOW_CUBE) {
-            stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);
+        } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
+            path = PickupLowCone.getArmPath();
+            adjustWrist = true;
+        } else if(sequence == ArmSequence.FLIP_CONE) {
+            stateMachine.pickup(ArmStateConstants.coneFlipFlexPosition);
             adjustWrist = true;
         }
         
