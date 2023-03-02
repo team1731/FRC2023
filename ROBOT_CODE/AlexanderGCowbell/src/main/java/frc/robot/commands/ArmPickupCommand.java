@@ -39,7 +39,11 @@ public class ArmPickupCommand extends CommandBase {
             path = PickupLowCone.getArmPath();
             adjustWrist = true;
         } else if((sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) || sequence == ArmSequence.PICKUP_LOW_CUBE) {
-            stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);
+        
+            path = PickupLowCube.getArmPath();
+            //stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);  // to not use path - uncomment this and comment out line above
+
+            
             adjustWrist = true;
         }
         

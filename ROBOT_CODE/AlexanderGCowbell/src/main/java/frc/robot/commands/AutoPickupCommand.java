@@ -19,10 +19,12 @@ public class AutoPickupCommand extends CommandBase {
         this.stateMachine = stateMachine;
         this.sequence = sequence;
         this.pieceType = pieceType;
+        
     }
 
     @Override
 	public void initialize() {
+        System.out.println("Starting the pickup..........................................................*****************************88");
         stateMachine.setGamePiece(pieceType);
         stateMachine.setIsInAuto(true);
 
@@ -34,8 +36,9 @@ public class AutoPickupCommand extends CommandBase {
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = PickupLowCone.getArmPath();
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
-           stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);
-            return;
+            path = PickupLowCube.getArmPath();
+           //stateMachine.pickup(ArmStateConstants.pickupLowCubeFlexPosition);  // to not use path - uncomment this and comment out line above
+           // return;
         }
 
         if(path != null) {
@@ -43,6 +46,7 @@ public class AutoPickupCommand extends CommandBase {
         } else {
             isFinished = true;
         }
+        System.out.println("starting the pickup");
 	}
 
     @Override
