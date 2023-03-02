@@ -19,23 +19,23 @@
         "names": [
           "ScoreConeHigh"
         ],
-        "executionBehavior": "parallel",
+        "executionBehavior": "sequential",
         "waitBehavior": "none",
-        "waitTime": 0
+        "waitTime": 3.0
       }
     },
     {
       "anchorPoint": {
-        "x": 7.678146719929804,
-        "y": 4.545581545708546
+        "x": 7.6966425131419145,
+        "y": 4.531550816232223
       },
       "prevControl": {
-        "x": 4.903288862521781,
-        "y": 4.985048110769502
+        "x": 5.463703248922192,
+        "y": 4.316755177175992
       },
       "nextControl": {
-        "x": 4.903288862521781,
-        "y": 4.985048110769502
+        "x": 5.463703248922192,
+        "y": 4.316755177175992
       },
       "holonomicAngle": 0,
       "isReversal": true,
@@ -53,16 +53,16 @@
     },
     {
       "anchorPoint": {
-        "x": 1.829923568938047,
-        "y": 4.363393908606
+        "x": 1.8601197846402857,
+        "y": 4.302105205283756
       },
       "prevControl": {
-        "x": 3.5242685939917333,
-        "y": 4.937284965479022
+        "x": 3.3228355544367627,
+        "y": 5.019122739497716
       },
       "nextControl": {
-        "x": 3.5242685939917333,
-        "y": 4.937284965479022
+        "x": 3.3228355544367627,
+        "y": 5.019122739497716
       },
       "holonomicAngle": 0,
       "isReversal": true,
@@ -71,25 +71,26 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "ScoreCubeHigh"
+          "ScoreCubeHigh",
+          "AutoScoreHighWait"
         ],
-        "executionBehavior": "sequential",
+        "executionBehavior": "parallelDeadline",
         "waitBehavior": "none",
         "waitTime": 0
       }
     },
     {
       "anchorPoint": {
-        "x": 5.318816819451821,
-        "y": 4.818863001362367
+        "x": 5.337035583162075,
+        "y": 4.600237836839311
       },
       "prevControl": {
-        "x": 4.152815941995521,
-        "y": 4.782425473941856
+        "x": 4.186497283187106,
+        "y": 4.79297434070947
       },
       "nextControl": {
-        "x": 6.4358656099424785,
-        "y": 4.8537707760652005
+        "x": 6.452910416635599,
+        "y": 4.413308106499121
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -128,11 +129,13 @@
       }
     }
   ],
+  "maxVelocity": null,
+  "maxAcceleration": 0.05,
+  "isReversed": null,
   "markers": [
     {
-      "position": 0.6545454545454545,
+      "position": 0.5818181818181816,
       "names": [
-        "event",
         "StartIntakeCube"
       ]
     },
