@@ -4,6 +4,9 @@
 # Compiled class file
 *.class
 
+# Remove Mac directory files
+.DS_Store
+
 # Log file
 *.log
 
@@ -27,8 +30,20 @@
 **/.gradle
 **/.settings
 
+# Mac files
+.DS_Store
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
 # Branch information file. This is generated during deployment.
 **/deploy/DeployedBranchInfo.txt
+
+**/.metadata/**
+**/.recommenders/**
+
+**/Keypad/.gitignore
+
+*.hprof
+/.metadata/
+/.recommenders/
