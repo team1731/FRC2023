@@ -244,9 +244,9 @@ public final class Constants {
     public static final class AutoConstants {
         public static final String kDefault           = "_Default_Auto";
         public static final String k_0_Example        = "_0_Example_Auto";
-        public static final String k_Program_1        = "_Program_1";
-        public static final String k_Program_2        = "_Program_2";
-        public static final String k_Program_3        = "_Program_3";
+        public static final String k_Program_1        = "1_ChargerMiddle";
+        public static final String k_Program_2        = "2_FeederSide";
+        public static final String k_Program_3        = "3_RailSide";
         public static final String k_Program_4        = "_Program_4";
         public static final String k_9_Move_Forward   = "_9_Move_Forward";
         

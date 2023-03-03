@@ -181,13 +181,14 @@ public class Robot extends TimedRobot {
 
 	String useCode = autoChooser.getSelected();
 
-    MessageLog.add("\nPreloading AUTO CODE --> " + useCode);
+  
 
 	if(useCode == null) {
         MessageLog.add("\nNULL AUTO CODE : DEFAULTING TO " + AutoConstants.kDefault);
 		autoCode = AutoConstants.kDefault;
 	}
 	else{
+		MessageLog.add("\nPreloading AUTO CODE --> " + useCode);
 		m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);
 		if(m_autonomousCommand != null){
 			autoCode = useCode;

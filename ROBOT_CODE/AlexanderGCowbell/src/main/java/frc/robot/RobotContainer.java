@@ -165,9 +165,9 @@ public class RobotContainer {
       case AutoConstants.k_Program_1:
         return new _Program_1(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_Program_2:
-        return new _Program_2(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+        return isRedAlliance()? new _Program_2R(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine): new _Program_2(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_Program_3:
-        return new _Program_3(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+        return isRedAlliance()? new _Program_3R(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine): new _Program_3(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_Program_4:
         return new _Program_4(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_9_Move_Forward:
