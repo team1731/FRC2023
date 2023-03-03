@@ -19,9 +19,9 @@
         "names": [
           "ScoreConeHigh"
         ],
-        "executionBehavior": "parallel",
-        "waitBehavior": "none",
-        "waitTime": 0
+        "executionBehavior": "parallelDeadline",
+        "waitBehavior": "deadline",
+        "waitTime": 3.0
       }
     },
     {
@@ -51,16 +51,16 @@
     },
     {
       "anchorPoint": {
-        "x": 8.671786359672899,
-        "y": 2.1367122519575994
+        "x": 8.671069342138685,
+        "y": 2.158923499665182
       },
       "prevControl": {
-        "x": 6.859410470975766,
-        "y": 2.261782924118784
+        "x": 6.8586934534415525,
+        "y": 2.2839941718263663
       },
       "nextControl": {
-        "x": 6.859410470975766,
-        "y": 2.261782924118784
+        "x": 6.8586934534415525,
+        "y": 2.2839941718263663
       },
       "holonomicAngle": 0,
       "isReversal": true,
@@ -76,12 +76,12 @@
     },
     {
       "anchorPoint": {
-        "x": 4.369681154389142,
-        "y": 2.179733304010438
+        "x": 5.236832382755675,
+        "y": 2.2317985545062
       },
       "prevControl": {
-        "x": 5.602951313237153,
-        "y": 2.079350849220485
+        "x": 6.470102541603685,
+        "y": 2.131416099716247
       },
       "nextControl": null,
       "holonomicAngle": 0.0,
