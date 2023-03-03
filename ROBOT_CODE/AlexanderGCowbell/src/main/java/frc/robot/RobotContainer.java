@@ -4,6 +4,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -121,7 +122,12 @@ public class RobotContainer {
       kRightBumper.onTrue(new InstantCommand(() -> s_armSubSystem.stopRecordingArmPath()));
     } else {
       kLeftBumper.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_HIGH, operator, kDisatalAxis));
-      kRightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_KEYPAD, operator, kDisatalAxis));
+      //kRightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_KEYPAD, operator, kDisatalAxis));
+      kRightBumper.whileTrue(new SequentialCommandGroup(
+        new InstantCommand(() -> sm_armStateMachine.setIsInAuto(true)),
+        new _Program_1(isRedAlliance(), s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine),
+        new InstantCommand(() -> sm_armStateMachine.setIsInAuto(false))
+      ));
     }
     kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDisatalAxis));
     kRightTrigger.whileTrue(new SequentialCommandGroup(
@@ -227,4 +233,8 @@ public class RobotContainer {
 		 MessageLog.add("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
 		}
 	}
+
+  private boolean isRedAlliance(){
+    return DriverStation.getAlliance().equals(DriverStation.Alliance.Red);
+    }
 }
