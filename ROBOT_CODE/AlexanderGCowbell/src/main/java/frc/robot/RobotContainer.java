@@ -125,24 +125,7 @@ public class RobotContainer {
       //kRightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_KEYPAD, operator, kDisatalAxis));
     }
     kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDisatalAxis));
-    kRightTrigger.whileTrue(new SequentialCommandGroup(
-        new InstantCommand(() -> {
-          storedPiece = sm_armStateMachine.getGamePiece(); // store the current game piece setting
-          System.out.println("RobotContainer: Storing current piece: " + storedPiece);
-          sm_armStateMachine.setGamePiece(GamePiece.CUBE); // set to cube, so intake will run in the right direction
-        }),
-        new ArmPickupCommand(sm_armStateMachine, ArmSequence.FLIP_CONE, operator, kDisatalAxis),
-        new InstantCommand(() -> {
-          System.out.println("RobotContainer: Setting back to stored piece: " + storedPiece);
-          sm_armStateMachine.setGamePiece(storedPiece); // reset FSM to previous game piece setting
-          storedPiece = null;
-        })
-      ).andThen(new InstantCommand(() -> {
-        System.out.println("RobotContainer: Setting back to stored piece: " + storedPiece);
-        sm_armStateMachine.setGamePiece(storedPiece); // reset FSM to previous game piece setting
-        storedPiece = null;
-      }
-    )));
+    kRightTrigger.whileTrue(new FlipConeCommand(sm_armStateMachine));
 
     /* Operator Buttons */
     kPreventScoreBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setAllowScore(false)));
