@@ -78,16 +78,16 @@
     },
     {
       "anchorPoint": {
-        "x": 3.1234557923661304,
-        "y": 0.592109820583279
+        "x": 3.1507839379315126,
+        "y": 0.6923130209896794
       },
       "prevControl": {
-        "x": 3.7519081075075666,
-        "y": 0.5811802151025586
+        "x": 3.7685656444557667,
+        "y": 0.5764789510163819
       },
       "nextControl": {
-        "x": 2.075876879026486,
-        "y": 0.6103285842935333
+        "x": 2.7135336088853994,
+        "y": 0.7742974576858255
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -107,12 +107,12 @@
         "y": 1.0567748451411407
       },
       "prevControl": {
-        "x": 3.3329715750340596,
-        "y": 1.1386727318909193
+        "x": 3.114346410511003,
+        "y": 1.0749070589050276
       },
       "nextControl": {
-        "x": 3.3329715750340596,
-        "y": 1.1386727318909193
+        "x": 3.114346410511003,
+        "y": 1.0749070589050276
       },
       "holonomicAngle": -0.011191128235694209,
       "isReversal": true,
@@ -120,11 +120,9 @@
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
-        "names": [
-          "ScoreCubeHigh"
-        ],
-        "executionBehavior": "parallelDeadline",
-        "waitBehavior": "deadline",
+        "names": [],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
         "waitTime": 3.0
       }
     },
@@ -134,12 +132,12 @@
         "y": 0.6376567298589153
       },
       "prevControl": {
-        "x": 2.8775024822776913,
-        "y": 0.5647816750178958
+        "x": 2.8137368092918003,
+        "y": 0.6649848754242974
       },
       "nextControl": {
-        "x": 5.643565125094653,
-        "y": 0.7390218414945561
+        "x": 5.646350640180458,
+        "y": 0.6015681478670886
       },
       "holonomicAngle": 0.0,
       "isReversal": false,
@@ -189,6 +187,18 @@
       "names": [
         "event",
         "StartIntakeCone"
+      ]
+    },
+    {
+      "position": 2.9454545454545444,
+      "names": [
+        "ScoreCubeHigh"
+      ]
+    },
+    {
+      "position": 0.0,
+      "names": [
+        "ScoreCubeHigh"
       ]
     }
   ]

@@ -26,19 +26,19 @@
     },
     {
       "anchorPoint": {
-        "x": 3.9159720137622096,
-        "y": 2.85123652065486
+        "x": 3.8886438681968274,
+        "y": 3.078971067033044
       },
       "prevControl": {
-        "x": 2.4402521532315795,
-        "y": 2.9332209573510064
+        "x": 2.410761038755407,
+        "y": 3.0607256000029035
       },
       "nextControl": {
-        "x": 4.914432366967592,
-        "y": 2.7957665010323387
+        "x": 2.410761038755407,
+        "y": 3.0607256000029035
       },
-      "holonomicAngle": 0,
-      "isReversal": false,
+      "holonomicAngle": 0.0,
+      "isReversal": true,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
@@ -106,10 +106,11 @@
   "isReversed": null,
   "markers": [
     {
-      "position": 1.7018181818181102,
+      "position": 1.145454545454545,
       "names": [
         "event",
-        "StartIntakeCone"
+        "StartIntakeCone",
+        "tieShoes"
       ]
     }
   ]
