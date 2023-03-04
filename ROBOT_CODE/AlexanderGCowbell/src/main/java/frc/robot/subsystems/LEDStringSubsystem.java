@@ -22,6 +22,7 @@ public class LEDStringSubsystem extends SubsystemBase{
     private static final int[] BLUE = {64, 0, 0};
     private static final int[] BLACK = {0, 0, 0};
     private static final int[] RED = {255, 0, 0};
+    private static final int[] GREEN = {0, 0, 128};
     private Timer mTimer;
     private AddressableLED m_led;
     private AddressableLEDBuffer m_ledBuffer;
@@ -150,6 +151,12 @@ public class LEDStringSubsystem extends SubsystemBase{
             setFullColor(RED[0], RED[1], RED[2]);
             if(!blink) {
               this.currentColor = LedOption.RED;
+            }
+            break;
+          case GREEN:
+            setFullColor(GREEN[0], GREEN[1], GREEN[2]);
+            if(!blink) {
+              this.currentColor = LedOption.GREEN;
             }
             break;
           case BLACK:

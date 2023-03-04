@@ -369,11 +369,52 @@ public class ArmSubsystem extends SubsystemBase {
 
     }
 
+
+    /*
+    * METHODS FOR CHECKING/SETTING ENCODER VALUES
+    */
+
     public void resetArmEncoders() {
-        proximalMotor.setSelectedSensorPosition((proximalAbsolute.getAverageValue() - ArmConstants.proximalAbsoluteTicsCenter) * ArmConstants.proximalRelativeTicsPerAbsoluteTick);
-        distalMotor.setSelectedSensorPosition((distalAbsolute.getAverageValue()- ArmConstants.distalAbsoluteTicsCenter) * ArmConstants.distalRelativeTicsPerAbsoluteTick);
-        System.out.println("setting distal to " + (distalAbsolute.getAverageValue()- ArmConstants.distalAbsoluteTicsCenter) * ArmConstants.distalRelativeTicsPerAbsoluteTick);
-        System.out.println("setting proximal to " + (proximalAbsolute.getAverageValue() - ArmConstants.proximalAbsoluteTicsCenter) * ArmConstants.proximalRelativeTicsPerAbsoluteTick);
+        int proximalAbsoluteVal = isProximalAbsoluteEncoderOutOfBounds()? ArmConstants.proximalAbsoluteBackup : proximalAbsolute.getAverageValue();
+        resetProximalEncoder(proximalAbsoluteVal);
+        int distalAbsoluteVal = isDistalAbsoluteEncoderOutOfBounds()? ArmConstants.distalAbsoluteBackup : distalAbsolute.getAverageValue();
+        resetDistalEncoder(distalAbsoluteVal);
+    }
+
+    public void resetProximalEncoder(int proximalAbsoluteVal) {
+        proximalMotor.setSelectedSensorPosition((proximalAbsoluteVal - ArmConstants.proximalAbsoluteTicsCenter) * ArmConstants.proximalRelativeTicsPerAbsoluteTick);
+        System.out.println("ArmSubsystem: setting proximal to " + (proximalAbsoluteVal - ArmConstants.proximalAbsoluteTicsCenter) * ArmConstants.proximalRelativeTicsPerAbsoluteTick);
+    }
+
+    public void resetDistalEncoder(int distalAbsoluteVal) {
+        distalMotor.setSelectedSensorPosition((distalAbsoluteVal - ArmConstants.distalAbsoluteTicsCenter) * ArmConstants.distalRelativeTicsPerAbsoluteTick);
+        System.out.println("ArmSubsystem: setting distal to " + (distalAbsoluteVal - ArmConstants.distalAbsoluteTicsCenter) * ArmConstants.distalRelativeTicsPerAbsoluteTick);
+    }
+
+    public boolean isInEncodersOutOfBoundsCondition() {
+        if(isProximalAbsoluteEncoderOutOfBounds() || isDistalAbsoluteEncoderOutOfBounds()) {
+        System.out.println("ArmSubsystem: WARNING reporting out of bounds condition with absolute encoders");
+        return true;
+        }
+        return false;
+    }
+
+    private boolean isProximalAbsoluteEncoderOutOfBounds() {
+        int proximalAbsoluteVal = proximalAbsolute.getAverageValue();
+        if(proximalAbsoluteVal < ArmConstants.proximalAbsoluteBounds[0] || proximalAbsoluteVal > ArmConstants.proximalAbsoluteBounds[1]) {
+            System.out.println("ArmSubsystem: WARNING proximal absolute encoder reading out of bounds: " + proximalAbsoluteVal);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isDistalAbsoluteEncoderOutOfBounds() {
+        int distalAbsoluteVal = distalAbsolute.getAverageValue();
+        if(distalAbsoluteVal < ArmConstants.distalAbsoluteBounds[0] || distalAbsoluteVal > ArmConstants.distalAbsoluteBounds[1]) {
+            System.out.println("ArmSubsystem: WARNING distal absolute encoder reading out of bounds: " + distalAbsoluteVal);
+            return true;
+        }
+        return false;
     }
 
 

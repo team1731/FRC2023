@@ -279,6 +279,12 @@ public class Robot extends TimedRobot {
 		// SmartDashboard.putBoolean("HighSensor", m_sequencer.highSensorHasBall());
 	}
 
+	if(s_armSubSystem.isInEncodersOutOfBoundsCondition()) {
+		m_ledstring.setColor(OpConstants.LedOption.RED);
+	} else {
+		m_ledstring.setColor(OpConstants.LedOption.GREEN);
+	}
+
 	String newCode = autoChooser.getSelected();
 	if(!newCode.equals(autoCode)) {
         MessageLog.add("New Auto Code read from dashboard. OLD: " + autoCode + ", NEW: " + newCode);
@@ -316,6 +322,7 @@ public class Robot extends TimedRobot {
 	} else {
         MessageLog.add("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand.getClass().getSimpleName() + " <----------");
 		m_robotContainer.zeroHeading();
+		m_ledstring.setColor(OpConstants.LedOption.WHITE); // reset color to default from red/green set during disabled
 		sm_armStateMachine.setIsInAuto(true);
 		sm_armStateMachine.initializeArm();
 		sm_armStateMachine.setGamePiece(GamePiece.CONE);

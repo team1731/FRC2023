@@ -307,6 +307,10 @@ public final class Constants {
         public final static double emergencyModeMaxArmVelocity = 2000; // max for Falcon motors is 6800 velocity units
         public final static double mostlyExtendedThreshold = 0.5; // percentage of the path completed to consider mostly extended
         public final static double proximalOutOfPositionThreshold = -37500;
+        public final static int[] proximalAbsoluteBounds = new int[] {2000, 4000};
+        public final static int[] distalAbsoluteBounds = new int[] {1000, 2500};
+        public final static int proximalAbsoluteBackup = 2502; // used if we are not getting reasonable values from absolute encoder
+        public final static int distalAbsoluteBackup = 2032; // used if we are not getting reasonable values from absolute encoder
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;
@@ -419,7 +423,7 @@ public final class Constants {
         public static final int kPWM_LedSting = 6;         // Addressable Led String
 
         public enum LedOption {
-            INIT, YELLOW, PURPLE, BLACK, WHITE, BLUE, RED
+            INIT, YELLOW, PURPLE, BLACK, WHITE, BLUE, RED, GREEN
           }
     }
 }
