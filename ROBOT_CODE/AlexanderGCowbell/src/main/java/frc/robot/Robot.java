@@ -272,7 +272,7 @@ public class Robot extends TimedRobot {
 //   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
   @Override
   public void disabledPeriodic() {
-	//s_armSubSystem.resetArmEncoders();
+	s_armSubSystem.resetArmEncoders();
     if (System.currentTimeMillis() % 5000 == 0) {
 		// SmartDashboard.putBoolean("LowSensor", m_sequencer.lowSensorHasBall());
 		// SmartDashboard.putBoolean("MidSensor", m_sequencer.midSensorHasBall());
