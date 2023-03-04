@@ -291,9 +291,9 @@ public final class Constants {
         public final static int intakeCancoderId = 13;
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
-        public final static int proximalAbsoluteTicsCenter = 2682; // 2697
+        public final static int proximalAbsoluteTicsCenter = 2682; // 2697 was the number read at beginning of blacksburg but did not change
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
-        public final static int distalAbsoluteTicsCenter = 1812;// 1817
+        public final static int distalAbsoluteTicsCenter = 1812;// 1817 was the number read at beginning of blacksburg but did not change.
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
