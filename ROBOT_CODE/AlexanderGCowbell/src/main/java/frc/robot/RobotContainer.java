@@ -178,11 +178,6 @@ public class RobotContainer {
   }
 
 
-	public void resetEncoders() {
-    s_armSubSystem.resetArmEncoders();
-	}
-
-
 	public void displayEncoders() {
 	}
 

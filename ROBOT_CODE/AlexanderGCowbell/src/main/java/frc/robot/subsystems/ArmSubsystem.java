@@ -375,9 +375,16 @@ public class ArmSubsystem extends SubsystemBase {
     */
 
     public void resetArmEncoders() {
-        int proximalAbsoluteVal = isProximalAbsoluteEncoderOutOfBounds()? ArmConstants.proximalAbsoluteBackup : proximalAbsolute.getAverageValue();
+        int proximalAbsoluteVal = isProximalAbsoluteEncoderOutOfBounds(ArmConstants.proximalAbsoluteBounds)? ArmConstants.proximalAbsoluteBackup : proximalAbsolute.getAverageValue();
         resetProximalEncoder(proximalAbsoluteVal);
-        int distalAbsoluteVal = isDistalAbsoluteEncoderOutOfBounds()? ArmConstants.distalAbsoluteBackup : distalAbsolute.getAverageValue();
+        int distalAbsoluteVal = isDistalAbsoluteEncoderOutOfBounds(ArmConstants.distalAbsoluteBounds)? ArmConstants.distalAbsoluteBackup : distalAbsolute.getAverageValue();
+        resetDistalEncoder(distalAbsoluteVal);
+    }
+
+    public void resetArmEncodersForAuto() {
+        int proximalAbsoluteVal = isProximalAbsoluteEncoderOutOfBounds(ArmConstants.proximalAbsoluteBoundsAuto)? ArmConstants.proximalAbsoluteBackup : proximalAbsolute.getAverageValue();
+        resetProximalEncoder(proximalAbsoluteVal);
+        int distalAbsoluteVal = isDistalAbsoluteEncoderOutOfBounds(ArmConstants.distalAbsoluteBoundsAuto)? ArmConstants.distalAbsoluteBackup : distalAbsolute.getAverageValue();
         resetDistalEncoder(distalAbsoluteVal);
     }
 
@@ -392,25 +399,25 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public boolean isInEncodersOutOfBoundsCondition() {
-        if(isProximalAbsoluteEncoderOutOfBounds() || isDistalAbsoluteEncoderOutOfBounds()) {
+        if(isProximalAbsoluteEncoderOutOfBounds(ArmConstants.proximalAbsoluteBounds) || isDistalAbsoluteEncoderOutOfBounds(ArmConstants.distalAbsoluteBounds)) {
           System.out.println("ArmSubsystem: WARNING reporting out of bounds condition with absolute encoders");
           return true;
         }
         return false;
     }
 
-    private boolean isProximalAbsoluteEncoderOutOfBounds() {
+    private boolean isProximalAbsoluteEncoderOutOfBounds(int[] range) {
         int proximalAbsoluteVal = proximalAbsolute.getAverageValue();
-        if(proximalAbsoluteVal < ArmConstants.proximalAbsoluteBounds[0] || proximalAbsoluteVal > ArmConstants.proximalAbsoluteBounds[1]) {
+        if(proximalAbsoluteVal < range[0] || proximalAbsoluteVal > range[1]) {
             //System.out.println("ArmSubsystem: WARNING proximal absolute encoder reading out of bounds: " + proximalAbsoluteVal);
             return true;
         }
         return false;
     }
 
-    private boolean isDistalAbsoluteEncoderOutOfBounds() {
+    private boolean isDistalAbsoluteEncoderOutOfBounds(int[] range) {
         int distalAbsoluteVal = distalAbsolute.getAverageValue();
-        if(distalAbsoluteVal < ArmConstants.distalAbsoluteBounds[0] || distalAbsoluteVal > ArmConstants.distalAbsoluteBounds[1]) {
+        if(distalAbsoluteVal < range[0] || distalAbsoluteVal > range[1]) {
             //System.out.println("ArmSubsystem: WARNING distal absolute encoder reading out of bounds: " + distalAbsoluteVal);
             return true;
         }

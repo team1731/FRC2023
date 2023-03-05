@@ -291,9 +291,9 @@ public final class Constants {
         public final static int intakeCancoderId = 13;
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
-        public final static int proximalAbsoluteTicsCenter = 2682; // 2697 was the number read at beginning of blacksburg but did not change
+        public final static int proximalAbsoluteTicsCenter = 2700; // 2697 was the number read at beginning of blacksburg but did not change  2710
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
-        public final static int distalAbsoluteTicsCenter = 1812;// 1817 was the number read at beginning of blacksburg but did not change.
+        public final static int distalAbsoluteTicsCenter = 1821;// 1817 was the number read at beginning of blacksburg but did not change.
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
@@ -309,6 +309,8 @@ public final class Constants {
         public final static double proximalOutOfPositionThreshold = -37500;
         public final static int[] proximalAbsoluteBounds = new int[] {2000, 4000};
         public final static int[] distalAbsoluteBounds = new int[] {1000, 2500};
+        public final static int[] proximalAbsoluteBoundsAuto = new int[] {2430, 2585};
+        public final static int[] distalAbsoluteBoundsAuto = new int[] {1925, 2000};
         public final static int proximalAbsoluteBackup = 2502; // used if we are not getting reasonable values from absolute encoder
         public final static int distalAbsoluteBackup = 2032; // used if we are not getting reasonable values from absolute encoder
 

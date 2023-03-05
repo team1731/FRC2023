@@ -104,6 +104,7 @@ public class Robot extends TimedRobot {
 	m_robotContainer = new RobotContainer(s_Swerve, s_poseEstimatorSubsystem, s_armSubSystem, m_ledstring);
 
 	initSubsystems();
+	s_armSubSystem.resetArmEncoders();
 
 	autoChooser.setDefaultOption(AutoConstants.kDefault,             AutoConstants.kDefault);
 	autoChooser.addOption(       AutoConstants.k_0_Example,          AutoConstants.k_0_Example);
@@ -209,7 +210,6 @@ public class Robot extends TimedRobot {
 //   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
   private void initSubsystems() {
 	m_ledstring.init();
-	m_robotContainer.resetEncoders();
   }
 
   
@@ -272,7 +272,7 @@ public class Robot extends TimedRobot {
 //   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
   @Override
   public void disabledPeriodic() {
-	s_armSubSystem.resetArmEncoders();
+	//s_armSubSystem.resetArmEncoders();
     if (System.currentTimeMillis() % 5000 == 0) {
 		// SmartDashboard.putBoolean("LowSensor", m_sequencer.lowSensorHasBall());
 		// SmartDashboard.putBoolean("MidSensor", m_sequencer.midSensorHasBall());
@@ -323,6 +323,7 @@ public class Robot extends TimedRobot {
         MessageLog.add("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand.getClass().getSimpleName() + " <----------");
 		m_robotContainer.zeroHeading();
 		m_ledstring.setColor(OpConstants.LedOption.WHITE); // reset color to default from red/green set during disabled
+		s_armSubSystem.resetArmEncodersForAuto();
 		sm_armStateMachine.setIsInAuto(true);
 		sm_armStateMachine.initializeArm();
 		sm_armStateMachine.setGamePiece(GamePiece.CONE);
