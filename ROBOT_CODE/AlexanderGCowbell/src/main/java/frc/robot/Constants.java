@@ -292,10 +292,10 @@ public final class Constants {
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
         public final static int proximalAbsoluteTicsCenter = 2700; // 2697 was the number read at beginning of blacksburg but did not change  2710
-        public final static int proximalEstimatedAutoAbsolute = 2502; // only used if we are not getting reasonable values from absolute encoder
+        public final static int proximalEstimatedAutoAbsolute = 2509; // only used if we are not getting reasonable values from absolute encoder
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
         public final static int distalAbsoluteTicsCenter = 1821;// 1817 was the number read at beginning of blacksburg but did not change.
-        public final static int distalEstimatedAutoAbsolute = 2032; // only used if we are not getting reasonable values from absolute encoder
+        public final static int distalEstimatedAutoAbsolute = 1996; // only used if we are not getting reasonable values from absolute encoder
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
@@ -317,8 +317,8 @@ public final class Constants {
         public final static int[] distalAbsoluteBounds = new int[] {1000, 2500};
         // these second set of bounds are used when we are starting from auto where we do know about where we are
         // we want to keep the range checking narrower for this situation
-        public final static int[] proximalAbsoluteBoundsAuto = new int[] {2430, 2585};
-        public final static int[] distalAbsoluteBoundsAuto = new int[] {1925, 2000};
+        public final static int[] proximalAbsoluteBoundsAuto = new int[] {2430, 2585};  
+        public final static int[] distalAbsoluteBoundsAuto = new int[] {1925, 2060}; 
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;
