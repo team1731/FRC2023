@@ -3,6 +3,7 @@ package frc.robot.commands;
 import frc.robot.Constants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.Swerve;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
@@ -18,6 +19,7 @@ public class AutoBalanceSwerve extends CommandBase {
     private Double desiredHeading = 0.0;
     private boolean fieldrelative = true;
     private boolean openLoop = false;
+    private boolean isFinished = false;
 
     
     private final PIDController headingController = 
@@ -51,9 +53,17 @@ public class AutoBalanceSwerve extends CommandBase {
             translation = new Translation2d(0.3, 0);
         } else {
             translation = new Translation2d(0 , 0);
+            if(Timer.getMatchTime() <= 0.2) {
+                isFinished = true;
+            }
         }
 
 
         s_Swerve.drive(translation, rotation, fieldrelative, openLoop);
+    }
+
+    @Override
+    public boolean isFinished() {
+        return isFinished;
     }
 }
