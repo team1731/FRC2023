@@ -315,6 +315,7 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     MessageLog.add("AUTO INIT");
 	CommandScheduler.getInstance().cancelAll();
+	s_armSubSystem.resetArmEncodersForAuto();
 
 	if(m_autonomousCommand == null) {
 		System.err.println("SOMETHING WENT WRONG - UNABLE TO RUN AUTONOMOUS! CHECK SOFTWARE!");
@@ -322,7 +323,6 @@ public class Robot extends TimedRobot {
         MessageLog.add("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand.getClass().getSimpleName() + " <----------");
 		m_robotContainer.zeroHeading();
 		m_ledstring.setColor(OpConstants.LedOption.WHITE); // reset color to default from red/green set during disabled
-		s_armSubSystem.resetArmEncodersForAuto();
 		sm_armStateMachine.setIsInAuto(true);
 		sm_armStateMachine.initializeArm();
 		sm_armStateMachine.setGamePiece(GamePiece.CONE);
