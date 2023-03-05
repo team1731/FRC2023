@@ -260,8 +260,7 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
 	keypad.putValue("driver entry", NetworkTableValue.makeString(""));
 	sm_armStateMachine.disable();
-	s_armSubSystem.resetArmEncoders();
-
+	//s_armSubSystem.resetArmEncoders();
   }
 
 
