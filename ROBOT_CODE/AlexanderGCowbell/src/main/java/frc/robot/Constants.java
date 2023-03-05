@@ -291,10 +291,10 @@ public final class Constants {
         public final static int intakeCancoderId = 13;
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
-        public final static int proximalAbsoluteTicsCenter = 2711; // 2697 was the number read at beginning of blacksburg but did not change  2710
+        public final static int proximalAbsoluteTicsCenter = 2714; // 2697 was the number read at beginning of blacksburg but did not change  2710  
         public final static int proximalEstimatedAutoAbsolute = 2509; // only used if we are not getting reasonable values from absolute encoder
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
-        public final static int distalAbsoluteTicsCenter = 1802;// 1817 was the number read at beginning of blacksburg but did not change.
+        public final static int distalAbsoluteTicsCenter = 1790;// 1817 was the number read at beginning of blacksburg but did not change. 1790
         public final static int distalEstimatedAutoAbsolute = 1996; // only used if we are not getting reasonable values from absolute encoder
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
