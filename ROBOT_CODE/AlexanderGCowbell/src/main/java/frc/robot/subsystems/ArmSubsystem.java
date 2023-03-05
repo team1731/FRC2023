@@ -372,19 +372,31 @@ public class ArmSubsystem extends SubsystemBase {
 
     /*
     * METHODS FOR CHECKING/SETTING ENCODER VALUES
+    * Note: much of the code below is oriented toward working around spotty absolute encoder values
+    * this behavior may not be a desirable approach if we resolve that issue
     */
 
+    // This is the reset called outside of auto, however in this state, if we don't have reasonable absolute values
+    // we must discard them as we cannot estimate where we are like we can in auto where we start from a consistent position
     public void resetArmEncoders() {
-        int proximalAbsoluteVal = isProximalAbsoluteEncoderOutOfBounds(ArmConstants.proximalAbsoluteBounds)? ArmConstants.proximalAbsoluteBackup : proximalAbsolute.getAverageValue();
-        resetProximalEncoder(proximalAbsoluteVal);
-        int distalAbsoluteVal = isDistalAbsoluteEncoderOutOfBounds(ArmConstants.distalAbsoluteBounds)? ArmConstants.distalAbsoluteBackup : distalAbsolute.getAverageValue();
-        resetDistalEncoder(distalAbsoluteVal);
+        // if we are getting reasonable values use them, otherwise do not set anything
+        // note: we provide wider out of bounds thresholds for this check b/c we don't know where we are
+        if(!isProximalAbsoluteEncoderOutOfBounds(ArmConstants.proximalAbsoluteBounds)) {
+            resetProximalEncoder(proximalAbsolute.getAverageValue());
+        }
+        if(!isDistalAbsoluteEncoderOutOfBounds(ArmConstants.distalAbsoluteBounds)) {
+            resetDistalEncoder(distalAbsolute.getAverageValue());
+        }
     }
 
+    // This is the reset called from autoInit, we are starting from the same position in auto every time which allows us
+    // to reasonably estimate the absolute values in the instance that we are not getting reliable values from the potentiometer
     public void resetArmEncodersForAuto() {
-        int proximalAbsoluteVal = isProximalAbsoluteEncoderOutOfBounds(ArmConstants.proximalAbsoluteBoundsAuto)? ArmConstants.proximalAbsoluteBackup : proximalAbsolute.getAverageValue();
+        // if we are getting reasonable values use them, otherwise provide estimated proximal/distal absolutes
+        // note: we provide narrower out of bounds thresholds for this check b/c we know about where we are
+        int proximalAbsoluteVal = isProximalAbsoluteEncoderOutOfBounds(ArmConstants.proximalAbsoluteBoundsAuto)? ArmConstants.proximalEstimatedAutoAbsolute : proximalAbsolute.getAverageValue();
         resetProximalEncoder(proximalAbsoluteVal);
-        int distalAbsoluteVal = isDistalAbsoluteEncoderOutOfBounds(ArmConstants.distalAbsoluteBoundsAuto)? ArmConstants.distalAbsoluteBackup : distalAbsolute.getAverageValue();
+        int distalAbsoluteVal = isDistalAbsoluteEncoderOutOfBounds(ArmConstants.distalAbsoluteBoundsAuto)? ArmConstants.distalEstimatedAutoAbsolute : distalAbsolute.getAverageValue();
         resetDistalEncoder(distalAbsoluteVal);
     }
 
@@ -398,6 +410,8 @@ public class ArmSubsystem extends SubsystemBase {
         System.out.println("ArmSubsystem: setting distal to " + (distalAbsoluteVal - ArmConstants.distalAbsoluteTicsCenter) * ArmConstants.distalRelativeTicsPerAbsoluteTick);
     }
 
+    // this helper method is used during disabled to notify the team if the absolute values seems out of whack
+    // this enables them to move the arm around a bit to see if they can get better readings
     public boolean isInEncodersOutOfBoundsCondition() {
         if(isProximalAbsoluteEncoderOutOfBounds(ArmConstants.proximalAbsoluteBounds) || isDistalAbsoluteEncoderOutOfBounds(ArmConstants.distalAbsoluteBounds)) {
           System.out.println("ArmSubsystem: WARNING reporting out of bounds condition with absolute encoders");
@@ -406,6 +420,7 @@ public class ArmSubsystem extends SubsystemBase {
         return false;
     }
 
+    // check for unreasonable (out-of-bounds) conditions using the  upper/lower bounds provided
     private boolean isProximalAbsoluteEncoderOutOfBounds(int[] range) {
         int proximalAbsoluteVal = proximalAbsolute.getAverageValue();
         if(proximalAbsoluteVal < range[0] || proximalAbsoluteVal > range[1]) {
@@ -415,6 +430,7 @@ public class ArmSubsystem extends SubsystemBase {
         return false;
     }
 
+    // check for unreasonable (out-of-bounds) conditions using the  upper/lower bounds provided
     private boolean isDistalAbsoluteEncoderOutOfBounds(int[] range) {
         int distalAbsoluteVal = distalAbsolute.getAverageValue();
         if(distalAbsoluteVal < range[0] || distalAbsoluteVal > range[1]) {

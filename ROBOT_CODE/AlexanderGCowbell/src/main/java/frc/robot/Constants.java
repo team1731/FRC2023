@@ -292,8 +292,10 @@ public final class Constants {
 
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
         public final static int proximalAbsoluteTicsCenter = 2700; // 2697 was the number read at beginning of blacksburg but did not change  2710
+        public final static int proximalEstimatedAutoAbsolute = 2502; // only used if we are not getting reasonable values from absolute encoder
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
         public final static int distalAbsoluteTicsCenter = 1821;// 1817 was the number read at beginning of blacksburg but did not change.
+        public final static int distalEstimatedAutoAbsolute = 2032; // only used if we are not getting reasonable values from absolute encoder
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
@@ -307,12 +309,16 @@ public final class Constants {
         public final static double emergencyModeMaxArmVelocity = 2000; // max for Falcon motors is 6800 velocity units
         public final static double mostlyExtendedThreshold = 0.5; // percentage of the path completed to consider mostly extended
         public final static double proximalOutOfPositionThreshold = -37500;
+
+        // bounds checking for absolute encoder values, work around for spotty values we are receiving
+        // these first set of bounds are used when we don't know where the arm is and we mainly want to make sure that
+        // we are discarding readings that are obviously absurd
         public final static int[] proximalAbsoluteBounds = new int[] {2000, 4000};
         public final static int[] distalAbsoluteBounds = new int[] {1000, 2500};
+        // these second set of bounds are used when we are starting from auto where we do know about where we are
+        // we want to keep the range checking narrower for this situation
         public final static int[] proximalAbsoluteBoundsAuto = new int[] {2430, 2585};
         public final static int[] distalAbsoluteBoundsAuto = new int[] {1925, 2000};
-        public final static int proximalAbsoluteBackup = 2502; // used if we are not getting reasonable values from absolute encoder
-        public final static int distalAbsoluteBackup = 2032; // used if we are not getting reasonable values from absolute encoder
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;
