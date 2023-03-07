@@ -130,8 +130,10 @@ public class RobotContainer {
     /* Operator Buttons */
     kPreventScoreBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setAllowScore(false)));
     kPreventScoreBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.setAllowScore(true)));
-    kExtraExtensionBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setExtraExtension(true)));
-    kExtraExtensionBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.setExtraExtension(false)));
+   // kExtraExtensionBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setExtraExtension(true)));
+   // kExtraExtensionBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.setExtraExtension(false)));
+    kExtraExtensionBtn.whileTrue(new InstantCommand(() -> s_Swerve.setLockWheels(true)));
+    kExtraExtensionBtn.whileFalse(new InstantCommand(() -> s_Swerve.setLockWheels(false)));
     kIntakeBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.intake()));
     kIntakeBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.releaseIntake()));
     kReleaseBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.release()));

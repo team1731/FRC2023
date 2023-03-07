@@ -169,7 +169,7 @@ public final class Constants {
         /* Angle Motor PID Values */
         public static final double angleKP = 2.0; // was .6
         public static final double angleKI = 0.0;
-        public static final double angleKD = 12.0;
+        public static final double angleKD = 12.0;  // these values are suspect ?????  ratttly swerve noise is from this but not sure want to change now.
         public static final double angleKF = 0.0;
 
         /* Drive Motor PID Values */

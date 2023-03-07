@@ -37,11 +37,13 @@ public class AutoBalanceSwerve extends CommandBase {
      */
     public AutoBalanceSwerve(Swerve s_Swerve) {
         this.s_Swerve = s_Swerve;
-        addRequirements(s_Swerve);
-
-     
+        addRequirements(s_Swerve);  
     }
-
+  
+    @Override
+    public void initialize() {
+        s_Swerve.setLockWheels(true);
+    }
     @Override
     public void execute() {
 
@@ -54,6 +56,7 @@ public class AutoBalanceSwerve extends CommandBase {
         } else {
             translation = new Translation2d(0 , 0);
             if(Timer.getMatchTime() <= 0.2) {
+                s_Swerve.setLockWheels(false);
                 isFinished = true;
             }
         }
@@ -65,5 +68,10 @@ public class AutoBalanceSwerve extends CommandBase {
     @Override
     public boolean isFinished() {
         return isFinished;
+    }
+
+    @Override
+    public void end(boolean innterruped) {
+        s_Swerve.setLockWheels(false);
     }
 }

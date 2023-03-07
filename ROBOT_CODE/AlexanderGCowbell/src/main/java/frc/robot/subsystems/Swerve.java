@@ -29,6 +29,7 @@ public class Swerve extends SubsystemBase {
   //  public PigeonIMU gyro;
     private final AHRS m_gyro = new AHRS(SPI.Port.kMXP, (byte) 200); // NavX connected over MXP
     public Double lockedHeading = null;
+    private boolean s_lockWheels = false;
 
     public Swerve() {
 
@@ -61,18 +62,30 @@ public class Swerve extends SubsystemBase {
                                     rotation)
                                 );
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
+        if (s_lockWheels && 
+            (swerveModuleStates[0].speedMetersPerSecond == 0.0 &&
+            swerveModuleStates[1].speedMetersPerSecond == 0.0 &&
+            swerveModuleStates[2].speedMetersPerSecond == 0.0 &&
+            swerveModuleStates[3].speedMetersPerSecond == 0.0 )
+            ) {
+            swerveModuleStates = new SwerveModuleState[] {
+                new SwerveModuleState(0.0, Rotation2d.fromDegrees(45.0)),
+                new SwerveModuleState(0.0, Rotation2d.fromDegrees(315.0)),
+                new SwerveModuleState(0.0, Rotation2d.fromDegrees(135.0)),
+                new SwerveModuleState(0.0, Rotation2d.fromDegrees(225.0))};
+        }
 
         for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+            mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop, s_lockWheels);
         }
-    }    
+    }
 
     /* Used by SwerveControllerCommand in Auto */
     public void setModuleStates(SwerveModuleState[] desiredStates) {
         SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.Swerve.maxSpeed);
-        
+           
         for(SwerveModule mod : mSwerveMods){
-            mod.setDesiredState(desiredStates[mod.moduleNumber], false);
+            mod.setDesiredState(desiredStates[mod.moduleNumber], false, false);
         }
     }    
 
@@ -145,6 +158,7 @@ public class Swerve extends SubsystemBase {
         SmartDashboard.putNumber("getHeading",getHeading().getDegrees());
         SmartDashboard.putNumber("Pitch", getPitch());
         SmartDashboard.putString("Alliance Color", DriverStation.getAlliance().toString());
+        SmartDashboard.putBoolean("Swerve Locked", s_lockWheels);
  
         if (Robot.doSD()) {
             for(SwerveModule mod : mSwerveMods){
@@ -154,5 +168,9 @@ public class Swerve extends SubsystemBase {
 
             }
         }
+    }
+
+    public void setLockWheels(boolean b) {
+        s_lockWheels = b;
     }
 }
