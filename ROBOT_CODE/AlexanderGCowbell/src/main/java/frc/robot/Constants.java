@@ -172,9 +172,9 @@ public final class Constants {
         public static final boolean driveEnableCurrentLimit = true;
 
         /* Angle Motor PID Values */
-        public static final double angleKP = 2.0; // was .6
+        public static final double angleKP = 0.3; // was .6
         public static final double angleKI = 0.0;
-        public static final double angleKD = 12.0;  // these values are suspect ?????  ratttly swerve noise is from this but not sure want to change now.
+        public static final double angleKD = 0.0;  // these values are suspect ?????  ratttly swerve noise is from this but not sure
         public static final double angleKF = 0.0;
 
         /* Drive Motor PID Values */
@@ -190,7 +190,7 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         public static final double maxSpeed = 5.0; // disabled for testing = 3.0; //meters per second
-        public static final double maxAngularVelocity = 3.0; // disabled for testing = 2.7;
+        public static final double maxAngularVelocity = 6.0; // disabled for testing = 2.7;
 
         /* Neutral Modes */
         public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
@@ -263,7 +263,7 @@ public final class Constants {
     
         public static final double kPXController = 1;
         public static final double kPYController = 1;
-        public static final double kPThetaController = 1;
+        public static final double kPThetaController = 2;
     
         // Constraint for the motion profilied robot angle controller
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
@@ -284,23 +284,52 @@ public final class Constants {
         public static final String kArmStateMachineId = "ArmStateMachine";
     }
 
-    public static final class ArmStateConstants {
+    public static final class ArmStateConstants {       
         public final static double coneFlipFlexPosition = 0.37;
         public final static double wristOnlyFlexMaxVelocity = 2000;
     };
 
     public static final class ArmConstants {
+
+
+        /*
+         ************************************************************************************************
+         * THESE VALUES NEED TO CHANGE IF WE WORK ON THE ARM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         * 
+         * **********************************************************************************************
+         */
+
+         public final static int proximalAbsoluteTicsCenter = 2714;
+         public final static int distalAbsoluteTicsCenter = 1790;
+
+        /*
+         ************************************************************************************************
+         * These are absolute values based off the center tics above
+         * **********************************************************************************************
+         */
+
+         public final static int proximalEstimatedAutoAbsolute = proximalAbsoluteTicsCenter - 205; //  2509; // only used if we are not getting reasonable values from absolute encoder
+         public final static int distalEstimatedAutoAbsolute = distalAbsoluteTicsCenter + 206; //1996; // only used if we are not getting reasonable values from absolute encoder
+
+                 // bounds checking for absolute encoder values, work around for spotty values we are receiving
+        // these first set of bounds are used when we don't know where the arm is and we mainly want to make sure that
+        // we are discarding readings that are obviously absurd
+        public final static int[] proximalAbsoluteBounds = new int[] {proximalAbsoluteTicsCenter - 714,  proximalAbsoluteTicsCenter + 1286};  // 2000 4000
+        public final static int[] distalAbsoluteBounds = new int[] {distalAbsoluteTicsCenter - 790, distalAbsoluteTicsCenter + 710}; // 1000, 2500
+        // these second set of bounds are used when we are starting from auto where we do know about where we are
+        // we want to keep the range checking narrower for this situation
+        public final static int[] proximalAbsoluteBoundsAuto = new int[] {proximalAbsoluteTicsCenter - 150, proximalAbsoluteTicsCenter + 150};  // {2430, 2585}
+        public final static int[] distalAbsoluteBoundsAuto = new int[] {distalAbsoluteTicsCenter - 100, distalAbsoluteTicsCenter + 100};   //  {1925, 2060}
+
+
+
+
         public final static int proximalCancoderId = 11;
         public final static int distalCancoderId = 10;
         public final static int wristCancoderId = 12;
         public final static int intakeCancoderId = 13;
-
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
-        public final static int proximalAbsoluteTicsCenter = 2714; // 2697 was the number read at beginning of blacksburg but did not change  2710  
-        public final static int proximalEstimatedAutoAbsolute = 2509; // only used if we are not getting reasonable values from absolute encoder
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
-        public final static int distalAbsoluteTicsCenter = 1790;// 1817 was the number read at beginning of blacksburg but did not change. 1790
-        public final static int distalEstimatedAutoAbsolute = 1996; // only used if we are not getting reasonable values from absolute encoder
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
@@ -315,15 +344,7 @@ public final class Constants {
         public final static double mostlyExtendedThreshold = 0.5; // percentage of the path completed to consider mostly extended
         public final static double proximalOutOfPositionThreshold = -37500;
 
-        // bounds checking for absolute encoder values, work around for spotty values we are receiving
-        // these first set of bounds are used when we don't know where the arm is and we mainly want to make sure that
-        // we are discarding readings that are obviously absurd
-        public final static int[] proximalAbsoluteBounds = new int[] {2000, 4000};
-        public final static int[] distalAbsoluteBounds = new int[] {1000, 2500};
-        // these second set of bounds are used when we are starting from auto where we do know about where we are
-        // we want to keep the range checking narrower for this situation
-        public final static int[] proximalAbsoluteBoundsAuto = new int[] {2430, 2585};  
-        public final static int[] distalAbsoluteBoundsAuto = new int[] {1925, 2060}; 
+
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;
