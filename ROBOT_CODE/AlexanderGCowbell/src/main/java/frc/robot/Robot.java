@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
@@ -92,6 +93,7 @@ public class Robot extends TimedRobot {
 
 	LiveWindow.disableAllTelemetry();
     ctreConfigs = new CTREConfigs();
+	PortForwarder.add(5800, "photonvision.local", 5800);
 
 	s_Swerve = new Swerve();
   	s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);
