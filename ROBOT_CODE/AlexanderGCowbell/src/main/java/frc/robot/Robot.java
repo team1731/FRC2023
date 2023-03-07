@@ -87,13 +87,19 @@ public class Robot extends TimedRobot {
 //   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
   @Override
   public void robotInit() {
+
 	LogWriter.setupLogging();
 	MessageLog.start();
 	MessageLog.add("\n\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  EVENT: " + DriverStation.getEventName() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
 	LiveWindow.disableAllTelemetry();
     ctreConfigs = new CTREConfigs();
-	PortForwarder.add(5800, "photonvision.local", 5800);
+	PortForwarder.add(5800, "10.17.31.11", 5800);
+	PortForwarder.add(5801, "10.17.31.11", 5801);
+	PortForwarder.add(5802, "10.17.31.11", 5802);
+	PortForwarder.add(5803, "10.17.31.11", 5803);
+	PortForwarder.add(5804, "10.17.31.11", 5804);
+
 
 	s_Swerve = new Swerve();
   	s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);
