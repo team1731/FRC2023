@@ -25,6 +25,7 @@ import frc.robot.util.log.MessageLog;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OperatorConsoleConstants;
 import frc.robot.Constants.GamePiece;
+import frc.robot.Constants.HighPickup;
 import frc.robot.Constants.OpConstants.LedOption;
 
 /**
@@ -64,6 +65,7 @@ public class RobotContainer {
   private final JoystickButton kAutoRecoverySwitch = new JoystickButton(operator,OperatorConsoleConstants.kAutoRecoverySwitchId);
   private final JoystickButton kConeSwitch = new JoystickButton(operator,OperatorConsoleConstants.kConeSwitchId);
   private final JoystickButton kCubeSwitch = new JoystickButton(operator,OperatorConsoleConstants.kCubeSwitchId);
+  private final JoystickButton kHighPickupSwitch = new JoystickButton(operator,OperatorConsoleConstants.kHighPickupSwitch);
   public final int kDisatalAxis = OperatorConsoleConstants.kDistalAxisId;
   public final int kProximalAxis = OperatorConsoleConstants.kProximalAxisId;
 
@@ -125,7 +127,7 @@ public class RobotContainer {
       //kRightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_KEYPAD, operator, kDisatalAxis));
     }
     kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDisatalAxis));
-    kRightTrigger.whileTrue(new FlipConeCommand(sm_armStateMachine));
+    kRightTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_DOWNED_CONE, operator, kDisatalAxis));
 
     /* Operator Buttons */
     kPreventScoreBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setAllowScore(false)));
@@ -155,6 +157,12 @@ public class RobotContainer {
       sm_armStateMachine.setGamePiece(GamePiece.CUBE);
       m_ledstring.setBlink(false);
       m_ledstring.setColor(LedOption.PURPLE);
+    }));
+    kHighPickupSwitch.onTrue(new InstantCommand(() -> {
+      sm_armStateMachine.setHighPickup(HighPickup.FEEDER);
+    }));
+    kHighPickupSwitch.onFalse(new InstantCommand(() -> {
+      sm_armStateMachine.setHighPickup(HighPickup.SHELF);
     }));
   }
 

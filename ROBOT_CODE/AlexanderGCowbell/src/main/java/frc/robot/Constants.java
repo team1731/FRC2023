@@ -32,6 +32,10 @@ public final class Constants {
         CONE, CUBE
     }
 
+    public static enum HighPickup {
+        FEEDER, SHELF
+    }
+
     public static final class LogConstants {
         /*
          * To write to a log you must:
@@ -131,6 +135,7 @@ public final class Constants {
         public static int kAutoRecoverySwitchId = 8;
         public static int kConeSwitchId = 4;
         public static int kCubeSwitchId = 5;
+        public static int kHighPickupSwitch = 1;
     }
 
     public static final class Swerve {

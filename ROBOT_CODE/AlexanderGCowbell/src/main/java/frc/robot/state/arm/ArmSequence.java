@@ -12,7 +12,7 @@ public enum ArmSequence {
     SCORE_LOW("DEPLOY_LOW"),
     PICKUP_HIGH,
     PICKUP_LOW,
-    PICKUP_FLOOR_CONE,
+    PICKUP_DOWNED_CONE,
     FLIP_CONE;
 
     public String code = null;

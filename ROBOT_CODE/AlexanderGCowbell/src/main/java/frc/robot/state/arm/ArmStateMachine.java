@@ -8,6 +8,7 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ArmStateConstants;
 import frc.robot.Constants.OperatorConsoleConstants;
 import frc.robot.Constants.GamePiece;
+import frc.robot.Constants.HighPickup;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.util.log.LogWriter;
 
@@ -15,6 +16,7 @@ public class ArmStateMachine {
   private ArmSubsystem subsystem;
   private Status status = Status.READY;
   private GamePiece gamePiece = GamePiece.CUBE;
+  private HighPickup highPickup = HighPickup.FEEDER;
   private MovementType movementType;
   private boolean isInAuto = false;
   private boolean isRunningKeypadEntry = false;
@@ -650,6 +652,14 @@ public class ArmStateMachine {
       return; // do not clear if running a path
     }
     this.gamePiece = gamePiece;
+  }
+
+  public HighPickup getHighPickup() {
+    return highPickup;
+  }
+
+  public void setHighPickup(HighPickup pickup) {
+    highPickup = pickup;
   }
 
   public boolean isHoldingGamePiece() {

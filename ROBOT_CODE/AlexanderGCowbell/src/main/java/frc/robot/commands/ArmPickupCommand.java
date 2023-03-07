@@ -3,6 +3,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GamePiece;
+import frc.robot.Constants.HighPickup;
 import frc.robot.Constants.ArmStateConstants;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
@@ -26,14 +27,11 @@ public class ArmPickupCommand extends CommandBase {
     @Override
 	public void initialize() {
         ArmPath path = null;
-        boolean shouldDoExtraExtension = stateMachine.getExtraExtension();
-        if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE && shouldDoExtraExtension) {
-            path = PickupHighConeExtra.getArmPath();
-        } else if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE && !shouldDoExtraExtension) {
+        if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE && stateMachine.getHighPickup() == HighPickup.FEEDER) {
+            path = PickupHighConeFeeder.getArmPath();
+        } else if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE && stateMachine.getHighPickup() == HighPickup.SHELF) {
             path = PickupHighCone.getArmPath();
-        } if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE && shouldDoExtraExtension) {
-            path = PickupHighCubeExtra.getArmPath();
-        } else if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE && !shouldDoExtraExtension) {
+        } if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE) {
             path = PickupHighCube.getArmPath();
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = PickupLowCone.getArmPath();
@@ -45,7 +43,7 @@ public class ArmPickupCommand extends CommandBase {
             stateMachine.pickup(ArmStateConstants.coneFlipFlexPosition);
             adjustWrist = true;
 
-        } else if (sequence == ArmSequence.PICKUP_FLOOR_CONE) {
+        } else if (sequence == ArmSequence.PICKUP_DOWNED_CONE) {
             path = PickupFloorCone.getArmPath();
             adjustWrist = true;
         }

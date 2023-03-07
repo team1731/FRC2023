@@ -1,6 +1,6 @@
 package frc.data.mp;
 
-public class PickupHighConeExtra {
+public class PickupHighConeFeeder {
     public static ArmPath getArmPath() {
         return new ArmPath(kNumPoints, proximalPoints, distalPoints, kWristFlexIndex, kWristFlexPosition, kWristExtendIndex, kWristMaxVelocity);
     }
