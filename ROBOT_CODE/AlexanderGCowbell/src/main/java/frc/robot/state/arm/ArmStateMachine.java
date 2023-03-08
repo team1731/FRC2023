@@ -362,6 +362,7 @@ public class ArmStateMachine {
     // allows driver to kick this off without waiting for operator
     status = Status.EMERGENCY_RECOVERY;
     currentArmState = ArmState.EMERGENCY_RECOVERY;
+    queuedCommand = null;
     attemptAutoRecovery();
   }
 
@@ -485,7 +486,7 @@ public class ArmStateMachine {
      * These commands can get queued when the command is requested while the arm is still reaching a ready state
      */
     if(queuedCommand != null && isReadyToStartMovement()) {
-      if(queuedCommand.type == MovementType.PICKUP && queuedCommand.path != null) {
+      if((queuedCommand.type == MovementType.PICKUP || queuedCommand.type == MovementType.PICKUP_DOWNED_CONE) && queuedCommand.path != null) {
         pickup(queuedCommand.path, queuedCommand.type, queuedCommand.queuedTime);
         queuedCommand = null;
       } else if(queuedCommand.type == MovementType.PICKUP && queuedCommand.path == null) {
