@@ -282,7 +282,11 @@ public class ArmStateMachine {
         transitionIntake(Input.STOP);
       }
     } else if(currentArmState == ArmState.EXTENDING) {
-      interrupt();
+      // check for accidental button press
+      if(!accidentalButtonPressInterrupt()) {
+        // appears to be a normal interrupt
+        interrupt();
+      }
     }
   }
 
@@ -396,6 +400,25 @@ public class ArmStateMachine {
       // movement was cut short, the intake should be stopped unless we're holding a piece
       transitionIntake(Input.STOP);
     }
+  }
+
+  // DETECT IF A RELEASE EVENT WAS LIKELY CAUSED BY AN ACCIDENTAL BUTTON CLICK
+  // return = true, means detected accidental click and handled interrupt
+  // return = false, means did not detect accidental click and did nothing
+  public boolean accidentalButtonPressInterrupt() {
+    if(Timer.getFPGATimestamp() - currentPathQueuedTime < 0.5) {
+      System.out.println("ArmStateMachine: Detected likely accidental button click!!!!!!!!!!!!!!!!!!!!");
+      //subsystem.stopArm();
+      //transitionArm(Input.AUTO_RECOVER); // kick off arm/state reset
+      //return true;
+    } else if(queuedCommand != null && Timer.getFPGATimestamp() - queuedCommand.queuedTime < 0.5) {
+      System.out.println("ArmStateMachine: Detected likely accidental button click!!!!!!!!!!!!!!!!!!!!");
+      //queuedCommand = null; // clear the queued command
+      //return true;
+    }
+
+    // appears to be a normal interrupt event
+    return false;
   }
 
   // EITHER THE SYSTEM HAS DETECTED ITS OUT OF POSITION OR OPERATOR HAS HIT THE KILL SWITCH
