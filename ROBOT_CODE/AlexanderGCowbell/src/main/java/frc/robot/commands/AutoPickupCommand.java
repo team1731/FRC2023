@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.ArmStateConstants;
 import frc.robot.Constants.GamePiece;
 import frc.robot.state.arm.ArmSequence;
@@ -14,6 +15,7 @@ public class AutoPickupCommand extends CommandBase {
     private GamePiece pieceType;
     private boolean started = false;
     private boolean isFinished = false;
+    private double queuedTime;
 
     public AutoPickupCommand(ArmStateMachine stateMachine, ArmSequence sequence, GamePiece pieceType) {
         this.stateMachine = stateMachine;
@@ -27,6 +29,9 @@ public class AutoPickupCommand extends CommandBase {
         System.out.println("Starting the pickup..........................................................*****************************88");
         stateMachine.setGamePiece(pieceType);
 
+        // Queued time used to distinguish running path from queued path if both are present
+        queuedTime = Timer.getFPGATimestamp();
+
         ArmPath path = null;
         if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = PickupHighCone.getArmPath();
@@ -39,7 +44,7 @@ public class AutoPickupCommand extends CommandBase {
         }
 
         if(path != null) {
-            stateMachine.pickup(path);
+            stateMachine.pickup(path, queuedTime);
         } else {
             isFinished = true;
         }

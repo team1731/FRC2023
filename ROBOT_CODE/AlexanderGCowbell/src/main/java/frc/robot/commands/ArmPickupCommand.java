@@ -1,10 +1,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.HighPickup;
-import frc.robot.Constants.ArmStateConstants;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.state.arm.ArmStateMachine.MovementType;
@@ -16,6 +16,7 @@ public class ArmPickupCommand extends CommandBase {
     private Joystick joystick;
     private int distalAxis;
     private boolean adjustWrist = false;
+    private double queuedTime;
 
     public ArmPickupCommand(ArmStateMachine stateMachine, ArmSequence sequence, Joystick joystick, int distalAxis) {
         this.stateMachine = stateMachine;
@@ -26,6 +27,9 @@ public class ArmPickupCommand extends CommandBase {
 
     @Override
 	public void initialize() {
+        // Queued time used to distinguish running path from queued path if both are present
+        queuedTime = Timer.getFPGATimestamp();
+
         ArmPath path = null;
         if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE && stateMachine.getHighPickup() == HighPickup.FEEDER) {
             path = PickupHighConeFeeder.getArmPath();
@@ -39,26 +43,21 @@ public class ArmPickupCommand extends CommandBase {
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
             path = PickupLowCube.getArmPath();
             adjustWrist = true;
-        } else if (sequence == ArmSequence.FLIP_CONE) {
-            stateMachine.pickup(ArmStateConstants.coneFlipFlexPosition);
-            adjustWrist = true;
         } else if (sequence == ArmSequence.PICKUP_DOWNED_CONE) {
-            path = PickupFloorCone.getArmPath();
+            stateMachine.pickup(PickupFloorCone.getArmPath(), MovementType.PICKUP_DOWNED_CONE, queuedTime);
             adjustWrist = true;
         }
         
         // Note: distal joystick doubles for distal arm and wrist adjustment dependending on the path being run
         stateMachine.addJoystickControl(joystick, distalAxis, adjustWrist);
 
-        if(path != null && sequence == ArmSequence.PICKUP_DOWNED_CONE) {
-            stateMachine.pickup(path, MovementType.PICKUP_DOWNED_CONE);
-        } else if(path != null) {
-            stateMachine.pickup(path);
+        if(path != null) {
+            stateMachine.pickup(path, queuedTime);
         }
 	}
 
     @Override
     public void end(boolean interrupted) {
-        stateMachine.buttonReleased();
+        stateMachine.buttonReleased(queuedTime);
     }
 }

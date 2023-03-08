@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GamePiece;
 import frc.robot.state.arm.ArmSequence;
@@ -13,6 +14,7 @@ public class ArmScoreCommand extends CommandBase {
     private ArmSequence sequence;
     private Joystick joystick;
     private int distalAxis;
+    private double queuedTime;
 
     public ArmScoreCommand(ArmStateMachine stateMachine, ArmSequence sequence, Joystick joystick, int distalAxis) {
         this.stateMachine = stateMachine;
@@ -23,6 +25,9 @@ public class ArmScoreCommand extends CommandBase {
 
     @Override
 	public void initialize() {
+        // Queued time used to distinguish running path from queued path if both are present
+        queuedTime = Timer.getFPGATimestamp();
+
         ArmPath path = null;
         if(sequence == ArmSequence.SCORE_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = ScoreHighCone.getArmPath();
@@ -41,14 +46,14 @@ public class ArmScoreCommand extends CommandBase {
         stateMachine.addJoystickControl(joystick, distalAxis, false);
 
         if(sequence == ArmSequence.READ_OPERATOR_ENTRY) {
-            stateMachine.scoreOperatorEntry();
+            stateMachine.scoreOperatorEntry(queuedTime);
         } else if(path != null) {
-            stateMachine.score(path);
+            stateMachine.score(path, queuedTime);
         }
 	}
 
     @Override
     public void end(boolean interrupted) {
-        stateMachine.buttonReleased();
+        stateMachine.buttonReleased(queuedTime);
     }
 }

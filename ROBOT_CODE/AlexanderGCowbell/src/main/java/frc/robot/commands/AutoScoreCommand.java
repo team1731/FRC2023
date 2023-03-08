@@ -1,6 +1,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Constants.GamePiece;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
@@ -13,6 +14,7 @@ public class AutoScoreCommand extends CommandBase {
     private GamePiece pieceType;
     private boolean started = false;
     private boolean isFinished = false;
+    private double queuedTime;
 
     public AutoScoreCommand(ArmStateMachine stateMachine, ArmSequence sequence, GamePiece pieceType) {
         this.stateMachine = stateMachine;
@@ -23,6 +25,9 @@ public class AutoScoreCommand extends CommandBase {
     @Override
 	public void initialize() {
         stateMachine.setGamePiece(pieceType);
+
+        // Queued time used to distinguish running path from queued path if both are present
+        queuedTime = Timer.getFPGATimestamp();
 
         ArmPath path = null;
         if(sequence == ArmSequence.SCORE_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {
@@ -40,7 +45,7 @@ public class AutoScoreCommand extends CommandBase {
         }
 
         if(path != null) {
-            stateMachine.score(path);
+            stateMachine.score(path, queuedTime);
         } else {
             isFinished = true;
         }

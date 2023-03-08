@@ -29,6 +29,7 @@ public class ArmStateMachine {
 
   private ArmPath currentPath; // used if running full arm path
   private double currentWristFlexPosition = 0; // used if running wrist only movement
+  private double currentPathQueuedTime; // used to distinguish requests when one running and another queued
   private int pathStartedIndex = 0;
   private double pathStartedTime = 0;
   private double wristMovementStartedTime = 0;
@@ -65,17 +66,20 @@ public class ArmStateMachine {
     public ArmPath path; // used if running full arm path
     public double wristFlexPosition; // used if running wrist only movement
     public double queuedTime;
+    public boolean autoCommand;
 
-    public QueuedCommand(MovementType type, ArmPath path) {
+    public QueuedCommand(MovementType type, ArmPath path, double queuedTime) {
       this.type = type;
       this.path = path;
-      this.queuedTime = Timer.getFPGATimestamp();
+      this.queuedTime = queuedTime;
+      this.autoCommand = isInAuto;
     }
 
-    public QueuedCommand(MovementType type, double wristFlexPosition) {
+    public QueuedCommand(MovementType type, double wristFlexPosition, double queuedTime) {
       this.type = type;
       this.wristFlexPosition = wristFlexPosition;
-      this.queuedTime = Timer.getFPGATimestamp();
+      this.queuedTime = queuedTime;
+      this.autoCommand = isInAuto;
     }
   }
 
@@ -122,6 +126,7 @@ public class ArmStateMachine {
     status = Status.READY;
     currentPath = null;
     currentWristFlexPosition = 0;
+    currentPathQueuedTime = 0;
     pathStartedIndex = 0;
     pathStartedTime = 0;
     wristMovementStartedTime = 0;
@@ -171,21 +176,20 @@ public class ArmStateMachine {
    */
   
   // PICKUP
-  public void pickup(ArmPath path) {
-    pickup(path, MovementType.PICKUP);
+  public void pickup(ArmPath path, double queuedTime) {
+    pickup(path, MovementType.PICKUP, queuedTime);
   }
 
-  public void pickup(ArmPath path, MovementType movement) {
+  public void pickup(ArmPath path, MovementType movement, double queuedTime) {
     if(path == null) return;
     if(!isReadyToStartMovement()) {
-      if(isInAuto) {
-        queuedCommand = new QueuedCommand(MovementType.PICKUP, path);
-      }
+      setQueuedCommand(movement, path, queuedTime);
       return;
     }
 
     System.out.println("ArmStateMachine: STARTING " + movement + "!!!!!!!!!!!!!!!!!!!!!");
     currentPath = path;
+    currentPathQueuedTime = queuedTime;
     pathStartedIndex = 0;
     movementType = movement;
     // make sure the intake is stopped before attempting to start it
@@ -196,16 +200,15 @@ public class ArmStateMachine {
   }
 
   // PICKUP WITH A WRIST FLEX ONLY
-  public void pickup(double wristFlexPosition) {
+  public void pickup(double wristFlexPosition, double queuedTime) {
     if(!isReadyToStartMovement()) {
-      if(isInAuto) {
-        queuedCommand = new QueuedCommand(MovementType.PICKUP, wristFlexPosition);
-      }
+      setQueuedCommand(MovementType.PICKUP, wristFlexPosition, queuedTime);
       return;
     }
 
     System.out.println("ArmStateMachine: STARTING WRIST ONLY PICKUP!!!!!!!!!!!!!!!!!!!!!");
     currentWristFlexPosition = wristFlexPosition;
+    currentPathQueuedTime = queuedTime;
     movementType = MovementType.PICKUP;
     // make sure the intake is stopped before attempting to start it
     transitionIntake(Input.STOP);
@@ -216,26 +219,23 @@ public class ArmStateMachine {
   }
 
   // SCORE
-  public void score(ArmPath path) {
+  public void score(ArmPath path, double queuedTime) {
     if(path == null) return;
     if(!isReadyToStartMovement()) {
-      if(isInAuto) {
-        queuedCommand = new QueuedCommand(MovementType.SCORE, path);
-      }
+      setQueuedCommand(MovementType.SCORE, path, queuedTime);
       return;
     } 
 
     System.out.println("ArmStateMachine: STARTING SCORE!!!!!!!!!!!!!!!!!!!!!");
     currentPath = path;
+    currentPathQueuedTime = queuedTime;
     pathStartedIndex = 0;
     movementType = MovementType.SCORE;
     transitionArm(Input.EXTEND);
   }
 
   // SCORE BASED ON OPERATOR ENTRY (KEYPAD OR SWITCH)
-  public void scoreOperatorEntry() {
-    if(!isReadyToStartMovement()) return;
-
+  public void scoreOperatorEntry(double queuedTime) {
     ArmPath path = null;
     if(operatorSequence == ArmSequence.SCORE_HIGH && gamePiece == GamePiece.CONE) {
       path = ScoreHighCone.getArmPath();
@@ -253,12 +253,20 @@ public class ArmStateMachine {
     
     if(path != null) {
       isRunningOperatorEntry = true;
-      score(path);
+      score(path, queuedTime);
     }
   }
 
   // NOTIFY THAT PICKUP/SCORE BUTTON RELEASED
-  public void buttonReleased() {
+  public void buttonReleased(double queuedTime) {
+    if(queuedTime != currentPathQueuedTime) {
+      if(queuedCommand != null && queuedTime == queuedCommand.queuedTime) {
+        // if button is released before the queued command has been run then clear it out
+        queuedCommand = null;
+      }
+      return;
+    }
+
     if(currentArmState == ArmState.EXTENDED || isMostlyExtended()) {
       if(movementType == MovementType.SCORE && allowScore) {
         transitionIntake(Input.RELEASE);
@@ -448,21 +456,21 @@ public class ArmStateMachine {
   public void periodic() {
 
     /*
-     * Logic for handling queued auto commands
+     * Logic for handling queued commands
      * These commands can get queued when the command is requested while the arm is still reaching a ready state
      */
-    if(isInAuto && queuedCommand != null) {
-      if(isReadyToStartMovement() && queuedCommand.type == MovementType.PICKUP && queuedCommand.path != null) {
-        pickup(queuedCommand.path);
+    if(queuedCommand != null && isReadyToStartMovement()) {
+      if(queuedCommand.type == MovementType.PICKUP && queuedCommand.path != null) {
+        pickup(queuedCommand.path, queuedCommand.type, queuedCommand.queuedTime);
         queuedCommand = null;
-      } else if(isReadyToStartMovement() && queuedCommand.type == MovementType.PICKUP && queuedCommand.path == null) {
-        pickup(queuedCommand.wristFlexPosition);
+      } else if(queuedCommand.type == MovementType.PICKUP && queuedCommand.path == null) {
+        pickup(queuedCommand.wristFlexPosition, queuedCommand.queuedTime);
         queuedCommand = null;
-      } else if(isReadyToStartMovement() && queuedCommand.type == MovementType.SCORE) {
-        score(queuedCommand.path);
+      } else if(queuedCommand.type == MovementType.SCORE) {
+        score(queuedCommand.path, queuedCommand.queuedTime);
         queuedCommand = null;
       }
-    } else if(!isInAuto && queuedCommand != null) {
+    } else if(!isInAuto && queuedCommand != null && queuedCommand.autoCommand) {
       // we are no longer in auto, this command no longer applies, clear the queued command
       queuedCommand = null;
     }
@@ -731,5 +739,26 @@ public class ArmStateMachine {
     } else {
       distalJoystickControl = new JoystickControl(joystick, axis, adjustWrist);
     }
+  }
+
+  private void setQueuedCommand(MovementType movementType, ArmPath path, double queuedTime) {
+    if(isInAuto || isReturningToHome()) { // only allow queuing when: auto = anytime, teleop = when returning home
+      // allow current queued command to be overwritten
+      queuedCommand = new QueuedCommand(movementType, path, queuedTime);
+    }
+  }
+
+  private void setQueuedCommand(MovementType movementType, double position, double queuedTime) {
+    if(isInAuto || isReturningToHome()) { // only allow queuing when: auto = anytime, teleop = when returning home
+      // allow current queued command to be overwritten
+      queuedCommand = new QueuedCommand(movementType, position, queuedTime);
+    }
+  }
+
+  private boolean isReturningToHome() {
+    if(currentArmState == ArmState.RETRACTING || currentArmState == ArmState.RESETTING || currentArmState == ArmState.RESETTING_WRIST) {
+      return true;
+    }
+    return false;
   }
 }
