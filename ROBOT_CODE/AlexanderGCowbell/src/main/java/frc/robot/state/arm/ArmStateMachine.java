@@ -20,7 +20,7 @@ public class ArmStateMachine {
   private MovementType movementType;
   private boolean isInAuto = false;
   private boolean isRunningOperatorEntry = false;
-  private ArmSequence operatorSequence = ArmSequence.SCORE_HIGH; // sequence input by operator either via keypad or switch
+  private ArmSequence operatorSequence = ArmSequence.SCORE_HIGH; // sequence pre-loaded by operator via keypad/switch
 
   private ArmState currentArmState = ArmState.UNKNOWN;
   private IntakeState currentIntakeState = IntakeState.STOPPED;
@@ -57,7 +57,7 @@ public class ArmStateMachine {
 }
 
   public enum MovementType {
-    PICKUP, SCORE
+    PICKUP, PICKUP_DOWNED_CONE, SCORE
   }
   
   class QueuedCommand {
@@ -172,6 +172,10 @@ public class ArmStateMachine {
   
   // PICKUP
   public void pickup(ArmPath path) {
+    pickup(path, MovementType.PICKUP);
+  }
+
+  public void pickup(ArmPath path, MovementType movement) {
     if(path == null) return;
     if(!isReadyToStartMovement()) {
       if(isInAuto) {
@@ -180,10 +184,10 @@ public class ArmStateMachine {
       return;
     }
 
-    System.out.println("ArmStateMachine: STARTING PICKUP!!!!!!!!!!!!!!!!!!!!!");
+    System.out.println("ArmStateMachine: STARTING " + movement + "!!!!!!!!!!!!!!!!!!!!!");
     currentPath = path;
     pathStartedIndex = 0;
-    movementType = MovementType.PICKUP;
+    movementType = movement;
     // make sure the intake is stopped before attempting to start it
     transitionIntake(Input.STOP); 
     transitionIntake(Input.START);
@@ -261,7 +265,7 @@ public class ArmStateMachine {
         initiateRetraction();
       } else if(movementType == MovementType.SCORE && !allowScore) {
         initiateRetraction();
-      } else if(movementType == MovementType.PICKUP) {
+      } else if(movementType == MovementType.PICKUP || movementType == MovementType.PICKUP_DOWNED_CONE) {
         initiateRetraction();
       }
     } else if(currentArmState == ArmState.WRIST_ONLY_FLEXED && movementType == MovementType.PICKUP) {
@@ -421,8 +425,16 @@ public class ArmStateMachine {
 
   // NOTIFY THAT SUBSYSTEM COMPLETED ARM RETRACTION
   public void completedArmRetraction() {
-    if(currentIntakeState != IntakeState.HOLDING) {
-      // upon retraction the intake should be stopped unless we're holding a piece
+    if(movementType == MovementType.PICKUP_DOWNED_CONE && currentIntakeState != IntakeState.HOLDING) {
+      if(subsystem.isIntakeAtHoldingVelocity()) {
+        // looks like we got it
+        transitionIntake(Input.RETRIEVED); 
+      } else {
+        // didn't get the piece, stop the intake
+        transitionIntake(Input.STOP);
+      }
+    } else if(currentIntakeState != IntakeState.HOLDING) {
+      // in most scenarios, upon retraction, the intake should be stopped unless we're holding a piece
       transitionIntake(Input.STOP);
     }
     transitionArm(Input.COMPLETED);
@@ -510,11 +522,10 @@ public class ArmStateMachine {
     }
 
     if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
-      if (currentPath.getNumberOfPoints() == 94) {   // Total Hack :)
-          transitionArm(Input.RETRACT);
-      }     
-      else {
-      transitionIntake(Input.RETRIEVED);
+      if(movementType == MovementType.PICKUP_DOWNED_CONE) {
+        transitionArm(Input.RETRACT);
+      } else {
+        transitionIntake(Input.RETRIEVED);
       }
     }
 

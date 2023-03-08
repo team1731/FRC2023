@@ -7,7 +7,7 @@ import frc.robot.Constants.HighPickup;
 import frc.robot.Constants.ArmStateConstants;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
-import frc.robot.state.arm.ArmStateMachine.Status;
+import frc.robot.state.arm.ArmStateMachine.MovementType;
 import frc.data.mp.*;
 
 public class ArmPickupCommand extends CommandBase {
@@ -42,7 +42,6 @@ public class ArmPickupCommand extends CommandBase {
         } else if (sequence == ArmSequence.FLIP_CONE) {
             stateMachine.pickup(ArmStateConstants.coneFlipFlexPosition);
             adjustWrist = true;
-
         } else if (sequence == ArmSequence.PICKUP_DOWNED_CONE) {
             path = PickupFloorCone.getArmPath();
             adjustWrist = true;
@@ -51,7 +50,9 @@ public class ArmPickupCommand extends CommandBase {
         // Note: distal joystick doubles for distal arm and wrist adjustment dependending on the path being run
         stateMachine.addJoystickControl(joystick, distalAxis, adjustWrist);
 
-        if(path != null) {
+        if(path != null && sequence == ArmSequence.PICKUP_DOWNED_CONE) {
+            stateMachine.pickup(path, MovementType.PICKUP_DOWNED_CONE);
+        } else if(path != null) {
             stateMachine.pickup(path);
         }
 	}
