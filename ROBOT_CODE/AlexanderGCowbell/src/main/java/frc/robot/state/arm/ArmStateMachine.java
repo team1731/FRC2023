@@ -510,7 +510,12 @@ public class ArmStateMachine {
     }
 
     if(currentIntakeState == IntakeState.RETRIEVING && subsystem.isIntakeAtHoldingVelocity()) {
+      if (currentPath.getNumberOfPoints() == 94) {   // Total Hack :)
+          transitionArm(Input.RETRACT);
+      }     
+      else {
       transitionIntake(Input.RETRIEVED);
+      }
     }
 
 
