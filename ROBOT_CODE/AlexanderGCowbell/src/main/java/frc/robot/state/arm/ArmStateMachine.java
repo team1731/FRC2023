@@ -352,11 +352,13 @@ public class ArmStateMachine {
   }
 
   public void clearCurrentPath() {
-    if(currentArmState == ArmState.HOME) {
-      resetState();
-    } else {
-      interrupt();
-    }
+    // clear current path is used to handle situation in which we have hit an 
+    // edge case where the state machine and subsystem are out of sync, but 
+    // the arm is in a safe state for auto recovery
+    // allows driver to kick this off without waiting for operator
+    status = Status.EMERGENCY_RECOVERY;
+    currentArmState = ArmState.EMERGENCY_RECOVERY;
+    attemptAutoRecovery();
   }
 
   public int getPathIndex() {
