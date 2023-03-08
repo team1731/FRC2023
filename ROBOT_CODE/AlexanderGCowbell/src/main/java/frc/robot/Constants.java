@@ -299,8 +299,8 @@ public final class Constants {
          * **********************************************************************************************
          */
 
-         public final static int proximalAbsoluteTicsCenter = 2714;
-         public final static int distalAbsoluteTicsCenter = 1790;
+         public final static int proximalAbsoluteTicsCenter = 2727;
+         public final static int distalAbsoluteTicsCenter = 1717;
 
         /*
          ************************************************************************************************
@@ -369,7 +369,7 @@ public final class Constants {
         public final static double wristAllowedErr = 0;
 
          // Hand limits
-        public static final int INTAKE_CURRENT_LIMIT_A = 27;
+        public static final int INTAKE_CURRENT_LIMIT_A = 20;
         public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
         public static final double INTAKE_OUTPUT_POWER = 1.0;
         public static final double INTAKE_HOLD_POWER = 0.07;
