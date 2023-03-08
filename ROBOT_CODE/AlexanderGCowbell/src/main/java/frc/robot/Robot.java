@@ -251,7 +251,7 @@ public class Robot extends TimedRobot {
 		oldKeypadEntry = newKeypadEntry;
 		SmartDashboard.putString("keypadCommand", newKeypadEntry);
 		m_robotContainer.processKeypadCommand(newKeypadEntry);
-		sm_armStateMachine.setKeyedSequence(newKeypadEntry);
+		sm_armStateMachine.setOperatorSequence(newKeypadEntry);
 	}
 
 	m_robotContainer.displayEncoders();
@@ -407,7 +407,7 @@ public class Robot extends TimedRobot {
 	if(!newKeypadCommand.equals(currentKeypadCommand)){
 		// FEED FSM
 		m_robotContainer.processKeypadCommand(newKeypadCommand);
-		sm_armStateMachine.setKeyedSequence(newKeypadCommand);
+		sm_armStateMachine.setOperatorSequence(newKeypadCommand);
 		currentKeypadCommand = newKeypadCommand;
 	}
 

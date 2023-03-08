@@ -15,17 +15,16 @@ import frc.robot.util.log.LogWriter;
 public class ArmStateMachine {
   private ArmSubsystem subsystem;
   private Status status = Status.READY;
-  private GamePiece gamePiece = GamePiece.CUBE;
+  private GamePiece gamePiece = GamePiece.CONE;
   private HighPickup highPickup = HighPickup.FEEDER;
   private MovementType movementType;
   private boolean isInAuto = false;
-  private boolean isRunningKeypadEntry = false;
-  private ArmSequence keyedSequence;
+  private boolean isRunningOperatorEntry = false;
+  private ArmSequence operatorSequence = ArmSequence.SCORE_HIGH; // sequence input by operator either via keypad or switch
 
   private ArmState currentArmState = ArmState.UNKNOWN;
   private IntakeState currentIntakeState = IntakeState.STOPPED;
   private boolean allowScore = true;
-  private boolean extraExtension = false;
   private boolean emergencyModeTriggeredNotConfirmed = false;
 
   private ArmPath currentPath; // used if running full arm path
@@ -131,12 +130,11 @@ public class ArmStateMachine {
     distalJoystickControl = null;
     wristFlexed = false;
     allowScore = true;
-    extraExtension = false;
     emergencyModeTriggeredNotConfirmed = false;
 
-    if(isRunningKeypadEntry) {
-      keyedSequence = null;
-      isRunningKeypadEntry = false;
+    if(isRunningOperatorEntry) {
+      operatorSequence = null;
+      isRunningOperatorEntry = false;
     }
   }
 
@@ -230,27 +228,27 @@ public class ArmStateMachine {
     transitionArm(Input.EXTEND);
   }
 
-  // SCORE BASED ON KEYPAD ENTRY
-  public void scoreKeyedEntry() {
+  // SCORE BASED ON OPERATOR ENTRY (KEYPAD OR SWITCH)
+  public void scoreOperatorEntry() {
     if(!isReadyToStartMovement()) return;
 
     ArmPath path = null;
-    if(keyedSequence == ArmSequence.SCORE_HIGH && gamePiece == GamePiece.CONE) {
+    if(operatorSequence == ArmSequence.SCORE_HIGH && gamePiece == GamePiece.CONE) {
       path = ScoreHighCone.getArmPath();
-    } else if(keyedSequence == ArmSequence.SCORE_HIGH && gamePiece == GamePiece.CUBE) {
+    } else if(operatorSequence == ArmSequence.SCORE_HIGH && gamePiece == GamePiece.CUBE) {
       path = ScoreHighCube.getArmPath();
-    } else if(keyedSequence == ArmSequence.SCORE_MEDIUM && gamePiece == GamePiece.CONE) {
+    } else if(operatorSequence == ArmSequence.SCORE_MEDIUM && gamePiece == GamePiece.CONE) {
       path = ScoreMediumCone.getArmPath();
-    } else if(keyedSequence == ArmSequence.SCORE_MEDIUM && gamePiece == GamePiece.CUBE) {
+    } else if(operatorSequence == ArmSequence.SCORE_MEDIUM && gamePiece == GamePiece.CUBE) {
       path = ScoreMediumCube.getArmPath();
-    } else if(keyedSequence == ArmSequence.SCORE_LOW && gamePiece == GamePiece.CONE) {
+    } else if(operatorSequence == ArmSequence.SCORE_LOW && gamePiece == GamePiece.CONE) {
       path = ScoreLowCone.getArmPath();
-    } else if(keyedSequence == ArmSequence.SCORE_LOW && gamePiece == GamePiece.CUBE) {
+    } else if(operatorSequence == ArmSequence.SCORE_LOW && gamePiece == GamePiece.CUBE) {
       path = ScoreLowCube.getArmPath();
     }
     
     if(path != null) {
-      isRunningKeypadEntry = true;
+      isRunningOperatorEntry = true;
       score(path);
     }
   }
@@ -683,26 +681,32 @@ public class ArmStateMachine {
     allowScore = allow;
   }
 
-  public boolean getExtraExtension() {
-    return extraExtension;
-  }
-
-  public void setExtraExtension(boolean extraExtension) {
-    this.extraExtension = extraExtension;
-  }
-
-  public void setKeyedSequence(String keypadEntry) {
-    if(isRunningKeypadEntry) return; // do not allow keypad change if running a keyed path
+  // NOTE: the keypad is not currently in use, we are using a switch on the flight controller instead,
+  // however, leaving this code in place in case we switch back
+  public void setOperatorSequence(String keypadEntry) {
+    if(isRunningOperatorEntry) return; // do not allow keypad change if running an operator sequence
 
     String[] keypadValues = keypadEntry.split("; ");
     if(keypadValues.length > 1) {
       String sequenceCode = keypadValues[1];
-      keyedSequence = ArmSequence.valueForCode(sequenceCode);
+      ArmSequence sequence = ArmSequence.valueForCode(sequenceCode);
+      if(sequence != null) {
+        operatorSequence = sequence;
+      }
     }
   }
 
-  public ArmSequence getKeyedSequence() {
-    return keyedSequence;
+  public void setOperatorSequence(int switchId) {
+    if(isRunningOperatorEntry) return; // do not allow switch change if running an operator sequence
+
+    ArmSequence sequence = ArmSequence.valueForSwitch(switchId);
+    if(sequence != null) {
+      operatorSequence = sequence;
+    }
+  }
+
+  public ArmSequence getOperatorSequence() {
+    return operatorSequence;
   }
 
   public void addJoystickControl(Joystick joystick, int axis, boolean adjustWrist) {

@@ -125,17 +125,25 @@ public final class Constants {
     */
 
     public static final class OperatorConsoleConstants {
+        // Buttons
         public static int kPreventScoreBtnId = 13;
         public static int kReleaseBtnId = 14;
         public static int kIntakeBtnId = 15;
-        public static int kExtraExtensionBtnId = 16;
+        public static int kWheelLockBtnId = 16;
+
+        // Sticks
         public static int kProximalAxisId = 1;
         public static int kDistalAxisId = 4;
-        public static int kKillSwitchId = 9;
-        public static int kAutoRecoverySwitchId = 8;
+
+        // Switches
+        public static int kHighPickupSwitch = 1;
         public static int kConeSwitchId = 4;
         public static int kCubeSwitchId = 5;
-        public static int kHighPickupSwitch = 1;
+        public static int kScoreLowSwitchId = 8;
+        public static int kScoreMediumSwitchId = 0; // not an actual switch value, an indicator that switch is in neutral
+        public static int kScoreHighSwitchId = 9;
+        public static int kAutoRecoverySwitchId = 10;
+        public static int kKillSwitchId = 11;
     }
 
     public static final class Swerve {

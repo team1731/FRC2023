@@ -40,8 +40,8 @@ public class ArmScoreCommand extends CommandBase {
 
         stateMachine.addJoystickControl(joystick, distalAxis, false);
 
-        if(sequence == ArmSequence.READ_KEYPAD) {
-            stateMachine.scoreKeyedEntry();
+        if(sequence == ArmSequence.READ_OPERATOR_ENTRY) {
+            stateMachine.scoreOperatorEntry();
         } else if(path != null) {
             stateMachine.score(path);
         }
