@@ -17,6 +17,8 @@ public class ArmPickupCommand extends CommandBase {
     private int distalAxis;
     private boolean adjustWrist = false;
     private double queuedTime;
+    private boolean isFinished = false;
+
 
     public ArmPickupCommand(ArmStateMachine stateMachine, ArmSequence sequence, Joystick joystick, int distalAxis) {
         this.stateMachine = stateMachine;
@@ -59,5 +61,11 @@ public class ArmPickupCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         stateMachine.buttonReleased(queuedTime);
+        isFinished = true;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return isFinished;
     }
 }

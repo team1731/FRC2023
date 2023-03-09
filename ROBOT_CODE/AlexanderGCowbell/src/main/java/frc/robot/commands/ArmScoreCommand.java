@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GamePiece;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
-import frc.robot.state.arm.ArmStateMachine.Status;
 import frc.data.mp.*;
 
 public class ArmScoreCommand extends CommandBase {
@@ -15,6 +14,7 @@ public class ArmScoreCommand extends CommandBase {
     private Joystick joystick;
     private int distalAxis;
     private double queuedTime;
+    private boolean isFinished = false;
 
     public ArmScoreCommand(ArmStateMachine stateMachine, ArmSequence sequence, Joystick joystick, int distalAxis) {
         this.stateMachine = stateMachine;
@@ -55,5 +55,11 @@ public class ArmScoreCommand extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         stateMachine.buttonReleased(queuedTime);
+        isFinished = true;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return isFinished;
     }
 }

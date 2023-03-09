@@ -10,6 +10,7 @@ public class FlipConeCommand extends CommandBase {
     private ArmStateMachine stateMachine;
     private GamePiece prevGamePiece;
     private double queuedTime;
+    private boolean isFinished = false;
 
     public FlipConeCommand(ArmStateMachine stateMachine) {
         this.stateMachine = stateMachine;
@@ -30,5 +31,11 @@ public class FlipConeCommand extends CommandBase {
     public void end(boolean interrupted) {
         stateMachine.buttonReleased(queuedTime);
         stateMachine.setGamePiece(prevGamePiece);
+        isFinished = true;
+    }
+
+    @Override
+    public boolean isFinished() {
+        return isFinished;
     }
 }

@@ -20,7 +20,6 @@ public class AutoCheckRemainingTime extends CommandBase {
 
     @Override
     public void execute() {
-
     }
 
     @Override
