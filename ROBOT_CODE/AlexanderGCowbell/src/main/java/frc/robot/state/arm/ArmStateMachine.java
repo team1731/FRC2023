@@ -26,6 +26,7 @@ public class ArmStateMachine {
   private IntakeState currentIntakeState = IntakeState.STOPPED;
   private boolean allowScore = true;
   private boolean emergencyModeTriggeredNotConfirmed = false;
+  private boolean processAutoRecoveryOnRetraction = false;
 
   private ArmPath currentPath; // used if running full arm path
   private double currentWristFlexPosition = 0; // used if running wrist only movement
@@ -136,6 +137,7 @@ public class ArmStateMachine {
     wristFlexed = false;
     allowScore = true;
     emergencyModeTriggeredNotConfirmed = false;
+    processAutoRecoveryOnRetraction = false;
 
     if(isRunningOperatorEntry) {
       isRunningOperatorEntry = false;
@@ -281,11 +283,10 @@ public class ArmStateMachine {
         transitionIntake(Input.STOP);
       }
     } else if(currentArmState == ArmState.EXTENDING) {
-      // check for accidental button press
-      if(!accidentalButtonPressInterrupt()) {
-        // appears to be a normal interrupt
-        interrupt();
-      }
+      // if we detect this condition, we will kick off auto-recovery when we go into retracting
+      checkForAccidentalButtonPress(); 
+      // start interrupt
+      interrupt();
     }
   }
 
@@ -407,20 +408,14 @@ public class ArmStateMachine {
   // DETECT IF A RELEASE EVENT WAS LIKELY CAUSED BY AN ACCIDENTAL BUTTON CLICK
   // return = true, means detected accidental click and handled interrupt
   // return = false, means did not detect accidental click and did nothing
-  public boolean accidentalButtonPressInterrupt() {
+  public void checkForAccidentalButtonPress() {
     if(Timer.getFPGATimestamp() - currentPathQueuedTime < 0.5) {
       System.out.println("ArmStateMachine: Detected likely accidental button click!!!!!!!!!!!!!!!!!!!!");
-      //subsystem.stopArm();
-      //transitionArm(Input.AUTO_RECOVER); // kick off arm/state reset
-      //return true;
+      processAutoRecoveryOnRetraction = true; // as soon as the interrupt takes us into retraction attempt auto-recovery
     } else if(queuedCommand != null && Timer.getFPGATimestamp() - queuedCommand.queuedTime < 0.5) {
       System.out.println("ArmStateMachine: Detected likely accidental button click!!!!!!!!!!!!!!!!!!!!");
-      //queuedCommand = null; // clear the queued command
-      //return true;
+      queuedCommand = null; // clear the queued command
     }
-
-    // appears to be a normal interrupt event
-    return false;
   }
 
   // EITHER THE SYSTEM HAS DETECTED ITS OUT OF POSITION OR OPERATOR HAS HIT THE KILL SWITCH
@@ -597,6 +592,13 @@ public class ArmStateMachine {
       if(distalJoystickControl != null) {
         subsystem.adjustDistalArmVelocity(distalJoystickControl.getVelocityAdjustment());
       }
+    }
+
+    // this condition occurs when we go into an interrupt state immediately after starting a path 
+    // due to an accidental button click, this puts us into an out of sync state w/the subsystem
+    // as soon as we detect that the interruption has occurred, kick off path clearing + auto-recovery
+    if(processAutoRecoveryOnRetraction && currentArmState == ArmState.RETRACTING) {
+      clearCurrentPath(); // kick off auto recovery
     }
   }
 

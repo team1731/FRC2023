@@ -35,8 +35,6 @@ public enum ArmState {
           return EXTENDED;
         case INTERRUPT:
           return RETRACTING;
-        case AUTO_RECOVER:
-          return RESETTING_WRIST;
         default:
           return this;
       }
