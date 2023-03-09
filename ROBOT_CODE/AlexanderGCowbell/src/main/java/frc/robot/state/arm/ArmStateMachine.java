@@ -641,6 +641,12 @@ public class ArmStateMachine {
       case HOME:
         resetState();
         break;
+      case EXTENDED:
+      case WRIST_ONLY_FLEXED:
+      case EMERGENCY_RECOVERY:
+        // these cases represent valid transition states that don't have a corresponding subsystem call
+        // putting cases here so that we will not print unnecessary warning messages for them
+        break;
       default:
         System.out.println("WARNING: Invalid arm input sent to state machine: " + input + " --> " + newState);
     }
