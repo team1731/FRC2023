@@ -120,6 +120,7 @@ public class Robot extends TimedRobot {
 	autoChooser.addOption(       AutoConstants.k_Program_2,          AutoConstants.k_Program_2);
 	autoChooser.addOption(       AutoConstants.k_Program_3,          AutoConstants.k_Program_3);
 	autoChooser.addOption(       AutoConstants.k_Program_4,          AutoConstants.k_Program_4);
+	autoChooser.addOption(       AutoConstants.k_Program_5,          AutoConstants.k_Program_5);
 	autoChooser.addOption(       AutoConstants.k_9_Move_Forward,     AutoConstants.k_9_Move_Forward);
     SmartDashboard.putData(AutoConstants.kAutoCodeKey, autoChooser);
 	SmartDashboard.putString("Build Info - Branch", "N/A");

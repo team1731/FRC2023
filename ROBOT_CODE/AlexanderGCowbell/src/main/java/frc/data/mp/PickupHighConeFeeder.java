@@ -7,7 +7,7 @@ public class PickupHighConeFeeder {
 
     public static final int kNumPoints = 103;
     public static final int kWristFlexIndex = 1;
-    public static final double kWristFlexPosition = 0.472;
+    public static final double kWristFlexPosition = 0.382;
     public static final int kWristExtendIndex = 100;
     public static final double kWristMaxVelocity = 1000;
 

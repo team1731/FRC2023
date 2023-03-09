@@ -138,7 +138,6 @@ public class ArmStateMachine {
     emergencyModeTriggeredNotConfirmed = false;
 
     if(isRunningOperatorEntry) {
-      operatorSequence = null;
       isRunningOperatorEntry = false;
     }
   }
@@ -367,6 +366,8 @@ public class ArmStateMachine {
   }
 
   public int getPathIndex() {
+    if(currentPath == null) return 0;
+
     Direction direction = subsystem.getDirection();
     int pointsLastIndex = currentPath.getNumberOfPoints()-1;
     double elapsedTimeMS = (Timer.getFPGATimestamp() - pathStartedTime) * 1000;

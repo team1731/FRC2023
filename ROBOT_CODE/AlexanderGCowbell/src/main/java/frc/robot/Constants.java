@@ -139,8 +139,7 @@ public final class Constants {
         public static int kHighPickupSwitch = 1;
         public static int kConeSwitchId = 4;
         public static int kCubeSwitchId = 5;
-        public static int kScoreLowSwitchId = 8;
-        public static int kScoreMediumSwitchId = 0; // not an actual switch value, an indicator that switch is in neutral
+        public static int kScoreMediumSwitchId = 8;
         public static int kScoreHighSwitchId = 9;
         public static int kAutoRecoverySwitchId = 10;
         public static int kKillSwitchId = 11;
@@ -260,7 +259,8 @@ public final class Constants {
         public static final String k_Program_1        = "1_ChargerMiddle";
         public static final String k_Program_2        = "2_FeederSide";
         public static final String k_Program_3        = "3_RailSide";
-        public static final String k_Program_4        = "_Program_4";
+        public static final String k_Program_4        = "4_Program_4";
+        public static final String k_Program_5        = "5_ChargerCube";
         public static final String k_9_Move_Forward   = "_9_Move_Forward";
         
 		public static final String kAutoCodeKey = "Auto Selector";
@@ -342,7 +342,7 @@ public final class Constants {
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
         public final static double distalHomePosition = 10300;
-        public final static double wristHomePosition = 0.56;
+        public final static double wristHomePosition = 0.5;
         public final static double intakeStartedVelocityThreshold = 1000;
         public final static double intakeHoldingVelocityThreshold = 60;
         public final static double wristResetPostionThreshold = 0.2;

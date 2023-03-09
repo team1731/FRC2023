@@ -68,7 +68,7 @@ public class RobotContainer {
   private final JoystickButton kCubeSwitch = new JoystickButton(operator,OperatorConsoleConstants.kCubeSwitchId);
   private final JoystickButton kHighPickupSwitch = new JoystickButton(operator,OperatorConsoleConstants.kHighPickupSwitch);
   private final JoystickButton kHighScoreSwitch = new JoystickButton(operator,OperatorConsoleConstants.kScoreHighSwitchId);
-  private final JoystickButton kLowScoreSwitch = new JoystickButton(operator,OperatorConsoleConstants.kScoreLowSwitchId);
+  private final JoystickButton kMediumScoreSwitch = new JoystickButton(operator,OperatorConsoleConstants.kScoreMediumSwitchId);
   // Operator sticks
   public final int kDisatalAxis = OperatorConsoleConstants.kDistalAxisId;
   public final int kProximalAxis = OperatorConsoleConstants.kProximalAxisId;
@@ -199,10 +199,7 @@ public class RobotContainer {
 
     // HIGH/MED/LOW SCORE PRE-LOAD SWITCH
     kHighScoreSwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.setOperatorSequence(OperatorConsoleConstants.kScoreHighSwitchId)));
-    kLowScoreSwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.setOperatorSequence(OperatorConsoleConstants.kScoreLowSwitchId)));
-    // note: when either High or Low switch go false we have moved back into a neutral switch position, which is score medium
-    kHighScoreSwitch.onFalse(new InstantCommand(() -> sm_armStateMachine.setOperatorSequence(OperatorConsoleConstants.kScoreMediumSwitchId)));
-    kLowScoreSwitch.onFalse(new InstantCommand(() -> sm_armStateMachine.setOperatorSequence(OperatorConsoleConstants.kScoreMediumSwitchId)));
+    kMediumScoreSwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.setOperatorSequence(OperatorConsoleConstants.kScoreMediumSwitchId)));
   }
 
 
@@ -220,6 +217,8 @@ public class RobotContainer {
         return isRedAlliance()? new _Program_3R(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine): new _Program_3(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_Program_4:
         return new _Program_4(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+      case AutoConstants.k_Program_5:
+        return new _Program_5(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_9_Move_Forward:
 				return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
 		}
