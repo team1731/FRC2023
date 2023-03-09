@@ -62,6 +62,11 @@ public class AutoScoreCommand extends CommandBase {
     }
 
     @Override
+    public void end(boolean interrupted) {
+        isFinished = true;
+    }
+
+    @Override
     public boolean isFinished() {
         return isFinished;
     }

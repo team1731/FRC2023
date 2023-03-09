@@ -55,7 +55,7 @@ public class AutoBalanceSwerve extends CommandBase {
             translation = new Translation2d(0.3, 0);
         } else {
             translation = new Translation2d(0 , 0);
-            if(Timer.getMatchTime() <= 0.2) {
+            if(Timer.getMatchTime() <= 0.1) {
                 s_Swerve.setLockWheels(false);
                 isFinished = true;
             }
@@ -73,5 +73,6 @@ public class AutoBalanceSwerve extends CommandBase {
     @Override
     public void end(boolean innterruped) {
         s_Swerve.setLockWheels(false);
+        isFinished = true;
     }
 }
