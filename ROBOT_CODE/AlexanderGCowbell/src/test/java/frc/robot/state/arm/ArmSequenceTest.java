@@ -61,9 +61,6 @@ public class ArmSequenceTest {
   void mapSwitchSequence() {
     ArmSequence sequence = null;
 
-    sequence = ArmSequence.valueForSwitch(OperatorConsoleConstants.kScoreLowSwitchId);
-    assertEquals(ArmSequence.SCORE_LOW, sequence, "Should have mapped to SCORE_LOW");
-
     sequence = ArmSequence.valueForSwitch(OperatorConsoleConstants.kScoreMediumSwitchId);
     assertEquals(ArmSequence.SCORE_MEDIUM, sequence, "Should have mapped to SCORE_MEDIUM");
 
@@ -80,9 +77,6 @@ public class ArmSequenceTest {
   @Test
   void setStateMachineSwitchequence() {
     ArmStateMachine stateMachine = new ArmStateMachine(null);
-
-    stateMachine.setOperatorSequence(OperatorConsoleConstants.kScoreLowSwitchId);
-    assertEquals(ArmSequence.SCORE_LOW, stateMachine.getOperatorSequence(), "Should have mapped to SCORE_LOW");
 
     stateMachine.setOperatorSequence(OperatorConsoleConstants.kScoreMediumSwitchId);
     assertEquals(ArmSequence.SCORE_MEDIUM, stateMachine.getOperatorSequence(), "Should have mapped to SCORE_MEDIUM");
