@@ -29,6 +29,8 @@ public class ArmPickupCommand extends CommandBase {
 
     @Override
 	public void initialize() {
+        isFinished = false;
+
         // Queued time used to distinguish running path from queued path if both are present
         queuedTime = Timer.getFPGATimestamp();
 
@@ -63,7 +65,7 @@ public class ArmPickupCommand extends CommandBase {
         stateMachine.buttonReleased(queuedTime);
         isFinished = true;
     }
-
+    
     @Override
     public boolean isFinished() {
         return isFinished;

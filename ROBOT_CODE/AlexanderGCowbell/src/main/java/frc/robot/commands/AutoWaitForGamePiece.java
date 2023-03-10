@@ -18,7 +18,7 @@ public class AutoWaitForGamePiece extends CommandBase {
 
     @Override
 	public void initialize() {
-
+        isFinished = false;
 	}
 
     @Override

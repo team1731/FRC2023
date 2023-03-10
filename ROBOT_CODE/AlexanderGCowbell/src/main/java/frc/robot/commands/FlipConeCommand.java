@@ -18,6 +18,7 @@ public class FlipConeCommand extends CommandBase {
 
     @Override
 	public void initialize() {
+        isFinished = false;
         prevGamePiece = stateMachine.getGamePiece();
         stateMachine.setGamePiece(GamePiece.CUBE);
 

@@ -37,6 +37,7 @@ public class AutoBalanceSwerve extends CommandBase {
   
     @Override
     public void initialize() {
+        isFinished = false;
         s_Swerve.setLockWheels(true);
     }
     @Override
@@ -55,7 +56,6 @@ public class AutoBalanceSwerve extends CommandBase {
                 isFinished = true;
             }
         }
-
 
         s_Swerve.drive(translation, rotation, fieldrelative, openLoop);
     }

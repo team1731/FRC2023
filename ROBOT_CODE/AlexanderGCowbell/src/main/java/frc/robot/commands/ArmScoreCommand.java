@@ -25,6 +25,8 @@ public class ArmScoreCommand extends CommandBase {
 
     @Override
 	public void initialize() {
+        isFinished = false;
+        
         // Queued time used to distinguish running path from queued path if both are present
         queuedTime = Timer.getFPGATimestamp();
 
