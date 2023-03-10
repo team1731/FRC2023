@@ -32,6 +32,10 @@ public final class Constants {
         CONE, CUBE
     }
 
+    public static enum HighPickup {
+        FEEDER, SHELF
+    }
+
     public static final class LogConstants {
         /*
          * To write to a log you must:
@@ -121,16 +125,24 @@ public final class Constants {
     */
 
     public static final class OperatorConsoleConstants {
+        // Buttons
         public static int kPreventScoreBtnId = 13;
         public static int kReleaseBtnId = 14;
         public static int kIntakeBtnId = 15;
-        public static int kExtraExtensionBtnId = 16;
+        public static int kWheelLockBtnId = 16;
+
+        // Sticks
         public static int kProximalAxisId = 1;
         public static int kDistalAxisId = 4;
-        public static int kKillSwitchId = 9;
-        public static int kAutoRecoverySwitchId = 8;
+
+        // Switches
+        public static int kHighPickupSwitch = 1;
         public static int kConeSwitchId = 4;
         public static int kCubeSwitchId = 5;
+        public static int kScoreMediumSwitchId = 8;
+        public static int kScoreHighSwitchId = 9;
+        public static int kAutoRecoverySwitchId = 10;
+        public static int kKillSwitchId = 11;
     }
 
     public static final class Swerve {
@@ -167,9 +179,9 @@ public final class Constants {
         public static final boolean driveEnableCurrentLimit = true;
 
         /* Angle Motor PID Values */
-        public static final double angleKP = 2.0; // was .6
+        public static final double angleKP = 0.3; // was .6
         public static final double angleKI = 0.0;
-        public static final double angleKD = 12.0;
+        public static final double angleKD = 0.0;  // these values are suspect ?????  ratttly swerve noise is from this but not sure
         public static final double angleKF = 0.0;
 
         /* Drive Motor PID Values */
@@ -185,7 +197,7 @@ public final class Constants {
 
         /* Swerve Profiling Values */
         public static final double maxSpeed = 5.0; // disabled for testing = 3.0; //meters per second
-        public static final double maxAngularVelocity = 3.0; // disabled for testing = 2.7;
+        public static final double maxAngularVelocity = 6.0; // disabled for testing = 2.7;
 
         /* Neutral Modes */
         public static final NeutralMode angleNeutralMode = NeutralMode.Coast;
@@ -244,10 +256,11 @@ public final class Constants {
     public static final class AutoConstants {
         public static final String kDefault           = "_Default_Auto";
         public static final String k_0_Example        = "_0_Example_Auto";
-        public static final String k_Program_1        = "_Program_1";
-        public static final String k_Program_2        = "_Program_2";
-        public static final String k_Program_3        = "_Program_3";
-        public static final String k_Program_4        = "_Program_4";
+        public static final String k_Program_1        = "1_ChargerMiddle";
+        public static final String k_Program_2        = "2_FeederSide";
+        public static final String k_Program_3        = "3_RailSide";
+        public static final String k_Program_4        = "4_Program_4";
+        public static final String k_Program_5        = "5_ChargerCube";
         public static final String k_9_Move_Forward   = "_9_Move_Forward";
         
 		public static final String kAutoCodeKey = "Auto Selector";
@@ -258,7 +271,7 @@ public final class Constants {
     
         public static final double kPXController = 1;
         public static final double kPYController = 1;
-        public static final double kPThetaController = 1;
+        public static final double kPThetaController = 2;
     
         // Constraint for the motion profilied robot angle controller
         public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
@@ -279,26 +292,57 @@ public final class Constants {
         public static final String kArmStateMachineId = "ArmStateMachine";
     }
 
-    public static final class ArmStateConstants {
+    public static final class ArmStateConstants {       
         public final static double coneFlipFlexPosition = 0.37;
         public final static double wristOnlyFlexMaxVelocity = 2000;
     };
 
     public static final class ArmConstants {
+
+
+        /*
+         ************************************************************************************************
+         * THESE VALUES NEED TO CHANGE IF WE WORK ON THE ARM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+         * 
+         * **********************************************************************************************
+         */
+
+         public final static int proximalAbsoluteTicsCenter = 2727;
+         public final static int distalAbsoluteTicsCenter = 1717;
+
+        /*
+         ************************************************************************************************
+         * These are absolute values based off the center tics above
+         * **********************************************************************************************
+         */
+
+         public final static int proximalEstimatedAutoAbsolute = proximalAbsoluteTicsCenter - 205; //  2509; // only used if we are not getting reasonable values from absolute encoder
+         public final static int distalEstimatedAutoAbsolute = distalAbsoluteTicsCenter + 206; //1996; // only used if we are not getting reasonable values from absolute encoder
+
+                 // bounds checking for absolute encoder values, work around for spotty values we are receiving
+        // these first set of bounds are used when we don't know where the arm is and we mainly want to make sure that
+        // we are discarding readings that are obviously absurd
+        public final static int[] proximalAbsoluteBounds = new int[] {proximalAbsoluteTicsCenter - 714,  proximalAbsoluteTicsCenter + 1286};  // 2000 4000
+        public final static int[] distalAbsoluteBounds = new int[] {distalAbsoluteTicsCenter - 790, distalAbsoluteTicsCenter + 710}; // 1000, 2500
+        // these second set of bounds are used when we are starting from auto where we do know about where we are
+        // we want to keep the range checking narrower for this situation
+        public final static int[] proximalAbsoluteBoundsAuto = new int[] {proximalAbsoluteTicsCenter - 150, proximalAbsoluteTicsCenter + 150};  // {2430, 2585}
+        public final static int[] distalAbsoluteBoundsAuto = new int[] {distalAbsoluteTicsCenter - 100, distalAbsoluteTicsCenter + 100};   //  {1925, 2060}
+
+
+
+
         public final static int proximalCancoderId = 11;
         public final static int distalCancoderId = 10;
         public final static int wristCancoderId = 12;
         public final static int intakeCancoderId = 13;
-
         public final static double proximalRelativeTicsPerAbsoluteTick = 140;
-        public final static int proximalAbsoluteTicsCenter = 2682;
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
-        public final static int distalAbsoluteTicsCenter = 1812;
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
         public final static double distalHomePosition = 10300;
-        public final static double wristHomePosition = 0.56;
+        public final static double wristHomePosition = 0.5;
         public final static double intakeStartedVelocityThreshold = 1000;
         public final static double intakeHoldingVelocityThreshold = 60;
         public final static double wristResetPostionThreshold = 0.2;
@@ -306,7 +350,9 @@ public final class Constants {
         public final static double wristMaxAdjustment = 0.05;
         public final static double emergencyModeMaxArmVelocity = 2000; // max for Falcon motors is 6800 velocity units
         public final static double mostlyExtendedThreshold = 0.5; // percentage of the path completed to consider mostly extended
-        public final static double proximalOutOfPositionThreshold = -27000;
+        public final static double proximalOutOfPositionThreshold = -37500;
+
+
 
         // Arm PID constants
         public final static int armPIDLoopIdx = 0;
@@ -331,7 +377,7 @@ public final class Constants {
         public final static double wristAllowedErr = 0;
 
          // Hand limits
-        public static final int INTAKE_CURRENT_LIMIT_A = 27;
+        public static final int INTAKE_CURRENT_LIMIT_A = 25;
         public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
         public static final double INTAKE_OUTPUT_POWER = 1.0;
         public static final double INTAKE_HOLD_POWER = 0.07;
@@ -419,7 +465,7 @@ public final class Constants {
         public static final int kPWM_LedSting = 6;         // Addressable Led String
 
         public enum LedOption {
-            INIT, YELLOW, PURPLE, BLACK, WHITE, BLUE, RED
+            INIT, YELLOW, PURPLE, BLACK, WHITE, BLUE, RED, GREEN
           }
     }
 }

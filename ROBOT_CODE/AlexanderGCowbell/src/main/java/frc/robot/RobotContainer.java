@@ -25,6 +25,7 @@ import frc.robot.util.log.MessageLog;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OperatorConsoleConstants;
 import frc.robot.Constants.GamePiece;
+import frc.robot.Constants.HighPickup;
 import frc.robot.Constants.OpConstants.LedOption;
 
 /**
@@ -57,13 +58,18 @@ public class RobotContainer {
 
   /* Operator Buttons */
   private final JoystickButton kPreventScoreBtn = new JoystickButton(operator,OperatorConsoleConstants.kPreventScoreBtnId);
-  private final JoystickButton kExtraExtensionBtn = new JoystickButton(operator,OperatorConsoleConstants.kExtraExtensionBtnId);
+  private final JoystickButton kWheelLockBtn = new JoystickButton(operator,OperatorConsoleConstants.kWheelLockBtnId);
   private final JoystickButton kReleaseBtn = new JoystickButton(operator,OperatorConsoleConstants.kReleaseBtnId);
   private final JoystickButton kIntakeBtn = new JoystickButton(operator,OperatorConsoleConstants.kIntakeBtnId);
+  // Operator switches
   private final JoystickButton kKillSwitch = new JoystickButton(operator,OperatorConsoleConstants.kKillSwitchId);
   private final JoystickButton kAutoRecoverySwitch = new JoystickButton(operator,OperatorConsoleConstants.kAutoRecoverySwitchId);
   private final JoystickButton kConeSwitch = new JoystickButton(operator,OperatorConsoleConstants.kConeSwitchId);
   private final JoystickButton kCubeSwitch = new JoystickButton(operator,OperatorConsoleConstants.kCubeSwitchId);
+  private final JoystickButton kHighPickupSwitch = new JoystickButton(operator,OperatorConsoleConstants.kHighPickupSwitch);
+  private final JoystickButton kHighScoreSwitch = new JoystickButton(operator,OperatorConsoleConstants.kScoreHighSwitchId);
+  private final JoystickButton kMediumScoreSwitch = new JoystickButton(operator,OperatorConsoleConstants.kScoreMediumSwitchId);
+  // Operator sticks
   public final int kDisatalAxis = OperatorConsoleConstants.kDistalAxisId;
   public final int kProximalAxis = OperatorConsoleConstants.kProximalAxisId;
 
@@ -107,41 +113,69 @@ public class RobotContainer {
    * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    /* Driver Buttons */
+
+    /*
+     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     * DRIVER BUTTONS!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     */
+
+    // RESET BUTTON
     kStart.onTrue(new InstantCommand(() -> {
       s_Swerve.zeroGyro();
       s_Swerve.adjustWheelEncoders(); 
       s_armSubSystem.resetArmEncoders();
     }));
+
+    // SCORE HIGH/MED/LOW BUTTONS
     ky.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_HIGH, operator, kDisatalAxis)));
     kb.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_MEDIUM, operator, kDisatalAxis)));
     ka.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_LOW, operator, kDisatalAxis)));
+
+    // CLEAR/RESET PATH BUTTON
     kx.whileTrue(new InstantCommand(() -> sm_armStateMachine.clearCurrentPath()));
+
+    // BUMPERS - EITHER START/STOP RECORDING  - OR -  PICKUP HIGH/RUN OPERATOR SEQUENCE
     if(LogWriter.isArmRecordingEnabled()) {
       kLeftBumper.onTrue(new InstantCommand(() -> s_armSubSystem.startRecordingArmPath()));
       kRightBumper.onTrue(new InstantCommand(() -> s_armSubSystem.stopRecordingArmPath()));
     } else {
       kLeftBumper.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_HIGH, operator, kDisatalAxis));
-      //kRightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_KEYPAD, operator, kDisatalAxis));
+      kRightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_OPERATOR_ENTRY, operator, kDisatalAxis));
     }
-    kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDisatalAxis));
-    kRightTrigger.whileTrue(new FlipConeCommand(sm_armStateMachine));
 
-    /* Operator Buttons */
+    // TRIGGERS - PICKUP LOW AND PICKUP DOWNED CONE
+    kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDisatalAxis));
+    kRightTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_DOWNED_CONE, operator, kDisatalAxis));
+
+    
+    /*
+     * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     * OPERATOR BUTTONS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     */
+
+    // PREVENT SCORE
     kPreventScoreBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setAllowScore(false)));
     kPreventScoreBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.setAllowScore(true)));
-    kExtraExtensionBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.setExtraExtension(true)));
-    kExtraExtensionBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.setExtraExtension(false)));
+
+    // LOCK WHEELS IN X-PATTERN
+    kWheelLockBtn.whileTrue(new InstantCommand(() -> s_Swerve.setLockWheels(true)));
+    kWheelLockBtn.whileFalse(new InstantCommand(() -> s_Swerve.setLockWheels(false)));
+
+    // ON REQUEST INTAKE OR EJECT BUTTONS
     kIntakeBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.intake()));
     kIntakeBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.releaseIntake()));
     kReleaseBtn.whileTrue(new InstantCommand(() -> sm_armStateMachine.release()));
     kReleaseBtn.whileFalse(new InstantCommand(() -> sm_armStateMachine.stopRelease()));
+
+    // EMERENCY MODE AND AUTO-RECOVERY SWITCH
     kKillSwitch.onTrue(new InstantCommand(() -> {
       sm_armStateMachine.addJoystickControl(operator, kProximalAxis, false);
       sm_armStateMachine.addJoystickControl(operator, kDisatalAxis, false);
       sm_armStateMachine.emergencyInterrupt();
     }));
     kAutoRecoverySwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.attemptAutoRecovery()));
+
+    // CUBE VS CONE SWITCH
     kConeSwitch.onTrue(new InstantCommand(() -> {
       System.out.println("RobotContainer: Setting game piece to cone: " + storedPiece);
       sm_armStateMachine.setGamePiece(GamePiece.CONE);
@@ -154,7 +188,20 @@ public class RobotContainer {
       m_ledstring.setBlink(false);
       m_ledstring.setColor(LedOption.PURPLE);
     }));
+
+    // HIGH PICKUP SWITCH - FEEDER OR SHELF
+    kHighPickupSwitch.onTrue(new InstantCommand(() -> {
+      sm_armStateMachine.setHighPickup(HighPickup.FEEDER);
+    }));
+    kHighPickupSwitch.onFalse(new InstantCommand(() -> {
+      sm_armStateMachine.setHighPickup(HighPickup.SHELF);
+    }));
+
+    // HIGH/MED/LOW SCORE PRE-LOAD SWITCH
+    kHighScoreSwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.setOperatorSequence(OperatorConsoleConstants.kScoreHighSwitchId)));
+    kMediumScoreSwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.setOperatorSequence(OperatorConsoleConstants.kScoreMediumSwitchId)));
   }
+
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
     switch(autoCode) {
@@ -165,22 +212,19 @@ public class RobotContainer {
       case AutoConstants.k_Program_1:
         return new _Program_1(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_Program_2:
-        return new _Program_2(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+        return isRedAlliance()? new _Program_2R(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine): new _Program_2(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_Program_3:
-        return new _Program_3(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+        return isRedAlliance()? new _Program_3R(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine): new _Program_3(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_Program_4:
         return new _Program_4(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+      case AutoConstants.k_Program_5:
+        return new _Program_5(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_9_Move_Forward:
 				return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
 		}
     System.err.println("FATAL: SELECTED AUTO MODE " + autoCode + " DOES NOT MAP TO A KNOWN AUTONOMOUS CLASS -- DOING NOTHING!!!!");
     return null;
   }
-
-
-	public void resetEncoders() {
-    s_armSubSystem.resetArmEncoders();
-	}
 
 
 	public void displayEncoders() {

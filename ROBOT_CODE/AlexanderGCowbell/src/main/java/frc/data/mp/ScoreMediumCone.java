@@ -7,7 +7,7 @@ public class ScoreMediumCone {
 
     public static final int kNumPoints = 121;
     public static final int kWristFlexIndex = 75;
-    public static final double kWristFlexPosition = 0.35;
+    public static final double kWristFlexPosition = 0.29;
     public static final int kWristExtendIndex = 120;
     public static final double kWristMaxVelocity = 2000;
 

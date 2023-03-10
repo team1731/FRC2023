@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.NetworkTableValue;
@@ -86,12 +87,19 @@ public class Robot extends TimedRobot {
 //   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
   @Override
   public void robotInit() {
+
 	LogWriter.setupLogging();
 	MessageLog.start();
 	MessageLog.add("\n\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  EVENT: " + DriverStation.getEventName() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
 	LiveWindow.disableAllTelemetry();
     ctreConfigs = new CTREConfigs();
+	PortForwarder.add(5800, "10.17.31.11", 5800);
+	PortForwarder.add(5801, "10.17.31.11", 5801);
+	PortForwarder.add(5802, "10.17.31.11", 5802);
+	PortForwarder.add(5803, "10.17.31.11", 5803);
+	PortForwarder.add(5804, "10.17.31.11", 5804);
+
 
 	s_Swerve = new Swerve();
   	s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);
@@ -104,6 +112,7 @@ public class Robot extends TimedRobot {
 	m_robotContainer = new RobotContainer(s_Swerve, s_poseEstimatorSubsystem, s_armSubSystem, m_ledstring);
 
 	initSubsystems();
+	s_armSubSystem.resetArmEncoders();
 
 	autoChooser.setDefaultOption(AutoConstants.kDefault,             AutoConstants.kDefault);
 	autoChooser.addOption(       AutoConstants.k_0_Example,          AutoConstants.k_0_Example);
@@ -111,6 +120,7 @@ public class Robot extends TimedRobot {
 	autoChooser.addOption(       AutoConstants.k_Program_2,          AutoConstants.k_Program_2);
 	autoChooser.addOption(       AutoConstants.k_Program_3,          AutoConstants.k_Program_3);
 	autoChooser.addOption(       AutoConstants.k_Program_4,          AutoConstants.k_Program_4);
+	autoChooser.addOption(       AutoConstants.k_Program_5,          AutoConstants.k_Program_5);
 	autoChooser.addOption(       AutoConstants.k_9_Move_Forward,     AutoConstants.k_9_Move_Forward);
     SmartDashboard.putData(AutoConstants.kAutoCodeKey, autoChooser);
 	SmartDashboard.putString("Build Info - Branch", "N/A");
@@ -181,13 +191,14 @@ public class Robot extends TimedRobot {
 
 	String useCode = autoChooser.getSelected();
 
-    MessageLog.add("\nPreloading AUTO CODE --> " + useCode);
+  
 
 	if(useCode == null) {
         MessageLog.add("\nNULL AUTO CODE : DEFAULTING TO " + AutoConstants.kDefault);
 		autoCode = AutoConstants.kDefault;
 	}
 	else{
+		MessageLog.add("\nPreloading AUTO CODE --> " + useCode);
 		m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);
 		if(m_autonomousCommand != null){
 			autoCode = useCode;
@@ -208,7 +219,6 @@ public class Robot extends TimedRobot {
 //   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
   private void initSubsystems() {
 	m_ledstring.init();
-	m_robotContainer.resetEncoders();
   }
 
   
@@ -242,7 +252,7 @@ public class Robot extends TimedRobot {
 		oldKeypadEntry = newKeypadEntry;
 		SmartDashboard.putString("keypadCommand", newKeypadEntry);
 		m_robotContainer.processKeypadCommand(newKeypadEntry);
-		sm_armStateMachine.setKeyedSequence(newKeypadEntry);
+		sm_armStateMachine.setOperatorSequence(newKeypadEntry);
 	}
 
 	m_robotContainer.displayEncoders();
@@ -259,8 +269,7 @@ public class Robot extends TimedRobot {
   public void disabledInit() {
 	keypad.putValue("driver entry", NetworkTableValue.makeString(""));
 	sm_armStateMachine.disable();
-	s_armSubSystem.resetArmEncoders();
-
+	//s_armSubSystem.resetArmEncoders();
   }
 
 
@@ -276,6 +285,12 @@ public class Robot extends TimedRobot {
 		// SmartDashboard.putBoolean("LowSensor", m_sequencer.lowSensorHasBall());
 		// SmartDashboard.putBoolean("MidSensor", m_sequencer.midSensorHasBall());
 		// SmartDashboard.putBoolean("HighSensor", m_sequencer.highSensorHasBall());
+	}
+
+	if(s_armSubSystem.isInEncodersOutOfBoundsCondition()) {
+		m_ledstring.setColor(OpConstants.LedOption.RED);
+	} else {
+		m_ledstring.setColor(OpConstants.LedOption.GREEN);
 	}
 
 	String newCode = autoChooser.getSelected();
@@ -309,12 +324,14 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     MessageLog.add("AUTO INIT");
 	CommandScheduler.getInstance().cancelAll();
+	s_armSubSystem.resetArmEncodersForAuto();
 
 	if(m_autonomousCommand == null) {
 		System.err.println("SOMETHING WENT WRONG - UNABLE TO RUN AUTONOMOUS! CHECK SOFTWARE!");
 	} else {
         MessageLog.add("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand.getClass().getSimpleName() + " <----------");
 		m_robotContainer.zeroHeading();
+		m_ledstring.setColor(OpConstants.LedOption.WHITE); // reset color to default from red/green set during disabled
 		sm_armStateMachine.setIsInAuto(true);
 		sm_armStateMachine.initializeArm();
 		sm_armStateMachine.setGamePiece(GamePiece.CONE);
@@ -391,7 +408,7 @@ public class Robot extends TimedRobot {
 	if(!newKeypadCommand.equals(currentKeypadCommand)){
 		// FEED FSM
 		m_robotContainer.processKeypadCommand(newKeypadCommand);
-		sm_armStateMachine.setKeyedSequence(newKeypadCommand);
+		sm_armStateMachine.setOperatorSequence(newKeypadCommand);
 		currentKeypadCommand = newKeypadCommand;
 	}
 
