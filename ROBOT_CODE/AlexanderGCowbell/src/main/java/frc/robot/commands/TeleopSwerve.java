@@ -48,6 +48,7 @@ public class TeleopSwerve extends CommandBase {
         this.rotationAxis = rotationAxis;
         this.fieldRelative = fieldRelative;
         this.openLoop = openLoop;
+        headingController.enableContinuousInput(-180.0, 180.0);
     }
 
     @Override
