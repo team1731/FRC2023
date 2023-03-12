@@ -124,6 +124,7 @@ public class ArmStateMachine {
   }
 
   public void resetState() {
+    System.out.println("ArmStateMachine: Resetting State!!!!!!!!!!!!!!!!!!!!!");
     status = Status.READY;
     currentPath = null;
     currentWristFlexPosition = 0;
@@ -476,6 +477,11 @@ public class ArmStateMachine {
    */
 
   public void periodic() {
+    if(currentPath == null && status == Status.RUNNING) {
+      // this should never be the case, if it is then log as much as we can
+      System.err.println("ArmStateMachine: Current path object became null during the path run!!!!!!!!!!!!!!!!!!!!!!!!");
+      logDebugInfo();
+    }
 
     /*
      * Logic for handling queued commands
@@ -520,7 +526,7 @@ public class ArmStateMachine {
     /*
      * Logic for flexing/extending wrist
      */
-    if(!wristFlexed && subsystem.isMotionProfileRunning() && subsystem.getDirection() == Direction.FORWARD) {
+    if(currentPath != null && !wristFlexed && subsystem.isMotionProfileRunning() && subsystem.getDirection() == Direction.FORWARD) {
       int currentIndex = getPathIndex();
       int wristFlexIndex = currentPath.getWristFlexIndex();
       if(currentIndex >= wristFlexIndex) {
@@ -528,7 +534,7 @@ public class ArmStateMachine {
         subsystem.moveWrist(currentPath.getWristFlexPosition(), currentPath.getWristMaxVelocity());
         wristFlexed = true;
       }
-    } else if(wristFlexed && subsystem.isMotionProfileRunning() && subsystem.getDirection() == Direction.REVERSE) {
+    } else if(currentPath != null && wristFlexed && subsystem.isMotionProfileRunning() && subsystem.getDirection() == Direction.REVERSE) {
       int currentIndex = getPathIndex();
       int wristExtendIndex = currentPath.getWristExtendIndex();
       if(currentIndex <= wristExtendIndex) {
@@ -795,5 +801,39 @@ public class ArmStateMachine {
       return true;
     }
     return false;
+  }
+
+  /*
+   * Debug logging
+   */
+  private void logDebugInfo() {
+    try {
+      System.out.println("ArmStateMachine: Starting debug!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      System.out.println("Status: " + status);
+      System.out.println("In Auto? " + isInAuto);
+      System.out.println("Arm State: " + currentArmState);
+      System.out.println("Intake State: " + currentIntakeState);
+      System.out.println("Game Piece: " + gamePiece);
+      System.out.println("Movement Type: " + movementType);
+      if(currentPath != null) {
+        System.out.println("Current Path? Yes, # Points:" + currentPath.getNumberOfPoints());
+      } else {
+        System.out.println("Current Path? No");
+      }
+      System.out.println("Subsystem running a MP? " + subsystem.isMotionProfileRunning());
+      System.out.println("Wrist Flex Position: " + currentWristFlexPosition);
+      System.out.println("Path Started Time: " + pathStartedTime);
+      System.out.println("Wrist Movement Started Time: " + wristMovementStartedTime);
+      System.out.println("Wrist Flexed? " + wristFlexed);
+      System.out.println("Allowing Score? " + allowScore);
+      System.out.println("High Pickup Mode: " + highPickup);
+      System.out.println("Running Operator Entry? " + isRunningOperatorEntry);
+      if(isRunningOperatorEntry) {
+        System.out.println("Operator Sequence: " + operatorSequence);
+      }
+    } catch(Exception e) {
+      // fail silently
+      // if we accidentally put something dumb in here, we never want this to throw an exception
+    }
   }
 }
