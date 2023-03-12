@@ -379,6 +379,7 @@ public final class Constants {
          // Hand limits
         public static final int INTAKE_CURRENT_LIMIT_A = 12;
         public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
+        public static final int EJECT_CURRENT_LIMIT = 17;
         public static final double INTAKE_OUTPUT_POWER = 1.0;
         public static final double INTAKE_HOLD_POWER = 0.07;
 

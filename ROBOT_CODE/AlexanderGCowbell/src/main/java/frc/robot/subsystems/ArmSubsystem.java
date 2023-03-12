@@ -275,7 +275,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public void eject() {
-        intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
+        intakeMotor.setSmartCurrentLimit(ArmConstants.EJECT_CURRENT_LIMIT);
         intakeMotor.set((stateMachine.getGamePiece() == GamePiece.CONE)? -1.0 : 1.0);
     }
 
