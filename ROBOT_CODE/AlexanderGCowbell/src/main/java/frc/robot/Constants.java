@@ -269,7 +269,7 @@ public final class Constants {
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
         public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
     
-        public static final double kPXController = 1;
+        public static final double kPXController = 0.1;
         public static final double kPYController = 1;
         public static final double kPThetaController = 2;
     
@@ -293,9 +293,9 @@ public final class Constants {
     }
 
     public static final class ArmStateConstants {       
-        public final static double coneFlipFlexPosition = 0.37;
+        public final static double coneFlipFlexPosition = 0.31;
         public final static double wristOnlyFlexMaxVelocity = 2000;
-    };
+    }
 
     public static final class ArmConstants {
 
@@ -307,7 +307,7 @@ public final class Constants {
          * **********************************************************************************************
          */
 
-         public final static int proximalAbsoluteTicsCenter = 2727;
+         public final static int proximalAbsoluteTicsCenter = 2750; // was 2727
          public final static int distalAbsoluteTicsCenter = 1717;
 
         /*
@@ -377,8 +377,9 @@ public final class Constants {
         public final static double wristAllowedErr = 0;
 
          // Hand limits
-        public static final int INTAKE_CURRENT_LIMIT_A = 25;
+        public static final int INTAKE_CURRENT_LIMIT_A = 15;
         public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
+        public static final int EJECT_CURRENT_LIMIT = 20;
         public static final double INTAKE_OUTPUT_POWER = 1.0;
         public static final double INTAKE_HOLD_POWER = 0.07;
 
