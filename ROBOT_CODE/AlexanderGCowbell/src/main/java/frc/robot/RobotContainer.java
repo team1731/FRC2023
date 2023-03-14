@@ -4,13 +4,17 @@
 
 package frc.robot;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -22,7 +26,6 @@ import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.subsystems.*;
 import frc.robot.util.log.LogWriter;
 import frc.robot.util.log.MessageLog;
-import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.OperatorConsoleConstants;
 import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.HighPickup;
@@ -80,6 +83,9 @@ public class RobotContainer {
   private ArmSubsystem s_armSubSystem;
   private ArmStateMachine sm_armStateMachine;
   private final LEDStringSubsystem m_ledstring;
+
+  /* Auto Paths */
+  private static List<String> autoPaths;
 
   private GamePiece storedPiece; // used to temporarily store game piece setting when using cone flip feature
 
@@ -204,27 +210,40 @@ public class RobotContainer {
   }
 
 
-  public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
-    switch(autoCode) {
-      case AutoConstants.kDefault:
-        return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
-      case AutoConstants.k_0_Example:
-        return new _0_exampleAuto(s_Swerve, s_poseEstimatorSubsystem);
-      case AutoConstants.k_Program_1:
-        return new _Program_1(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_Program_2:
-        return isRedAlliance()? new _Program_2R(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine): new _Program_2(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_Program_3:
-        return isRedAlliance()? new _Program_3R(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine): new _Program_3(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_Program_4:
-        return new _Program_4(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_Program_5:
-        return new _Program_5(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_9_Move_Forward:
-				return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
-		}
-    System.err.println("FATAL: SELECTED AUTO MODE " + autoCode + " DOES NOT MAP TO A KNOWN AUTONOMOUS CLASS -- DOING NOTHING!!!!");
-    return null;
+  public static String[] deriveAutoModes() {
+    List<String> autoModes = new ArrayList<String>();
+    autoPaths = findPaths(new File(Filesystem.getLaunchDirectory(), "src/main/deploy/pathplanner"));
+    for(String autoPath : autoPaths){
+      if(!autoPath.endsWith("R")) {
+        autoModes.add(autoPath);
+      }
+    }
+    return autoModes.toArray(String[]::new);
+  }
+
+  private static List<String> findPaths(File directory){
+    List<String> paths = new ArrayList<String>();
+    if (!directory.exists()) {
+        System.out.println("FATAL: path directory not found! " + directory.getAbsolutePath());
+        return paths;
+    }
+    File[] files = directory.listFiles();
+    for (File file : files) {
+        String fileName = file.getName();
+        if (fileName.startsWith("Program_") && fileName.endsWith(".path")) {
+          System.out.println(file.getAbsolutePath());
+          paths.add(file.getName().substring(0, file.getName().length() - 5));
+        }
+    }
+    return paths;
+  }
+
+  public Command getNamedAutonomousCommand(String autoName, boolean isRedAlliance) {
+    String alliancePathName = autoName + (isRedAlliance ? "R" : "");
+    if (!autoPaths.contains(alliancePathName)) {
+      alliancePathName = autoName;
+    }
+    return new PathPlannerCommandGroup(alliancePathName, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
   }
 
 
@@ -264,5 +283,6 @@ public class RobotContainer {
 
   private boolean isRedAlliance(){
     return DriverStation.getAlliance().equals(DriverStation.Alliance.Red);
-    }
+  }
+
 }

@@ -27,8 +27,14 @@ import java.util.List;
 import com.pathplanner.lib.PathConstraints;
 
 public class PathPlannerCommandGroup extends SequentialCommandGroup {
-    public PathPlannerCommandGroup(String pathPlannerFile, boolean isRedAlliance, Swerve s_Swerve, PoseEstimatorSubsystem s_PoseEstimatorSubsystem, ArmStateMachine sm_ArmStateMachine) {
+    private String pathName;
 
+    public String toString(){
+        return getClass().getSimpleName() + ":" + pathName;
+    }
+    
+    public PathPlannerCommandGroup(String pathPlannerFile, Swerve s_Swerve, PoseEstimatorSubsystem s_PoseEstimatorSubsystem, ArmStateMachine sm_ArmStateMachine) {
+        pathName = pathPlannerFile;
         // This will load the file "FullAuto.path" and generate it with a max velocity of 4 m/s and a max acceleration of 3 m/s^2
         // for every path in the group
         PathConstraints pathConstraints = new PathConstraints(3, 1.5); //Constants.AutoConstants.kMaxSpeedMetersPerSecond, Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared);
