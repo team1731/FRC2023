@@ -54,8 +54,8 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   private final Field2d field2d = new Field2d();
   private boolean useVisionCorrection = true;
   private boolean gamePieceDetected = false;
-  private double cameraAngleOutFromFloor = VisionConstants.CubeAutoAngle;
-  private boolean aprilTagsIsEnabled = false;
+  private double cameraAngleOutFromFloor = Units.degreesToRadians(VisionConstants.CubeAutoAngle);
+  private boolean aprilTagsIsEnabled = true;
   
   // Camera configuration
   private HashMap<String, CameraTransform> cameraMap = new HashMap<String, CameraTransform>();
@@ -222,13 +222,13 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
          // double cameraAngleOutFromFloor = Units.degreesToRadians(10.0);
 
           double slantRange = robotToCamera.getZ()/Math.cos(cameraAngleOutFromFloor + Units.degreesToRadians(visionResult.getBestTarget().getPitch()));
-          double lateralErrorCorrection = Units.inchesToMeters(4.5)  + slantRange* Math.tan(Units.degreesToRadians(visionResult.getBestTarget().getYaw()));
+          double lateralErrorCorrection = Units.inchesToMeters(-7.5) +robotToCamera.getZ()*Math.tan(Units.degreesToRadians(visionResult.getBestTarget().getYaw() ));
 
           SmartDashboard.putNumber("Slant Range to piece (inches)", Units.metersToInches(slantRange));
           SmartDashboard.putNumber("Lateral Correction (inches)", Units.metersToInches(lateralErrorCorrection));
           Pose2d adjustedPose = new Pose2d(
-              getCurrentPose().getX() + (Math.sin(m_swerve.getHeading().getRadians()) * lateralErrorCorrection),
-              getCurrentPose().getY() + (Math.cos(m_swerve.getHeading().getRadians()) * lateralErrorCorrection),
+              getCurrentPose().getX() - (Math.sin(getCurrentPose().getRotation().getRadians()) * lateralErrorCorrection),
+              getCurrentPose().getY() + (Math.cos(getCurrentPose().getRotation().getRadians()) * lateralErrorCorrection),
               getCurrentPose().getRotation());
 
           field2d.getObject("MyRobot Adjusted Pose").setPose(adjustedPose);

@@ -452,13 +452,13 @@ public final class Constants {
         public static final String kCameraMount3Id = "USB_Camera2";  // camera on the arm
         public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, -5.3,10.253, 17.0, 135.0,0.0);
         public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, -5.3, -10.253, 17.0, 225.0,0.0);
-        public static final CameraMountPoseValues kCameraMount3Pose = new CameraMountPoseValues(kCameraMount3Id, -11, -5.0, 38, 0.0,-80.0);
+        public static final CameraMountPoseValues kCameraMount3Pose = new CameraMountPoseValues(kCameraMount3Id, -11, -5.0, 37, 0.0,-80.0);
 /*
  * The Auto angles are measured as the angle between a line from the camera perpendicular to the ground plane and the boresight of the camera.  This could be calculated from 
  * the arm geometry and arm relative encoders but it is easier to just run the pickup paths and measure it. 
  */
-        public static final double ConeAutoAngle = 5.0; // degrees   Note: 
-        public static final double CubeAutoAngle = 5.0; //degrees
+        public static final double ConeAutoAngle = 23.0; // degrees   Note: 
+        public static final double CubeAutoAngle = 23.0; //degrees
 
 		// #region TurnPID
 		public static final double kTurnP = 0.05;
