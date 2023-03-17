@@ -1,6 +1,7 @@
 package frc.robot.autos;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -44,12 +45,18 @@ public class PathPlannerCommandGroup extends SequentialCommandGroup {
         eventMap.put("AutoWaitForGamePiece", new AutoWaitForGamePiece(sm_ArmStateMachine));
         eventMap.put("AutoBalanceSwerve", new AutoBalanceSwerve(s_Swerve));
         eventMap.put("AutoScoreHighWait", new WaitCommand(2.2));
+        eventMap.put("EnableVisionCorrectionCube", new InstantCommand(() -> s_PoseEstimatorSubsystem.setVisionCorrection(true, GamePiece.CUBE)));
+        eventMap.put("DisableVisionCorrectionCube", new InstantCommand(() -> s_PoseEstimatorSubsystem.setVisionCorrection(false, GamePiece.CUBE)));
+        eventMap.put("EnableVisionCorrectionCone", new InstantCommand(() -> s_PoseEstimatorSubsystem.setVisionCorrection(true, GamePiece.CONE)));
+        eventMap.put("DisableVisionCorrectionCone", new InstantCommand(() -> s_PoseEstimatorSubsystem.setVisionCorrection(false, GamePiece.CONE)));
+        eventMap.put("EnableAprilTtags", new InstantCommand(() -> s_PoseEstimatorSubsystem.enableAprilTags(true)));
+        eventMap.put("DisableAprilTags", new InstantCommand(() -> s_PoseEstimatorSubsystem.enableAprilTags(false)));
         eventMap.put("ScoreCubeHigh", new SequentialCommandGroup(new AutoCheckRemainingTime(), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CUBE)));
         //eventMap.put("intakeDown", new IntakeDown());
     
         // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.
         SwerveAutoBuilder autoBuilder = new SwerveAutoBuilder(
-            s_PoseEstimatorSubsystem::getCurrentPose, // Pose2d supplier
+            s_PoseEstimatorSubsystem::getAutoPose, // Pose2d supplier
             s_PoseEstimatorSubsystem::setCurrentPose, // Pose2d consumer, used to reset odometry at the beginning of auto
             Constants.Swerve.swerveKinematics, // SwerveDriveKinematics
             new PIDConstants(Constants.AutoConstants.kPXController, 0.0, 0.0), // PID constants to correct for translation error (used to create the X and Y PID controllers)

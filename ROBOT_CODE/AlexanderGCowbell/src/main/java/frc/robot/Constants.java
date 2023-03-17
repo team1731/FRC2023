@@ -86,10 +86,10 @@ public final class Constants {
 
         public static final AprilTagPoseValues kAprilTagPose1 = new AprilTagPoseValues(1, 610.77, 42.19, 18.22, 180);
         public static final AprilTagPoseValues kAprilTagPose2 = new AprilTagPoseValues(2, 610.77, 108.19, 18.22, 180);
-        public static final AprilTagPoseValues kAprilTagPose3 = new AprilTagPoseValues(3, 610.77, 147.19, 18.22, 180);
+        public static final AprilTagPoseValues kAprilTagPose3 = new AprilTagPoseValues(3, 610.77, 174.19, 18.22, 180);
         public static final AprilTagPoseValues kAprilTagPose4 = new AprilTagPoseValues(4, 636.96, 265.74, 27.38, 180);
         public static final AprilTagPoseValues kAprilTagPose5 = new AprilTagPoseValues(5, 14.25, 265.74, 27.38, 0);
-        public static final AprilTagPoseValues kAprilTagPose6 = new AprilTagPoseValues(6, 40.45, 147.19, 18.22, 0);
+        public static final AprilTagPoseValues kAprilTagPose6 = new AprilTagPoseValues(6, 40.45, 174.19, 18.22, 0);
         public static final AprilTagPoseValues kAprilTagPose7 = new AprilTagPoseValues(7, 40.45, 108.19, 18.22, 0);
         public static final AprilTagPoseValues kAprilTagPose8 = new AprilTagPoseValues(8, 40.45, 42.19, 18.22, 0);
     }
@@ -430,25 +430,35 @@ public final class Constants {
             public double y;
             public double z;
             public double yaw;
+            public double pitch;
 
             // Note: this constructor assumes the camera is mounted parallel to the floor
-            public CameraMountPoseValues(String cameraId, double xInches, double yInches, double zInches, double yawDegrees) {
+            public CameraMountPoseValues(String cameraId, double xInches, double yInches, double zInches, double yawDegrees, double pitchDegrees) {
                 id = cameraId;
                 x = Units.inchesToMeters(xInches);
                 y = Units.inchesToMeters(yInches);
                 z = Units.inchesToMeters(zInches);
                 yaw = Units.degreesToRadians(yawDegrees);
+                pitch = Units.degreesToRadians(pitchDegrees);
             }
 
             public Transform3d getPoseTransform() {
-                return new Transform3d(new Translation3d(x, y, z), new Rotation3d(0.0,0.0,yaw));
+                return new Transform3d(new Translation3d(x, y, z), new Rotation3d(0.0,pitch,yaw));
             }
         }
 
         public static final String kCameraMount1Id = "leftcamera";  //camera on the left looking back
         public static final String kCameraMount2Id = "Global_Shutter_Camera";  // camera on the right looking back
-        public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, -5.3033,10.253, 17.0, 135);
-        public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, -5.3033, -10.253, 17.0, 225);
+        public static final String kCameraMount3Id = "USB_Camera2";  // camera on the arm
+        public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, -5.3,10.253, 17.0, 135.0,0.0);
+        public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, -5.3, -10.253, 17.0, 225.0,0.0);
+        public static final CameraMountPoseValues kCameraMount3Pose = new CameraMountPoseValues(kCameraMount3Id, -11, -5.0, 38, 0.0,-80.0);
+/*
+ * The Auto angles are measured as the angle between a line from the camera perpendicular to the ground plane and the boresight of the camera.  This could be calculated from 
+ * the arm geometry and arm relative encoders but it is easier to just run the pickup paths and measure it. 
+ */
+        public static final double ConeAutoAngle = 5.0; // degrees   Note: 
+        public static final double CubeAutoAngle = 5.0; //degrees
 
 		// #region TurnPID
 		public static final double kTurnP = 0.05;
