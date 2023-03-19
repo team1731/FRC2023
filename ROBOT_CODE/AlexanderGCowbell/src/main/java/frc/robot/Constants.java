@@ -307,8 +307,8 @@ public final class Constants {
          * **********************************************************************************************
          */
 
-         public final static int proximalAbsoluteTicsCenter = 2750; // was 2727
-         public final static int distalAbsoluteTicsCenter = 1717;
+         public final static int proximalAbsoluteTicsCenter = 2770; // was 2727
+         public final static int distalAbsoluteTicsCenter = 1720;
 
         /*
          ************************************************************************************************
@@ -342,7 +342,7 @@ public final class Constants {
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
         public final static double distalHomePosition = 10300;
-        public final static double wristHomePosition = 0.5;
+        public final static double wristHomePosition = 0.57;
         public final static double intakeStartedVelocityThreshold = 1000;
         public final static double intakeHoldingVelocityThreshold = 60;
         public final static double wristResetPostionThreshold = 0.2;
@@ -377,7 +377,7 @@ public final class Constants {
         public final static double wristAllowedErr = 0;
 
          // Hand limits
-        public static final int INTAKE_CURRENT_LIMIT_A = 15;
+        public static final int INTAKE_CURRENT_LIMIT_A = 20;
         public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
         public static final int EJECT_CURRENT_LIMIT = 20;
         public static final double INTAKE_OUTPUT_POWER = 1.0;
