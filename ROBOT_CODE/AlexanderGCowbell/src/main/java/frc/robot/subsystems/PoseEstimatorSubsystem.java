@@ -206,39 +206,35 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
    * NOTE: we really should dynamically set the camera pitch based on the proximal and distal relative encoders. 
  
    */
-    private Pose2d getAdjustedPose() {
-      for (String cameraName : this.cameraMap.keySet()) {
-        PhotonCamera camera = this.cameraMap.get(cameraName).camera;
-        if (!camera.isConnected() || !camera.getName().equals(photonCamera3.getName())) {
-          continue;
-        }
-
-        Transform3d robotToCamera = this.cameraMap.get(cameraName).transform;
-
-        var visionResult = camera.getLatestResult();
-
-        if (visionResult.hasTargets()) {
-
-         // double cameraAngleOutFromFloor = Units.degreesToRadians(10.0);
-
-          double slantRange = robotToCamera.getZ()/Math.cos(cameraAngleOutFromFloor + Units.degreesToRadians(visionResult.getBestTarget().getPitch()));
-          double lateralErrorCorrection = Units.inchesToMeters(-7.5) +robotToCamera.getZ()*Math.tan(Units.degreesToRadians(visionResult.getBestTarget().getYaw() ));
-
-          SmartDashboard.putNumber("Slant Range to piece (inches)", Units.metersToInches(slantRange));
-          SmartDashboard.putNumber("Lateral Correction (inches)", Units.metersToInches(lateralErrorCorrection));
-          Pose2d adjustedPose = new Pose2d(
-              getCurrentPose().getX() - (Math.sin(getCurrentPose().getRotation().getRadians()) * lateralErrorCorrection),
-              getCurrentPose().getY() + (Math.cos(getCurrentPose().getRotation().getRadians()) * lateralErrorCorrection),
-              getCurrentPose().getRotation());
-
-          field2d.getObject("MyRobot Adjusted Pose").setPose(adjustedPose);
-          gamePieceDetected = true;
-          return adjustedPose;
-        }
-      }
-      field2d.getObject("MyRobot Adjusted Pose").setPose(poseEstimator.getEstimatedPosition());
+  private Pose2d getAdjustedPose() {
+    PhotonCamera camera = photonCamera3;
+    if(!camera.isConnected()) {
       return poseEstimator.getEstimatedPosition();
     }
+
+    Transform3d robotToCamera = this.cameraMap.get(VisionConstants.kCameraMount3Id).transform;
+    var visionResult = camera.getLatestResult();
+
+    if (visionResult.hasTargets()) {
+      // double cameraAngleOutFromFloor = Units.degreesToRadians(10.0);
+      double slantRange = robotToCamera.getZ()/Math.cos(cameraAngleOutFromFloor + Units.degreesToRadians(visionResult.getBestTarget().getPitch()));
+      double lateralErrorCorrection = Units.inchesToMeters(-7.5) +robotToCamera.getZ()*Math.tan(Units.degreesToRadians(visionResult.getBestTarget().getYaw() ));
+
+      SmartDashboard.putNumber("Slant Range to piece (inches)", Units.metersToInches(slantRange));
+      SmartDashboard.putNumber("Lateral Correction (inches)", Units.metersToInches(lateralErrorCorrection));
+      Pose2d adjustedPose = new Pose2d(
+          getCurrentPose().getX() - (Math.sin(getCurrentPose().getRotation().getRadians()) * lateralErrorCorrection),
+          getCurrentPose().getY() + (Math.cos(getCurrentPose().getRotation().getRadians()) * lateralErrorCorrection),
+          getCurrentPose().getRotation());
+
+      field2d.getObject("MyRobot Adjusted Pose").setPose(adjustedPose);
+      gamePieceDetected = true;
+      return adjustedPose;
+    }
+    
+    field2d.getObject("MyRobot Adjusted Pose").setPose(poseEstimator.getEstimatedPosition());
+    return poseEstimator.getEstimatedPosition();
+  }
 
   private String getFomattedPose() {
     var pose = getCurrentPose();
