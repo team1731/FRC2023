@@ -216,7 +216,6 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     var visionResult = camera.getLatestResult();
 
     if (visionResult.hasTargets()) {
-      // double cameraAngleOutFromFloor = Units.degreesToRadians(10.0);
       double slantRange = robotToCamera.getZ()/Math.cos(cameraAngleOutFromFloor + Units.degreesToRadians(visionResult.getBestTarget().getPitch()));
       double lateralErrorCorrection = Units.inchesToMeters(-7.5) +robotToCamera.getZ()*Math.tan(Units.degreesToRadians(visionResult.getBestTarget().getYaw() ));
 
