@@ -274,12 +274,18 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
        m_swerve.getHeading(), m_swerve.getPositions(), new Pose2d());
   }
 
-  public void setVisionCorrection (boolean b, GamePiece pieceType ) {
-    System.out.println("Setting Vision Correction " + b + ": Game Piece Detected:" + gamePieceDetected);
+  public void enableVisionCorrection(GamePiece pieceType) {
+    System.out.println("Enabling Vision Correction: Game Piece Detected:" + gamePieceDetected);
     cameraAngleOutFromFloor = pieceType == GamePiece.CONE? Units.degreesToRadians(VisionConstants.ConeAutoAngle): Units.degreesToRadians(VisionConstants.CubeAutoAngle);
 
     gamePieceDetected = false;
-    this.useVisionCorrection = b;
+    useVisionCorrection = true;
+  }
+
+  public void disableVisionCorrection() {
+    System.out.println("Disabling Vision Correction: Game Piece Detected:" + gamePieceDetected);
+    gamePieceDetected = false;
+    useVisionCorrection = false;
   }
 
   public void enableAprilTags(boolean b) {
