@@ -125,25 +125,24 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
           EstimatedRobotPose cameraPose = estimatedPose.get();
           Pose2d cameraPose2d = cameraPose.estimatedPose.toPose2d();
           
-
           // determine difference between estimated pose and current pose
           Pose2d poseError = currentPose.relativeTo(cameraPose2d);
           double distanceBetweenPoseEstimations = Math.sqrt(Math.pow(poseError.getX(), 2) + Math.pow(poseError.getY(), 2));
 
           // If the distance between the vision pose estimation and the current swerve pose estimation is too great we will
           // ignore it. This should help filter out bad vision data.
-       //   if(distanceBetweenPoseEstimations < VisionConstants.kMaxDistanceBetweenPoseEstimations) {
-            MessageLog.add("PoseEstimatorSubsystem: Adding vision measurement from " + cameraName);
-            field2d.getObject("MyRobot"  + cameraName).setPose(cameraPose2d);
-            SmartDashboard.putString("Vision pose", String.format("(%.2f, %.2f) %.2f",
-              cameraPose2d.getTranslation().getX(),
-              cameraPose2d.getTranslation().getY(),
-              cameraPose2d.getRotation().getDegrees()));
+          //   if(distanceBetweenPoseEstimations < VisionConstants.kMaxDistanceBetweenPoseEstimations) {
+              MessageLog.add("PoseEstimatorSubsystem: Adding vision measurement from " + cameraName);
+              field2d.getObject("MyRobot"  + cameraName).setPose(cameraPose2d);
+              SmartDashboard.putString("Vision pose", String.format("(%.2f, %.2f) %.2f",
+                cameraPose2d.getTranslation().getX(),
+                cameraPose2d.getTranslation().getY(),
+                cameraPose2d.getRotation().getDegrees()));
 
-            if(currentPose.getX() < 2.5) { // test hack, throwing away values when moving away from AT
-        //      poseEstimator.addVisionMeasurement(cameraPose2d, cameraPose.timestampSeconds, VisionConstants.kVisionMeasurementStdDevs);
-            }
-      //    }
+              if(currentPose.getX() < 2.5) { // test hack, throwing away values when moving away from AT
+              //    poseEstimator.addVisionMeasurement(cameraPose2d, cameraPose.timestampSeconds, VisionConstants.kVisionMeasurementStdDevs);
+              }
+          //}
         }
       }
 

@@ -101,7 +101,7 @@ public class Swerve extends SubsystemBase {
         return positions;
     }
 
-        /**
+    /**
 	 * Returns the heading of the robot.
 	 *
 	 * @return the robot's heading in degrees, from -180 to 180
@@ -116,15 +116,12 @@ public class Swerve extends SubsystemBase {
             }
 		}
         return Rotation2d.fromDegrees(m_heading);
-
 	}
 
     public void zeroGyro(){
-
         lockedHeading = null;
         m_gyro.reset();
        // m_gyro.zeroYaw();
- 
     }
 
     public void adjustWheelEncoders(){
@@ -138,19 +135,21 @@ public class Swerve extends SubsystemBase {
         return m_gyro.getRoll(); // pitch is roll given the way the board is mounted.
     }
 
-  //  public Rotation2d getYaw() {
-  //  if (m_gyro.isMagnetometerCalibrated()) {
-      // We will only get valid fused headings if the magnetometer is calibrated
-  //    return Rotation2d.fromDegrees(m_gyro.getFusedHeading());
-  //  }
+    /*
+    public Rotation2d getYaw() {
+      if (m_gyro.isMagnetometerCalibrated()) {
+        // We will only get valid fused headings if the magnetometer is calibrated
+        return Rotation2d.fromDegrees(m_gyro.getFusedHeading());
+      }
 
-    // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
-   // return Rotation2d.fromDegrees(360.0 - m_gyro.getYaw());
-   // }
+      // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
+      return Rotation2d.fromDegrees(360.0 - m_gyro.getYaw());
+    }
+    */
 
     @Override
     public void periodic(){
-    //    SmartDashboard.putNumber("Yaw in degrees" , getYaw().getDegrees()) ; 
+        // SmartDashboard.putNumber("Yaw in degrees" , getYaw().getDegrees()) ; 
         SmartDashboard.putNumber("getHeading",getHeading().getDegrees());
         SmartDashboard.putNumber("Pitch", getPitch());
         SmartDashboard.putString("Alliance Color", DriverStation.getAlliance().toString());

@@ -6,23 +6,14 @@ import frc.robot.subsystems.Swerve;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
 
 public class TeleopSwerve extends CommandBase {
 
-    private boolean headingOverride = true;
-	private boolean visionHeadingOverride = false;
-
-    private Double desiredHeading;
-	private double m_heading;
-    
     private final PIDController headingController = 
         new PIDController(VisionConstants.kTurnP, VisionConstants.kTurnI, VisionConstants.kTurnD);
-       
 
     private double rotation;
     private Translation2d translation;
@@ -59,6 +50,7 @@ public class TeleopSwerve extends CommandBase {
         SmartDashboard.putNumber("yaxis before ",yAxis);
         SmartDashboard.putNumber("xaxis before ",xAxis);
         SmartDashboard.putNumber("raxis before ",rAxis);
+
         /* Deadbands */
         yAxis = (Math.abs(yAxis) < Constants.stickDeadband) ? 0 : (yAxis > 0? (yAxis - Constants.stickDeadband ): (yAxis + Constants.stickDeadband));
         yAxis *= Math.abs(yAxis);
@@ -86,7 +78,7 @@ public class TeleopSwerve extends CommandBase {
             }
 
             rotation = headingController.calculate(s_Swerve.getHeading().getDegrees(), s_Swerve.lockedHeading);
-        //    System.out.println("rotation from controller"+ rotation);
+            //    System.out.println("rotation from controller"+ rotation);
             rotation  = (Math.abs(rotation) < .1) ? 0 : rotation;
         } else {
 
