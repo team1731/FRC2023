@@ -76,30 +76,24 @@ public class TeleopSwerve extends CommandBase {
         translation = new Translation2d(yAxis , xAxis).times(Constants.Swerve.maxSpeed);
 
 
-            // If the right stick is neutral - this code should lock onto the last known
-            // heading
-            if (Math.abs(rAxis) == 0.0) {
-                if (s_Swerve.lockedHeading == null) {
-                //    System.out.println("Resetting the heading");
-                    headingController.reset();
-                    s_Swerve.lockedHeading = s_Swerve.getHeading().getDegrees();
-                }
-
-                rotation = headingController.calculate(s_Swerve.getHeading().getDegrees(), s_Swerve.lockedHeading);
-            //    System.out.println("rotation from controller"+ rotation);
-                rotation  = (Math.abs(rotation) < .1) ? 0 : rotation;
-            } else {
-
-                s_Swerve.lockedHeading = null;
-                rotation = rAxis * Constants.Swerve.maxAngularVelocity;
-             //   System.out.println("rotation from stick" + rotation);
+        // If the right stick is neutral - this code should lock onto the last known
+        // heading
+        if (Math.abs(rAxis) == 0.0) {
+            if (s_Swerve.lockedHeading == null) {
+            //    System.out.println("Resetting the heading");
+                headingController.reset();
+                s_Swerve.lockedHeading = s_Swerve.getHeading().getDegrees();
             }
-    
-          
-   
 
+            rotation = headingController.calculate(s_Swerve.getHeading().getDegrees(), s_Swerve.lockedHeading);
+        //    System.out.println("rotation from controller"+ rotation);
+            rotation  = (Math.abs(rotation) < .1) ? 0 : rotation;
+        } else {
 
-
+            s_Swerve.lockedHeading = null;
+            rotation = rAxis * Constants.Swerve.maxAngularVelocity;
+            //   System.out.println("rotation from stick" + rotation);
+        }
 
         s_Swerve.drive(translation, rotation, fieldRelative, openLoop);
     }

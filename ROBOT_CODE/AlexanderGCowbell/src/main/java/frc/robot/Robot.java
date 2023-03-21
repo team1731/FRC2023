@@ -114,7 +114,7 @@ public class Robot extends TimedRobot {
 	initSubsystems();
 	s_armSubSystem.resetArmEncoders();
 
-	String[] autoModes = m_robotContainer.deriveAutoModes();
+	String[] autoModes = RobotContainer.deriveAutoModes();
 	for(String autoMode: autoModes){
 		autoChooser.addOption(autoMode, autoMode);
 	}

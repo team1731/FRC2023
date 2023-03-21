@@ -23,10 +23,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
 
-  
-
     public SwerveModule[] mSwerveMods;
-  //  public PigeonIMU gyro;
     private final AHRS m_gyro = new AHRS(SPI.Port.kMXP, (byte) 200); // NavX connected over MXP
     public Double lockedHeading = null;
     private boolean s_lockWheels = false;
@@ -34,7 +31,6 @@ public class Swerve extends SubsystemBase {
     public Swerve() {
 
         zeroGyro();
-
 
         mSwerveMods = new SwerveModule[] {
             new SwerveModule(0, Constants.Swerve.Mod0.constants),
@@ -47,7 +43,6 @@ public class Swerve extends SubsystemBase {
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
 
- 
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -61,12 +56,13 @@ public class Swerve extends SubsystemBase {
                                     translation.getY(), 
                                     rotation)
                                 );
+
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
         if (s_lockWheels && 
             (swerveModuleStates[0].speedMetersPerSecond == 0.0 &&
-            swerveModuleStates[1].speedMetersPerSecond == 0.0 &&
-            swerveModuleStates[2].speedMetersPerSecond == 0.0 &&
-            swerveModuleStates[3].speedMetersPerSecond == 0.0 )
+             swerveModuleStates[1].speedMetersPerSecond == 0.0 &&
+             swerveModuleStates[2].speedMetersPerSecond == 0.0 &&
+             swerveModuleStates[3].speedMetersPerSecond == 0.0 )
             ) {
             swerveModuleStates = new SwerveModuleState[] {
                 new SwerveModuleState(0.0, Rotation2d.fromDegrees(45.0)),
@@ -132,7 +128,7 @@ public class Swerve extends SubsystemBase {
     }
 
     public void adjustWheelEncoders(){
-              for(SwerveModule mod : mSwerveMods){
+        for(SwerveModule mod : mSwerveMods){
             mod.resetToAbsolute();
             System.out.println("Adjusting Wheel Encoders!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         }  

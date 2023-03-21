@@ -35,10 +35,10 @@ public class PathPlannerCommandGroup extends SequentialCommandGroup {
     
     public PathPlannerCommandGroup(String pathPlannerFile, Swerve s_Swerve, PoseEstimatorSubsystem s_PoseEstimatorSubsystem, ArmStateMachine sm_ArmStateMachine) {
         pathName = pathPlannerFile;
-        // This will load the file "FullAuto.path" and generate it with a max velocity of 4 m/s and a max acceleration of 3 m/s^2
+        // This will load the file pathPlannerFile and generate it with a max velocity of 4 m/s and a max acceleration of 3 m/s^2
         // for every path in the group
         PathConstraints pathConstraints = new PathConstraints(3, 1.5); //Constants.AutoConstants.kMaxSpeedMetersPerSecond, Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared);
-        List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(pathPlannerFile, pathConstraints); // "A1"
+        List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(pathPlannerFile, pathConstraints);
     
         // This is just an example event map. It would be better to have a constant, global event map
         // in your code that will be used by all path following commands.
