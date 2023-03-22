@@ -39,7 +39,8 @@ public class PathPlannerCommandGroup extends SequentialCommandGroup {
         // in your code that will be used by all path following commands.
         HashMap<String, Command> eventMap = new HashMap<>();
         //eventMap.put("ScoreCone", new PrintCommand("Passed marker 1"));
-        eventMap.put("ScoreConeHigh", new SequentialCommandGroup(new AutoCheckRemainingTime(), new WaitCommand(.5), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CONE)));
+        eventMap.put("ScoreConeHigh", new SequentialCommandGroup(new AutoCheckRemainingTime(),  new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CONE)));
+        eventMap.put("ScoreConeHighFirstAuto", new SequentialCommandGroup(new AutoCheckRemainingTime(),  new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH_FIRST_AUTO, GamePiece.CONE)));
         eventMap.put("StartIntakeCone", new AutoPickupCommand(sm_ArmStateMachine, ArmSequence.PICKUP_LOW, GamePiece.CONE));
         eventMap.put("StartIntakeCube", new AutoPickupCommand(sm_ArmStateMachine, ArmSequence.PICKUP_LOW, GamePiece.CUBE));
         eventMap.put("AutoWaitForGamePiece", new AutoWaitForGamePiece(sm_ArmStateMachine));

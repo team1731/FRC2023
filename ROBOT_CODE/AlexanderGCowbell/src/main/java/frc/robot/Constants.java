@@ -43,14 +43,14 @@ public final class Constants {
          * 2. Set the desired logMode (CSV, DATA_LOG)
          * 2. Set the desired loggers below = true
          */
-        public static final boolean loggingEnabled = false;     // note: must also turn on applicable loggers below
+        public static final boolean loggingEnabled = false ;    // note: must also turn on applicable loggers below
         public static final boolean logNetworkTables = false;   // only applicable when logMode = DATA_LOG
         public static final LogMode logMode = LogMode.CSV;
 
         // list of loggers and enabled status, note: must also enable logging above
         public static final Map<Log, Boolean> loggers = Map.of(
             Log.MESSAGE, false,
-            Log.ARM_PATH_RECORDING, false,
+            Log.ARM_PATH_RECORDING,false,
             Log.POSE_ESTIMATIONS, false
         );
 
@@ -316,8 +316,8 @@ public final class Constants {
          * **********************************************************************************************
          */
 
-         public final static int proximalEstimatedAutoAbsolute = proximalAbsoluteTicsCenter - 205; //  2509; // only used if we are not getting reasonable values from absolute encoder
-         public final static int distalEstimatedAutoAbsolute = distalAbsoluteTicsCenter + 206; //1996; // only used if we are not getting reasonable values from absolute encoder
+         public final static int proximalEstimatedAutoAbsolute = proximalAbsoluteTicsCenter - 205; //  2565; // only used if we are not getting reasonable values from absolute encoder
+         public final static int distalEstimatedAutoAbsolute = distalAbsoluteTicsCenter + 206; //1926; // only used if we are not getting reasonable values from absolute encoder
 
                  // bounds checking for absolute encoder values, work around for spotty values we are receiving
         // these first set of bounds are used when we don't know where the arm is and we mainly want to make sure that

@@ -7,7 +7,7 @@ public class PickupFloorCone {
 
     public static final int kNumPoints = 94;
     public static final int kWristFlexIndex = 1;
-    public static final double kWristFlexPosition = 0.297;
+    public static final double kWristFlexPosition = 0.31;
     public static final int kWristExtendIndex = 93;
     public static final double kWristMaxVelocity = 2000;
 
