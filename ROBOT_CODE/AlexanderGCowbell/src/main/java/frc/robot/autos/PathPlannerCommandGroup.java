@@ -46,10 +46,10 @@ public class PathPlannerCommandGroup extends SequentialCommandGroup {
         eventMap.put("AutoWaitForGamePiece", new AutoWaitForGamePiece(sm_ArmStateMachine));
         eventMap.put("AutoBalanceSwerve", new AutoBalanceSwerve(s_Swerve));
         eventMap.put("AutoScoreHighWait", new WaitCommand(2.2));
-        eventMap.put("EnableVisionCorrectionCube", new InstantCommand(() -> s_PoseEstimatorSubsystem.setVisionCorrection(true, GamePiece.CUBE)));
-        eventMap.put("DisableVisionCorrectionCube", new InstantCommand(() -> s_PoseEstimatorSubsystem.setVisionCorrection(false, GamePiece.CUBE)));
-        eventMap.put("EnableVisionCorrectionCone", new InstantCommand(() -> s_PoseEstimatorSubsystem.setVisionCorrection(true, GamePiece.CONE)));
-        eventMap.put("DisableVisionCorrectionCone", new InstantCommand(() -> s_PoseEstimatorSubsystem.setVisionCorrection(false, GamePiece.CONE)));
+        eventMap.put("EnableVisionCorrectionCube", new InstantCommand(() -> s_PoseEstimatorSubsystem.enableVisionCorrection(GamePiece.CUBE)));
+        eventMap.put("DisableVisionCorrectionCube", new InstantCommand(() -> s_PoseEstimatorSubsystem.disableVisionCorrection()));
+        eventMap.put("EnableVisionCorrectionCone", new InstantCommand(() -> s_PoseEstimatorSubsystem.enableVisionCorrection(GamePiece.CONE)));
+        eventMap.put("DisableVisionCorrectionCone", new InstantCommand(() -> s_PoseEstimatorSubsystem.disableVisionCorrection()));
         eventMap.put("EnableAprilTtags", new InstantCommand(() -> s_PoseEstimatorSubsystem.enableAprilTags(true)));
         eventMap.put("DisableAprilTags", new InstantCommand(() -> s_PoseEstimatorSubsystem.enableAprilTags(false)));
         eventMap.put("ScoreCubeHigh", new SequentialCommandGroup(new AutoCheckRemainingTime(), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CUBE)));
