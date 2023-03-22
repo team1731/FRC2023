@@ -50,7 +50,7 @@ public final class Constants {
         // list of loggers and enabled status, note: must also enable logging above
         public static final Map<Log, Boolean> loggers = Map.of(
             Log.MESSAGE, false,
-            Log.ARM_PATH_RECORDING,false,
+            Log.ARM_PATH_RECORDING, false,
             Log.POSE_ESTIMATIONS, false
         );
 
@@ -308,7 +308,7 @@ public final class Constants {
          */
 
          public final static int proximalAbsoluteTicsCenter = 2770; // was 2727
-         public final static int distalAbsoluteTicsCenter = 1720;
+         public final static int distalAbsoluteTicsCenter = 1720;   // 1714
 
         /*
          ************************************************************************************************
@@ -368,7 +368,7 @@ public final class Constants {
         public final static double wristMaxRPM = 5700;
 
         // Wrist limits
-        public static final int WRIST_CURRENT_LIMIT = 20;
+        public static final int WRIST_CURRENT_LIMIT = 24;
 
         // Wrist Smart Motion Coefficients
         public final static double wristMaxVel = 2000;
@@ -377,7 +377,7 @@ public final class Constants {
         public final static double wristAllowedErr = 0;
 
          // Hand limits
-        public static final int INTAKE_CURRENT_LIMIT_A = 20;
+        public static final int INTAKE_CURRENT_LIMIT_A = 22;
         public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
         public static final int EJECT_CURRENT_LIMIT = 20;
         public static final double INTAKE_OUTPUT_POWER = 1.0;
