@@ -52,10 +52,10 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   private final SwerveDrivePoseEstimator poseEstimator;
   private AprilTagFieldLayout aprilTagFieldLayout;
   private final Field2d field2d = new Field2d();
-  private boolean useVisionCorrection = true;
+  private boolean useVisionCorrection = false;
   private boolean gamePieceDetected = false;
   private double cameraAngleOutFromFloor = Units.degreesToRadians(VisionConstants.CubeAutoAngle);
-  private boolean aprilTagsIsEnabled = true;
+  private boolean aprilTagsIsEnabled = false;
   
   // Camera configuration
   private HashMap<String, CameraTransform> cameraMap = new HashMap<String, CameraTransform>();
@@ -162,8 +162,8 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
             // If the distance between the vision pose estimation and the current swerve
             // pose estimation is too great we will
             // ignore it. This should help filter out bad vision data.
-            // if(distanceBetweenPoseEstimations <
-            // VisionConstants.kMaxDistanceBetweenPoseEstimations) {
+             if(distanceBetweenPoseEstimations <
+             VisionConstants.kMaxDistanceBetweenPoseEstimations) {
             MessageLog.add("PoseEstimatorSubsystem: Adding vision measurement from " + cameraName);
             field2d.getObject("MyRobot" + cameraName).setPose(cameraPose2d);
             SmartDashboard.putString("Vision pose", String.format("(%.2f, %.2f) %.2f",
@@ -176,15 +176,15 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
             poseEstimator.addVisionMeasurement(cameraPose2d, cameraPose.timestampSeconds,
                 VisionConstants.kVisionMeasurementStdDevs);
             // }
-            // }
+             }
           }
         }
       }
+    }
 
       // Update pose estimator with drivetrain sensors
       poseEstimator.updateWithTime(Timer.getFPGATimestamp(), m_swerve.getHeading(), m_swerve.getPositions());
       field2d.setRobotPose(getCurrentPose());
-    }
 
     // log pose estimations
     Pose2d currentPose = getCurrentPose();
@@ -275,21 +275,26 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   }
 
   public void enableVisionCorrection(GamePiece pieceType) {
+    /* 
     System.out.println("Enabling Vision Correction: Game Piece Detected:" + gamePieceDetected);
     cameraAngleOutFromFloor = pieceType == GamePiece.CONE? Units.degreesToRadians(VisionConstants.ConeAutoAngle): Units.degreesToRadians(VisionConstants.CubeAutoAngle);
-
+    photonCamera3.setDriverMode(false);
     gamePieceDetected = false;
     useVisionCorrection = true;
+    int pipelineIndex = pieceType == GamePiece.CONE? 0: 1;
+    photonCamera3.setPipelineIndex(pipelineIndex);
+    */
   }
 
   public void disableVisionCorrection() {
     System.out.println("Disabling Vision Correction: Game Piece Detected:" + gamePieceDetected);
     gamePieceDetected = false;
     useVisionCorrection = false;
+    photonCamera3.setDriverMode(true);
   }
 
   public void enableAprilTags(boolean b) {
-    aprilTagsIsEnabled = b;
+   // aprilTagsIsEnabled = b;
   }
 
 

@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GamePiece;
+import frc.robot.Constants.LogConstants;
 import frc.data.mp.*;
 import frc.data.mp.ArmPath.ArmMotor;
 import frc.data.mp.ArmPath.Direction;
@@ -132,6 +133,7 @@ public class ArmSubsystem extends SubsystemBase {
 		motor.configPeakOutputForward(0.5, 30);
 		motor.configPeakOutputReverse(-0.5, 30);
         motor.setInverted(invertType);
+
     }
 
 
@@ -365,7 +367,27 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Davids Distall Calc", getArbitraryFeedForwardForDistalArm());
         SmartDashboard.putNumber("Davids Proximal Calc", getArbitraryFeedForwardForProximalArm());
         SmartDashboard.putNumber("Absolute wrist Encoder", wristEncoder.getPosition());
-        SmartDashboard.putNumber("OutputCurrent", intakeMotor.getOutputCurrent());
+
+         if (LogConstants.loggingEnabled ) {
+        SmartDashboard.putNumber("Proximal Trajectory Position", proximalMotor.getActiveTrajectoryPosition());
+        SmartDashboard.putNumber("Proximal Trajectory Velocity", proximalMotor.getActiveTrajectoryVelocity());
+        SmartDashboard.putNumber("Proximal Motor Percent", proximalMotor.getMotorOutputPercent());
+        SmartDashboard.putNumber("Proximal Actual Position", proximalMotor.getSelectedSensorPosition());
+        SmartDashboard.putNumber("Proximal Actual Velocity", proximalMotor.getSelectedSensorVelocity());
+        SmartDashboard.putNumber("Proximal Closed Loop Error", proximalMotor.getClosedLoopError());
+        SmartDashboard.putNumber("Proximal Closed Loop Target", proximalMotor.getClosedLoopTarget());
+        SmartDashboard.putNumber("Proximal Arb Feed Forward", proximalMotor.getActiveTrajectoryArbFeedFwd());
+
+        SmartDashboard.putNumber("Distal Trajectory Position", distalMotor.getActiveTrajectoryPosition());
+        SmartDashboard.putNumber("Distal Trajectory Velocity", distalMotor.getActiveTrajectoryVelocity());
+        SmartDashboard.putNumber("Distal Motor Percent", distalMotor.getMotorOutputPercent());
+        SmartDashboard.putNumber("Distal Actual Position", distalMotor.getSelectedSensorPosition());
+        SmartDashboard.putNumber("Distal Actual Velocity", distalMotor.getSelectedSensorVelocity());
+        SmartDashboard.putNumber("Distal Closed Loop Error", distalMotor.getClosedLoopError());
+        SmartDashboard.putNumber("Distal Closed Loop Target", distalMotor.getClosedLoopTarget());
+        SmartDashboard.putNumber("Distal Arb Feed Forward", distalMotor.getActiveTrajectoryArbFeedFwd());
+
+    }
 
     }
 

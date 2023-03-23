@@ -17,25 +17,26 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ScoreConeHigh"
+          "ScoreConeHigh",
+          "EnableAprilTtags"
         ],
         "executionBehavior": "parallelDeadline",
         "waitBehavior": "deadline",
-        "waitTime": 3.0
+        "waitTime": 1.5
       }
     },
     {
       "anchorPoint": {
-        "x": 7.4671969021934474,
-        "y": 4.560231517600782
+        "x": 7.049599371926016,
+        "y": 4.53647216385342
       },
       "prevControl": {
-        "x": 5.234257637973725,
-        "y": 4.34543587854455
+        "x": 4.816660107706293,
+        "y": 4.321676524797188
       },
       "nextControl": {
-        "x": 5.234257637973725,
-        "y": 4.34543587854455
+        "x": 4.816660107706293,
+        "y": 4.321676524797188
       },
       "holonomicAngle": 0,
       "isReversal": true,
@@ -44,7 +45,7 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "AutoWaitForGamePiece"
+          "DisableVisionCorrectionCube"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -68,29 +69,78 @@
       "isReversal": true,
       "velOverride": null,
       "isLocked": false,
-      "isStopPoint": true,
+      "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "ScoreCubeHigh",
-          "AutoScoreHighWait"
-        ],
-        "executionBehavior": "parallelDeadline",
-        "waitBehavior": "deadline",
+        "names": [],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
         "waitTime": 3.0
       }
     },
     {
       "anchorPoint": {
-        "x": 4.653831944027524,
-        "y": 4.618456600549566
+        "x": 4.489863070635232,
+        "y": 4.7550973283764755
       },
       "prevControl": {
-        "x": 3.4765756295201795,
-        "y": 4.602255825579281
+        "x": 3.31426848684928,
+        "y": 4.819690437375703
       },
       "nextControl": {
-        "x": 6.639677188445286,
-        "y": 4.6457847461149475
+        "x": 6.147770568268409,
+        "y": 4.664003509825203
+      },
+      "holonomicAngle": -46.3322198538696,
+      "isReversal": false,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 7.0131618445055075,
+        "y": 3.233830558570209
+      },
+      "prevControl": {
+        "x": 6.677271721432368,
+        "y": 3.777003932443384
+      },
+      "nextControl": {
+        "x": 6.677271721432368,
+        "y": 3.777003932443384
+      },
+      "holonomicAngle": -50.66604368306299,
+      "isReversal": true,
+      "velOverride": null,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [
+          "AutoWaitForGamePiece"
+        ],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 4.183256595493513,
+        "y": 4.832698180602087
+      },
+      "prevControl": {
+        "x": 6.074895513427391,
+        "y": 4.764206710231603
+      },
+      "nextControl": {
+        "x": 2.520309391723348,
+        "y": 4.892909301263057
       },
       "holonomicAngle": 0,
       "isReversal": false,
@@ -106,12 +156,12 @@
     },
     {
       "anchorPoint": {
-        "x": 7.514177846537511,
-        "y": 3.015205394047152
+        "x": 1.8601197846402857,
+        "y": 3.814533282018264
       },
       "prevControl": {
-        "x": 5.313211046002511,
-        "y": 2.778850341405351
+        "x": 2.0760968730426654,
+        "y": 4.041318594956266
       },
       "nextControl": null,
       "holonomicAngle": 0,
@@ -120,10 +170,8 @@
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "AutoWaitForGamePiece"
-        ],
-        "executionBehavior": "sequential",
+        "names": [],
+        "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 0
       }
@@ -134,16 +182,46 @@
   "isReversed": null,
   "markers": [
     {
-      "position": 0.5818181818181816,
+      "position": 0.27272727272727265,
       "names": [
-        "StartIntakeCube"
+        "StartIntakeCube",
+        "EnableVisionCorrectionCube",
+        "DisableAprilTags"
       ]
     },
     {
-      "position": 3.3745454545452667,
+      "position": 2.9999999999999996,
       "names": [
         "event",
-        "StartIntakeCone"
+        "StartIntakeCone",
+        "EnableVisionCorrectionCone"
+      ]
+    },
+    {
+      "position": 1.6909090909091038,
+      "names": [
+        "ScoreCubeHigh",
+        "EnableAprilTags"
+      ]
+    },
+    {
+      "position": 2.2909090909090915,
+      "names": [
+        "DisableAprilTags"
+      ]
+    },
+    {
+      "position": 4.090909090909089,
+      "names": [
+        "DisableVisionCorrection"
+      ]
+    },
+    {
+      "position": 5.236363636363626,
+      "names": [
+        "event",
+        "EnableAprilTags",
+        "ScoreConeHigh"
       ]
     }
   ]

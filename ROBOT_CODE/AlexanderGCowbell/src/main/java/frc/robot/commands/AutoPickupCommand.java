@@ -6,6 +6,7 @@ import frc.robot.Constants.ArmStateConstants;
 import frc.robot.Constants.GamePiece;
 import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
+import frc.robot.state.arm.ArmStateMachine.MovementType;
 import frc.robot.state.arm.ArmStateMachine.Status;
 import frc.data.mp.*;
 
@@ -16,6 +17,8 @@ public class AutoPickupCommand extends CommandBase {
     private boolean started = false;
     private boolean isFinished = false;
     private double queuedTime;
+    private double pickupTime;
+    private MovementType movement =  MovementType.PICKUP;
 
     public AutoPickupCommand(ArmStateMachine stateMachine, ArmSequence sequence, GamePiece pieceType) {
         this.stateMachine = stateMachine;
@@ -43,9 +46,14 @@ public class AutoPickupCommand extends CommandBase {
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
             path = PickupLowCube.getArmPath();
         }
+        else if (sequence == ArmSequence.PICKUP_DOWNED_CONE) {
+            path = PickupFloorCone.getArmPath();
+            movement = MovementType.PICKUP_DOWNED_CONE;
+            pickupTime = Timer.getFPGATimestamp();
+    }
 
         if(path != null) {
-            stateMachine.pickup(path, queuedTime);
+            stateMachine.pickup(path, movement, queuedTime);
         } else {
             isFinished = true;
         }
@@ -56,10 +64,11 @@ public class AutoPickupCommand extends CommandBase {
     public void execute() {
         if(!started && stateMachine.getStatus() == Status.RUNNING) {
             started = true;
-        } else if(started && stateMachine.getStatus() == Status.READY) {
+        } else if((started && stateMachine.getStatus() == Status.READY) || (movement == MovementType.PICKUP_DOWNED_CONE  &&   Timer.getFPGATimestamp() - pickupTime > 4.0)) {
             // has returned to a ready state, we are done
             isFinished = true;
         }
+
     }
 
     @Override
