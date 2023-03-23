@@ -73,7 +73,7 @@ public class RobotContainer {
   private final JoystickButton kHighScoreSwitch = new JoystickButton(operator,OperatorConsoleConstants.kScoreHighSwitchId);
   private final JoystickButton kMediumScoreSwitch = new JoystickButton(operator,OperatorConsoleConstants.kScoreMediumSwitchId);
   // Operator sticks
-  public final int kDisatalAxis = OperatorConsoleConstants.kDistalAxisId;
+  public final int kDistalAxis = OperatorConsoleConstants.kDistalAxisId;
   public final int kProximalAxis = OperatorConsoleConstants.kProximalAxisId;
 
 
@@ -133,9 +133,9 @@ public class RobotContainer {
     }));
 
     // SCORE HIGH/MED/LOW BUTTONS
-    ky.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_HIGH, operator, kDisatalAxis)));
-    kb.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_MEDIUM, operator, kDisatalAxis)));
-    ka.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_LOW, operator, kDisatalAxis)));
+    ky.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_HIGH, operator, kDistalAxis)));
+    kb.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_MEDIUM, operator, kDistalAxis)));
+    ka.whileTrue((new ArmScoreCommand(sm_armStateMachine, ArmSequence.SCORE_LOW, operator, kDistalAxis)));
 
     // CLEAR/RESET PATH BUTTON
     kx.whileTrue(new InstantCommand(() -> sm_armStateMachine.clearCurrentPath()));
@@ -145,14 +145,14 @@ public class RobotContainer {
       kLeftBumper.onTrue(new InstantCommand(() -> s_armSubSystem.startRecordingArmPath()));
       kRightBumper.onTrue(new InstantCommand(() -> s_armSubSystem.stopRecordingArmPath()));
     } else {
-      kLeftBumper.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_HIGH, operator, kDisatalAxis));
-      kRightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_OPERATOR_ENTRY, operator, kDisatalAxis));
+      kLeftBumper.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_HIGH, operator, kDistalAxis));
+      kRightBumper.whileTrue(new ArmScoreCommand(sm_armStateMachine, ArmSequence.READ_OPERATOR_ENTRY, operator, kDistalAxis));
     }
 
     // TRIGGERS - PICKUP LOW AND PICKUP DOWNED CONE
-    kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDisatalAxis));
+    kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDistalAxis));
     kRightTrigger.whileTrue(new FlipConeCommand(sm_armStateMachine));
-    //kRightTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_DOWNED_CONE, operator, kDisatalAxis));
+    //kRightTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_DOWNED_CONE, operator, kDistalAxis));
 
     
     /*
@@ -177,7 +177,7 @@ public class RobotContainer {
     // EMERENCY MODE AND AUTO-RECOVERY SWITCH
     kKillSwitch.onTrue(new InstantCommand(() -> {
       sm_armStateMachine.addJoystickControl(operator, kProximalAxis, false);
-      sm_armStateMachine.addJoystickControl(operator, kDisatalAxis, false);
+      sm_armStateMachine.addJoystickControl(operator, kDistalAxis, false);
       sm_armStateMachine.emergencyInterrupt();
     }));
     kAutoRecoverySwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.attemptAutoRecovery()));
