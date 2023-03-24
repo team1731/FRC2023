@@ -43,14 +43,14 @@ public final class Constants {
          * 2. Set the desired logMode (CSV, DATA_LOG)
          * 2. Set the desired loggers below = true
          */
-        public static final boolean loggingEnabled = false ;    // note: must also turn on applicable loggers below
+        public static final boolean loggingEnabled = true;    // note: must also turn on applicable loggers below
         public static final boolean logNetworkTables = false;   // only applicable when logMode = DATA_LOG
-        public static final LogMode logMode = LogMode.DATA_LOG;
+        public static final LogMode logMode = LogMode.CSV;
 
         // list of loggers and enabled status, note: must also enable logging above
         public static final Map<Log, Boolean> loggers = Map.of(
             Log.MESSAGE, false,
-            Log.ARM_PATH_RECORDING, false,
+            Log.ARM_PATH_RECORDING, true,
             Log.POSE_ESTIMATIONS, false
         );
 
