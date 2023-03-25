@@ -27,16 +27,16 @@
     },
     {
       "anchorPoint": {
-        "x": 7.049599371926016,
-        "y": 4.53647216385342
+        "x": 6.965284628243675,
+        "y": 4.531550816232223
       },
       "prevControl": {
-        "x": 4.816660107706293,
-        "y": 4.321676524797188
+        "x": 4.732345364023953,
+        "y": 4.316755177175992
       },
       "nextControl": {
-        "x": 4.816660107706293,
-        "y": 4.321676524797188
+        "x": 4.732345364023953,
+        "y": 4.316755177175992
       },
       "holonomicAngle": 0,
       "isReversal": true,
@@ -54,16 +54,16 @@
     },
     {
       "anchorPoint": {
-        "x": 1.817098732587448,
-        "y": 4.259084153230918
+        "x": 1.8845798600688113,
+        "y": 4.345175144895745
       },
       "prevControl": {
-        "x": 3.29653404761355,
-        "y": 4.691331655390584
+        "x": 3.364015175094912,
+        "y": 4.7774226470554115
       },
       "nextControl": {
-        "x": 3.29653404761355,
-        "y": 4.691331655390584
+        "x": 3.364015175094912,
+        "y": 4.7774226470554115
       },
       "holonomicAngle": 0,
       "isReversal": true,
@@ -104,25 +104,25 @@
     },
     {
       "anchorPoint": {
-        "x": 7.0131618445055075,
-        "y": 3.233830558570209
+        "x": 6.7214986666109295,
+        "y": 3.6854701258597515
       },
       "prevControl": {
-        "x": 6.677271721432368,
-        "y": 3.777003932443384
+        "x": 6.38560854353779,
+        "y": 4.228643499732925
       },
       "nextControl": {
-        "x": 6.677271721432368,
-        "y": 3.777003932443384
+        "x": 6.38560854353779,
+        "y": 4.228643499732925
       },
       "holonomicAngle": -50.66604368306299,
       "isReversal": true,
       "velOverride": null,
       "isLocked": false,
-      "isStopPoint": false,
+      "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "AutoWaitForGamePiece"
+          "DisableVisionCorrectionCone"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -156,15 +156,15 @@
     },
     {
       "anchorPoint": {
-        "x": 1.8754704782136837,
-        "y": 3.771284088022722
+        "x": 1.8846838202718732,
+        "y": 3.8349432679550546
       },
       "prevControl": {
-        "x": 2.091447566616064,
-        "y": 3.998069400960722
+        "x": 2.932158773408456,
+        "y": 3.8077216154432314
       },
       "nextControl": null,
-      "holonomicAngle": 0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -177,57 +177,48 @@
       }
     }
   ],
-  "maxVelocity": null,
-  "maxAcceleration": 1.5,
+  "maxVelocity": 3.0,
+  "maxAcceleration": 2.0,
   "isReversed": null,
   "markers": [
     {
-      "position": 0.7090909090909092,
+      "position": 0.2727272727272726,
       "names": [
-        "StartIntakeCube",
-        "EnableVisionCorrectionCube",
-        "DisableAprilTags"
+        "DisableAprilTags",
+        "StartIntakeCube"
       ]
     },
     {
-      "position": 2.9999999999999996,
+      "position": 0.7636363636363637,
       "names": [
-        "event",
-        "StartIntakeCone",
-        "EnableVisionCorrectionCone"
+        "EnableVisionCorrectionCube"
       ]
     },
     {
-      "position": 1.6909090909091038,
+      "position": 1.6363636363636362,
       "names": [
         "ScoreCubeHigh",
         "EnableAprilTags"
       ]
     },
     {
-      "position": 2.2909090909090915,
+      "position": 2.5090909090909097,
       "names": [
-        "DisableAprilTags"
+        "DisableAprilTags",
+        "StartIntakeCone"
       ]
     },
     {
-      "position": 4.090909090909089,
+      "position": 3.2727272727272716,
       "names": [
-        "DisableVisionCorrection"
+        "EnableVisionCorrectionCone"
       ]
     },
     {
-      "position": 5.236363636363626,
+      "position": 5.236363636363624,
       "names": [
-        "event",
-        "EnableAprilTags",
-        "ScoreConeHigh"
-      ]
-    },
-    {
-      "position": 5.072727272727265,
-      "names": [
-        "event"
+        "ScoreConeHigh",
+        "EnableAprilTags"
       ]
     }
   ]

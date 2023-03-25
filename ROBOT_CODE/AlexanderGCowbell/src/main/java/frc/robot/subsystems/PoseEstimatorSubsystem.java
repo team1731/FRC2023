@@ -185,6 +185,9 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
       // Update pose estimator with drivetrain sensors
       poseEstimator.updateWithTime(Timer.getFPGATimestamp(), m_swerve.getHeading(), m_swerve.getPositions());
       field2d.setRobotPose(getCurrentPose());
+      Pose2d posenow = getCurrentPose();
+      SmartDashboard.putNumber("CurrentPoseX", posenow.getX());
+      SmartDashboard.putNumber("CurrentPoseY", posenow.getY());
 
     // log pose estimations
     Pose2d currentPose = getCurrentPose();
@@ -275,7 +278,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
   }
 
   public void enableVisionCorrection(GamePiece pieceType) {
-    /* 
+    
     System.out.println("Enabling Vision Correction: Game Piece Detected:" + gamePieceDetected);
     cameraAngleOutFromFloor = pieceType == GamePiece.CONE? Units.degreesToRadians(VisionConstants.ConeAutoAngle): Units.degreesToRadians(VisionConstants.CubeAutoAngle);
     photonCamera3.setDriverMode(false);
@@ -283,7 +286,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     useVisionCorrection = true;
     int pipelineIndex = pieceType == GamePiece.CONE? 0: 1;
     photonCamera3.setPipelineIndex(pipelineIndex);
-    */
+    
   }
 
   public void disableVisionCorrection() {

@@ -44,13 +44,13 @@ public final class Constants {
          * 2. Set the desired loggers below = true
          */
         public static final boolean loggingEnabled = true;    // note: must also turn on applicable loggers below
-        public static final boolean logNetworkTables = false;   // only applicable when logMode = DATA_LOG
-        public static final LogMode logMode = LogMode.CSV;
+        public static final boolean logNetworkTables = true;   // only applicable when logMode = DATA_LOG
+        public static final LogMode logMode = LogMode.DATA_LOG;
 
         // list of loggers and enabled status, note: must also enable logging above
         public static final Map<Log, Boolean> loggers = Map.of(
             Log.MESSAGE, false,
-            Log.ARM_PATH_RECORDING, true,
+            Log.ARM_PATH_RECORDING, false,
             Log.POSE_ESTIMATIONS, false
         );
 
@@ -269,8 +269,8 @@ public final class Constants {
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
         public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
     
-        public static final double kPXController = 0.1;
-        public static final double kPYController = 1;
+        public static final double kPXController = 3.0;
+        public static final double kPYController = 3.0;
         public static final double kPThetaController = 2;
     
         // Constraint for the motion profilied robot angle controller
@@ -377,7 +377,7 @@ public final class Constants {
         public final static double wristAllowedErr = 0;
 
          // Hand limits
-        public static final int INTAKE_CURRENT_LIMIT_A = 22;
+        public static final int INTAKE_CURRENT_LIMIT_A = 23;
         public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
         public static final int EJECT_CURRENT_LIMIT = 20;
         public static final double INTAKE_OUTPUT_POWER = 1.0;
