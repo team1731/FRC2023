@@ -150,6 +150,7 @@ public class ArmStateMachine {
     System.out.println("ArmStateMachine: DISABLED!!!!!!!!!!!!!!!!!!!!!!!!!");
     resetState();
     currentArmState = ArmState.UNKNOWN;
+    queuedCommand = null; // clear out any queued commands from previous mode (e.g., autonomous)
     subsystem.allowArmManipulation();
   }
 
@@ -487,7 +488,10 @@ public class ArmStateMachine {
      * Logic for handling queued commands
      * These commands can get queued when the command is requested while the arm is still reaching a ready state
      */
-    if(queuedCommand != null && isReadyToStartMovement()) {
+    if(!isInAuto && queuedCommand != null && queuedCommand.autoCommand) {
+      // we are no longer in auto, this command no longer applies, clear the queued command
+      queuedCommand = null;
+    } else if(queuedCommand != null && isReadyToStartMovement()) {
       if((queuedCommand.type == MovementType.PICKUP || queuedCommand.type == MovementType.PICKUP_DOWNED_CONE) && queuedCommand.path != null) {
         pickup(queuedCommand.path, queuedCommand.type, queuedCommand.queuedTime);
         queuedCommand = null;
@@ -498,9 +502,6 @@ public class ArmStateMachine {
         score(queuedCommand.path, queuedCommand.queuedTime);
         queuedCommand = null;
       }
-    } else if(!isInAuto && queuedCommand != null && queuedCommand.autoCommand) {
-      // we are no longer in auto, this command no longer applies, clear the queued command
-      queuedCommand = null;
     }
 
     if(wristMovementStartedTime != 0 && Timer.getFPGATimestamp() - wristMovementStartedTime > 0.75) {
