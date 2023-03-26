@@ -43,9 +43,9 @@ public final class Constants {
          * 2. Set the desired logMode (CSV, DATA_LOG)
          * 2. Set the desired loggers below = true
          */
-        public static final boolean loggingEnabled = false;     // note: must also turn on applicable loggers below
-        public static final boolean logNetworkTables = false;   // only applicable when logMode = DATA_LOG
-        public static final LogMode logMode = LogMode.CSV;
+        public static final boolean loggingEnabled = true;    // note: must also turn on applicable loggers below
+        public static final boolean logNetworkTables = true;   // only applicable when logMode = DATA_LOG
+        public static final LogMode logMode = LogMode.DATA_LOG;
 
         // list of loggers and enabled status, note: must also enable logging above
         public static final Map<Log, Boolean> loggers = Map.of(
@@ -269,8 +269,8 @@ public final class Constants {
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
         public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
     
-        public static final double kPXController = 0.1;
-        public static final double kPYController = 1;
+        public static final double kPXController = 3.0;
+        public static final double kPYController = 3.0;
         public static final double kPThetaController = 2;
     
         // Constraint for the motion profilied robot angle controller
@@ -308,7 +308,7 @@ public final class Constants {
          */
 
          public final static int proximalAbsoluteTicsCenter = 2770; // was 2727
-         public final static int distalAbsoluteTicsCenter = 1720;
+         public final static int distalAbsoluteTicsCenter = 1720;   // 1714
 
         /*
          ************************************************************************************************
@@ -316,8 +316,8 @@ public final class Constants {
          * **********************************************************************************************
          */
 
-         public final static int proximalEstimatedAutoAbsolute = proximalAbsoluteTicsCenter - 205; //  2509; // only used if we are not getting reasonable values from absolute encoder
-         public final static int distalEstimatedAutoAbsolute = distalAbsoluteTicsCenter + 206; //1996; // only used if we are not getting reasonable values from absolute encoder
+         public final static int proximalEstimatedAutoAbsolute = proximalAbsoluteTicsCenter - 205; //  2565; // only used if we are not getting reasonable values from absolute encoder
+         public final static int distalEstimatedAutoAbsolute = distalAbsoluteTicsCenter + 206; //1926; // only used if we are not getting reasonable values from absolute encoder
 
                  // bounds checking for absolute encoder values, work around for spotty values we are receiving
         // these first set of bounds are used when we don't know where the arm is and we mainly want to make sure that
@@ -368,7 +368,7 @@ public final class Constants {
         public final static double wristMaxRPM = 5700;
 
         // Wrist limits
-        public static final int WRIST_CURRENT_LIMIT = 20;
+        public static final int WRIST_CURRENT_LIMIT = 24;
 
         // Wrist Smart Motion Coefficients
         public final static double wristMaxVel = 2000;
@@ -377,7 +377,7 @@ public final class Constants {
         public final static double wristAllowedErr = 0;
 
          // Hand limits
-        public static final int INTAKE_CURRENT_LIMIT_A = 20;
+        public static final int INTAKE_CURRENT_LIMIT_A = 23;
         public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
         public static final int EJECT_CURRENT_LIMIT = 20;
         public static final double INTAKE_OUTPUT_POWER = 1.0;
@@ -411,7 +411,7 @@ public final class Constants {
         /**
          * PID Gains may have to be adjusted based on the responsiveness of control loop
          * 	                                    			  kP   kI    kD     kF             Iz    PeakOut */
-        public final static Gains kGains_MotProf = new Gains( 0.2, 0.0,  0.0, 1023.0/7200.0,  400,  1.00 ); /* measured 6800 velocity units at full motor output */
+        public final static Gains kGains_MotProf = new Gains( 0.25, 0.0,  0.0, 1023.0/15200.0,  400,  1.00 ); /* measured 6800 velocity units at full motor output */
         public final static int kPrimaryPIDSlot = 0; // any slot [0,3]
     }
 

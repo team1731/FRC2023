@@ -10,6 +10,7 @@ import frc.robot.Constants.OperatorConsoleConstants;
 public enum ArmSequence {
     READ_OPERATOR_ENTRY,
     SCORE_HIGH("DEPLOY_HIGH", OperatorConsoleConstants.kScoreHighSwitchId),
+    SCORE_HIGH_FIRST_AUTO,
     SCORE_MEDIUM("DEPLOY_MID", OperatorConsoleConstants.kScoreMediumSwitchId),
     SCORE_LOW("DEPLOY_LOW", -1), // no switch mapped to low
     PICKUP_HIGH,

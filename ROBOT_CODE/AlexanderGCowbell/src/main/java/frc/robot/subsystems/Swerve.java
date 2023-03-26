@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -173,4 +174,17 @@ public class Swerve extends SubsystemBase {
     public void setLockWheels(boolean b) {
         s_lockWheels = b;
     }
+
+    public void logPose(Pose2d pose) {
+      SmartDashboard.putNumber("PSwerveControllerCommand/targetposeX", pose.getX());
+      SmartDashboard.putNumber("PSwerveControllerCommand/targetposey", pose.getY());
+      SmartDashboard.putNumber("PSwerveControllerCommand/targetrot", pose.getRotation().getDegrees());
+    }
+    public void defaultLogError(Translation2d translationError, Rotation2d rotationError) {
+        SmartDashboard.putNumber("PPSwerveControllerCommand/xErrorMeters", translationError.getX());
+        SmartDashboard.putNumber("PPSwerveControllerCommand/yErrorMeters", translationError.getY());
+        SmartDashboard.putNumber(
+            "PPSwerveControllerCommand/rotationErrorDegrees", rotationError.getDegrees());
+      }
+ 
 }
