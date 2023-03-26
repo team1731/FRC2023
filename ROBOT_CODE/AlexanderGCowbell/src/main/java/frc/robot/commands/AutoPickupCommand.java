@@ -49,10 +49,10 @@ public class AutoPickupCommand extends CommandBase {
         else if (sequence == ArmSequence.PICKUP_DOWNED_CONE) {
             path = PickupFloorCone.getArmPath();
             movement = MovementType.PICKUP_DOWNED_CONE;
-            pickupTime = Timer.getFPGATimestamp();
     }
 
         if(path != null) {
+            pickupTime = Timer.getFPGATimestamp();
             stateMachine.pickup(path, movement, queuedTime);
         } else {
             isFinished = true;
@@ -64,7 +64,7 @@ public class AutoPickupCommand extends CommandBase {
     public void execute() {
         if(!started && stateMachine.getStatus() == Status.RUNNING) {
             started = true;
-        } else if((started && stateMachine.getStatus() == Status.READY) || (movement == MovementType.PICKUP_DOWNED_CONE  &&   Timer.getFPGATimestamp() - pickupTime > 4.0)) {
+        } else if((started && stateMachine.getStatus() == Status.READY) ||    Timer.getFPGATimestamp() - pickupTime > 4.0) {
             // has returned to a ready state, we are done
             isFinished = true;
         }
