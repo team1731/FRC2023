@@ -150,6 +150,7 @@ public class ArmStateMachine {
     System.out.println("ArmStateMachine: DISABLED!!!!!!!!!!!!!!!!!!!!!!!!!");
     resetState();
     currentArmState = ArmState.UNKNOWN;
+    queuedCommand = null; // clear out any queued commands from previous mode (e.g., autonomous)
     subsystem.allowArmManipulation();
   }
 
