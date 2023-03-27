@@ -9,7 +9,7 @@ public class PickupLowCube {
     public static final int kWristFlexIndex = 5;
     public static final double kWristFlexPosition = 0.30;
     public static final int kWristExtendIndex = 56;
-    public static final double kWristMaxVelocity = 3000;
+    public static final double kWristMaxVelocity = 2000;
 
     // Position (ticks)	Velocity (RPM)
 
