@@ -307,8 +307,8 @@ public final class Constants {
          * **********************************************************************************************
          */
 
-         public final static int proximalAbsoluteTicsCenter = 2770; // was 2727
-         public final static int distalAbsoluteTicsCenter = 1720;   // 1714
+         public final static int proximalAbsoluteTicsCenter = 2712; // was 2727
+         public final static int distalAbsoluteTicsCenter = 1562;   // 1714
 
         /*
          ************************************************************************************************
