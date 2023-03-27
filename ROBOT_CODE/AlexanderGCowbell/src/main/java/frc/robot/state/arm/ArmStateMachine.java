@@ -260,8 +260,10 @@ public class ArmStateMachine {
     }
   }
 
-  // NOTIFY THAT PICKUP/SCORE BUTTON RELEASED
-  public void buttonReleased(double queuedTime) {
+  // NOTIFY THAT CALLING COMMAND IS ENDING
+  // e.g., driver released button, auto command closing out
+  // should kick off a retraction
+  public void handleCommandEnding(double queuedTime) {
     if(queuedTime != currentPathQueuedTime) {
       if(queuedCommand != null && queuedTime == queuedCommand.queuedTime) {
         // if button is released before the queued command has been run then clear it out
@@ -745,6 +747,10 @@ public class ArmStateMachine {
 
   public MovementType getMovementType() {
     return movementType;
+  }
+
+  public double getCurrentPathQueuedTime() {
+    return currentPathQueuedTime;
   }
 
   public void setIsInAuto(boolean inAuto) {

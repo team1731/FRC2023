@@ -56,7 +56,7 @@ public class AutoScoreCommand extends CommandBase {
 
     @Override
     public void execute() {
-        if(!started && stateMachine.getStatus() == Status.RUNNING) {
+        if(!started && stateMachine.getStatus() == Status.RUNNING && stateMachine.getCurrentPathQueuedTime() == queuedTime) {
             started = true;
         } else if(started && stateMachine.getStatus() == Status.READY) {
             // has returned to a ready state, we are done
