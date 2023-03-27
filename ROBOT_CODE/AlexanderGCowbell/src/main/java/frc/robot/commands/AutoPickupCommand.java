@@ -62,7 +62,7 @@ public class AutoPickupCommand extends CommandBase {
 
     @Override
     public void execute() {
-        if(!started && stateMachine.getStatus() == Status.RUNNING) {
+        if(!started && stateMachine.getStatus() == Status.RUNNING && stateMachine.getCurrentPathQueuedTime() == queuedTime) {
             started = true;
         } else if((started && stateMachine.getStatus() == Status.READY) ||    Timer.getFPGATimestamp() - pickupTime > 3.0) {
             // has returned to a ready state, we are done
@@ -73,7 +73,7 @@ public class AutoPickupCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        stateMachine.buttonReleased(queuedTime);
+        stateMachine.handleCommandEnding(queuedTime);
         isFinished = true;
     }
 

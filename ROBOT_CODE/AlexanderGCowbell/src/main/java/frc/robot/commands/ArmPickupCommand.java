@@ -62,7 +62,7 @@ public class ArmPickupCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        stateMachine.buttonReleased(queuedTime);
+        stateMachine.handleCommandEnding(queuedTime);
         isFinished = true;
     }
     

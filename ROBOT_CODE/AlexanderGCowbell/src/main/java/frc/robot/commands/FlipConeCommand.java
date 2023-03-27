@@ -30,7 +30,7 @@ public class FlipConeCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        stateMachine.buttonReleased(queuedTime);
+        stateMachine.handleCommandEnding(queuedTime);
         stateMachine.setGamePiece(prevGamePiece);
         isFinished = true;
     }
