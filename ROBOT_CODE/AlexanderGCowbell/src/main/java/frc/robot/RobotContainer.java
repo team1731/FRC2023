@@ -205,25 +205,28 @@ public class RobotContainer {
 
 
   public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
-    switch(autoCode) {
+    switch (autoCode) {
       case AutoConstants.kDefault:
         return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
-      case AutoConstants.k_0_Example:
-        return new _0_exampleAuto(s_Swerve, s_poseEstimatorSubsystem);
       case AutoConstants.k_Program_1:
-        return new _Program_1(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+        return new _1_Charger_Mid_1pc(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_Program_2:
-        return isRedAlliance()? new _Program_2R(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine): new _Program_2(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+        return isRedAlliance() ? new _2_Feeder_3pc_Red(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine)
+            : new _2_Feeder_3pc_Blue(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_Program_3:
-        return isRedAlliance()? new _Program_3R(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine): new _Program_3(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+        return isRedAlliance() ? new _3_Cable_3pc_Red(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine)
+            : new _3_Cable_3pc_Blue(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_Program_4:
-        return new _Program_4(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+        return isRedAlliance() ? new _4_Feeder_2pc_Charger_Red(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine)
+            : new _4_Feeder_2pc_Charger_Blue(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_Program_5:
-        return new _Program_5(isRedAlliance, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+        return isRedAlliance() ? new _5_Charger_Mid_2pc_Red(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine)
+            : new _5_Charger_Mid_2pc_Blue(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_9_Move_Forward:
-				return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
-		}
-    System.err.println("FATAL: SELECTED AUTO MODE " + autoCode + " DOES NOT MAP TO A KNOWN AUTONOMOUS CLASS -- DOING NOTHING!!!!");
+        return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
+    }
+    System.err.println(
+        "FATAL: SELECTED AUTO MODE " + autoCode + " DOES NOT MAP TO A KNOWN AUTONOMOUS CLASS -- DOING NOTHING!!!!");
     return null;
   }
 

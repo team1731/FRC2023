@@ -28,7 +28,7 @@ import java.util.List;
 import com.pathplanner.lib.PathConstraints;
 
 public class PathPlannerCommandGroup extends SequentialCommandGroup {
-    public PathPlannerCommandGroup(String pathPlannerFile, boolean isRedAlliance, Swerve s_Swerve, PoseEstimatorSubsystem s_PoseEstimatorSubsystem, ArmStateMachine sm_ArmStateMachine, PathConstraints pathConstraints) {
+    public PathPlannerCommandGroup(String pathPlannerFile,  Swerve s_Swerve, PoseEstimatorSubsystem s_PoseEstimatorSubsystem, ArmStateMachine sm_ArmStateMachine, PathConstraints pathConstraints) {
 
         // This will load the file "FullAuto.path" and generate it with a max velocity of 4 m/s and a max acceleration of 3 m/s^2
         // for every path in the group
@@ -64,7 +64,7 @@ public class PathPlannerCommandGroup extends SequentialCommandGroup {
             new PIDConstants(Constants.AutoConstants.kPThetaController, 0.0, 0), //Constants.Swerve.angleKD), // PID constants to correct for rotation error (used to create the rotation controller)
             s_Swerve::setModuleStates, // Module states consumer used to output to the drive subsystem
             eventMap,
-            true, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
+            false, // Should the path be automatically mirrored depending on alliance color. Optional, defaults to true
             s_Swerve,
             s_PoseEstimatorSubsystem // The drive subsystem. Used to properly set the requirements of path following commands
         );

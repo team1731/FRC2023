@@ -123,7 +123,6 @@ public class Robot extends TimedRobot {
 	s_armSubSystem.resetArmEncoders();
 
 	autoChooser.setDefaultOption(AutoConstants.kDefault,             AutoConstants.kDefault);
-	autoChooser.addOption(       AutoConstants.k_0_Example,          AutoConstants.k_0_Example);
 	autoChooser.addOption(       AutoConstants.k_Program_1,          AutoConstants.k_Program_1);
 	autoChooser.addOption(       AutoConstants.k_Program_2,          AutoConstants.k_Program_2);
 	autoChooser.addOption(       AutoConstants.k_Program_3,          AutoConstants.k_Program_3);

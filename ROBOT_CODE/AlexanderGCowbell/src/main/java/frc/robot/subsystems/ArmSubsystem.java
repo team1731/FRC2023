@@ -221,6 +221,7 @@ public class ArmSubsystem extends SubsystemBase {
     public void initializeWrist() {
         wristMotor.restoreFactoryDefaults();
         wristMotor.setSmartCurrentLimit(ArmConstants.WRIST_CURRENT_LIMIT);
+        wristMotor.setIdleMode(IdleMode.kBrake);
         wristPIDController = wristMotor.getPIDController();
         wristEncoder = wristMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
@@ -273,7 +274,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void intake() {
         intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
-        intakeMotor.set((stateMachine.getGamePiece() == GamePiece.CONE)? 1.0 : -1.0);
+        intakeMotor.set((stateMachine.getGamePiece() == GamePiece.CONE)? 0.8: -0.7);
     }
 
     public void eject() {

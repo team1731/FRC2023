@@ -255,12 +255,11 @@ public final class Constants {
 
     public static final class AutoConstants {
         public static final String kDefault           = "_Default_Auto";
-        public static final String k_0_Example        = "_0_Example_Auto";
-        public static final String k_Program_1        = "1_ChargerMiddle";
-        public static final String k_Program_2        = "2_FeederSide";
-        public static final String k_Program_3        = "3_RailSide";
-        public static final String k_Program_4        = "4_Program_4";
-        public static final String k_Program_5        = "5_ChargerCube";
+        public static final String k_Program_1        = "1_Charger_Mid_1pc";
+        public static final String k_Program_2        = "2_Feeder_3pc";
+        public static final String k_Program_3        = "3_Cable_3pc";
+        public static final String k_Program_4        = "4_Feeder_2pc_Charger";
+        public static final String k_Program_5        = "5_Charge_Mid_2pc";
         public static final String k_9_Move_Forward   = "_9_Move_Forward";
         
 		public static final String kAutoCodeKey = "Auto Selector";
@@ -377,7 +376,7 @@ public final class Constants {
         public final static double wristAllowedErr = 0;
 
          // Hand limits
-        public static final int INTAKE_CURRENT_LIMIT_A = 23;
+        public static final int INTAKE_CURRENT_LIMIT_A = 18;
         public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
         public static final int EJECT_CURRENT_LIMIT = 20;
         public static final double INTAKE_OUTPUT_POWER = 1.0;
