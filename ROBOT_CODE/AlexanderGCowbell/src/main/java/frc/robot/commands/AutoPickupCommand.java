@@ -31,7 +31,7 @@ public class AutoPickupCommand extends CommandBase {
 	public void initialize() {
         isFinished = false;
         pickupTime = 0;
-        System.out.println("Starting the pickup..........................................................*****************************88");
+        System.out.println("AutoPickupCommand: Starting the pickup..........................................................*****************************88");
         stateMachine.setGamePiece(pieceType);
 
         // Queued time used to distinguish running path from queued path if both are present
@@ -50,15 +50,16 @@ public class AutoPickupCommand extends CommandBase {
         else if (sequence == ArmSequence.PICKUP_DOWNED_CONE) {
             path = PickupFloorCone.getArmPath();
             movement = MovementType.PICKUP_DOWNED_CONE;
-    }
+        }
 
         if(path != null) {
             pickupTime = Timer.getFPGATimestamp();
+            System.out.println("AutoPickupCommand: calling the state machine, queued time: " + queuedTime);
             stateMachine.pickup(path, movement, queuedTime);
         } else {
             isFinished = true;
         }
-        System.out.println("starting the pickup");
+        System.out.println("AutoPickupCommand: starting the pickup");
 	}
 
     @Override
@@ -74,6 +75,7 @@ public class AutoPickupCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
+        System.out.println("AutoPickupCommand: pickup is ending. Interrupted? " + interrupted);
         stateMachine.handleCommandEnding(queuedTime);
         isFinished = true;
     }
