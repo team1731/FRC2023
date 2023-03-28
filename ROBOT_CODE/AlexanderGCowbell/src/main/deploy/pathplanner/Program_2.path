@@ -104,22 +104,47 @@
     },
     {
       "anchorPoint": {
-        "x": 6.936603926875117,
-        "y": 3.3126210080684926
+        "x": 6.667005334010668,
+        "y": 3.771284088022722
       },
       "prevControl": {
-        "x": 6.600713803801978,
-        "y": 3.8557943819416667
+        "x": 6.545484464045317,
+        "y": 3.9364278343858885
       },
       "nextControl": {
-        "x": 6.600713803801978,
-        "y": 3.8557943819416667
+        "x": 6.8091116909506555,
+        "y": 3.5781651926940223
+      },
+      "holonomicAngle": -49.39870535499554,
+      "isReversal": false,
+      "velOverride": 0.5,
+      "isLocked": false,
+      "isStopPoint": false,
+      "stopEvent": {
+        "names": [],
+        "executionBehavior": "parallel",
+        "waitBehavior": "none",
+        "waitTime": 0
+      }
+    },
+    {
+      "anchorPoint": {
+        "x": 6.894739880388851,
+        "y": 3.488893250513774
+      },
+      "prevControl": {
+        "x": 6.749967521889834,
+        "y": 3.6495199895719765
+      },
+      "nextControl": {
+        "x": 6.749967521889834,
+        "y": 3.6495199895719765
       },
       "holonomicAngle": -50.66604368306299,
       "isReversal": true,
       "velOverride": null,
       "isLocked": false,
-      "isStopPoint": true,
+      "isStopPoint": false,
       "stopEvent": {
         "names": [
           "DisableVisionCorrectionCone"
@@ -195,7 +220,7 @@
       ]
     },
     {
-      "position": 1.6363636363636362,
+      "position": 1.5272727272727271,
       "names": [
         "ScoreCubeHigh",
         "EnableAprilTags"

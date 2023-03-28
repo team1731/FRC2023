@@ -30,6 +30,7 @@ public class AutoPickupCommand extends CommandBase {
     @Override
 	public void initialize() {
         isFinished = false;
+        pickupTime = 0;
         System.out.println("Starting the pickup..........................................................*****************************88");
         stateMachine.setGamePiece(pieceType);
 
@@ -64,7 +65,7 @@ public class AutoPickupCommand extends CommandBase {
     public void execute() {
         if(!started && stateMachine.getStatus() == Status.RUNNING && stateMachine.getCurrentPathQueuedTime() == queuedTime) {
             started = true;
-        } else if((started && stateMachine.getStatus() == Status.READY) ||    Timer.getFPGATimestamp() - pickupTime > 3.0) {
+        } else if((started && stateMachine.getStatus() == Status.READY) ||    Timer.getFPGATimestamp() - pickupTime > 4.0) {
             // has returned to a ready state, we are done
             isFinished = true;
         }

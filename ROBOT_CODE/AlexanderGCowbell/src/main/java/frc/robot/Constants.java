@@ -43,8 +43,8 @@ public final class Constants {
          * 2. Set the desired logMode (CSV, DATA_LOG)
          * 2. Set the desired loggers below = true
          */
-        public static final boolean loggingEnabled = true;    // note: must also turn on applicable loggers below
-        public static final boolean logNetworkTables = true;   // only applicable when logMode = DATA_LOG
+        public static final boolean loggingEnabled = false;    // note: must also turn on applicable loggers below
+        public static final boolean logNetworkTables = false;   // only applicable when logMode = DATA_LOG
         public static final LogMode logMode = LogMode.DATA_LOG;
 
         // list of loggers and enabled status, note: must also enable logging above
@@ -307,8 +307,8 @@ public final class Constants {
          * **********************************************************************************************
          */
 
-         public final static int proximalAbsoluteTicsCenter = 2712; // was 2727
-         public final static int distalAbsoluteTicsCenter = 1562;   // 1714
+         public final static int proximalAbsoluteTicsCenter = 2726; // was 2727
+         public final static int distalAbsoluteTicsCenter = 1493;   // 1714
 
         /*
          ************************************************************************************************
@@ -342,7 +342,7 @@ public final class Constants {
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
         public final static double distalHomePosition = 10300;
-        public final static double wristHomePosition = 0.57;
+        public final static double wristHomePosition = 0.54;
         public final static double intakeStartedVelocityThreshold = 1000;
         public final static double intakeHoldingVelocityThreshold = 60;
         public final static double wristResetPostionThreshold = 0.2;
