@@ -267,10 +267,13 @@ public class ArmStateMachine {
     if(queuedTime != currentPathQueuedTime) {
       if(queuedCommand != null && queuedTime == queuedCommand.queuedTime) {
         // if button is released before the queued command has been run then clear it out
+        System.out.println("ArmStateMachine: command canceled, clearing from the queue, queued time: " + queuedTime);
         queuedCommand = null;
       }
       return;
     }
+
+    System.out.println("ArmStateMachine: command ending/interrupted, queued time: " + queuedTime);
 
     if(currentArmState == ArmState.EXTENDED || isMostlyExtended()) {
       if(movementType == MovementType.SCORE && allowScore) {
@@ -493,17 +496,25 @@ public class ArmStateMachine {
      */
     if(!isInAuto && queuedCommand != null && queuedCommand.autoCommand) {
       // we are no longer in auto, this command no longer applies, clear the queued command
+      System.out.println("ArmStateMachine: auto command queued, but we are no longer in autonomous, clearing out, queued time: " + queuedCommand.queuedTime);
       queuedCommand = null;
     } else if(queuedCommand != null && isReadyToStartMovement()) {
+      System.out.println("ArmStateMachine: we have a queued command and we are ready to start movement");
       if((queuedCommand.type == MovementType.PICKUP || queuedCommand.type == MovementType.PICKUP_DOWNED_CONE) && queuedCommand.path != null) {
+        System.out.println("ArmStateMachine: loading queued arm pickup command, queued time: " + queuedCommand.queuedTime);
         pickup(queuedCommand.path, queuedCommand.type, queuedCommand.queuedTime);
         queuedCommand = null;
       } else if(queuedCommand.type == MovementType.PICKUP && queuedCommand.path == null) {
+        System.out.println("ArmStateMachine: loading queued wrist pickup command, queued time: " + queuedCommand.queuedTime);
         pickup(queuedCommand.wristFlexPosition, queuedCommand.queuedTime);
         queuedCommand = null;
       } else if(queuedCommand.type == MovementType.SCORE) {
+        System.out.println("ArmStateMachine: loading queued score command, queued time: " + queuedCommand.queuedTime);
         score(queuedCommand.path, queuedCommand.queuedTime);
         queuedCommand = null;
+      } else {
+        System.out.println("ArmStateMachine: we have a queued command, but it didn't match any of the normal criteria. Movement: " + 
+          queuedCommand.type + ", path null? " + (queuedCommand.path == null) + ", queued time: " + queuedCommand.queuedTime);
       }
     }
 
@@ -801,6 +812,7 @@ public class ArmStateMachine {
   private void setQueuedCommand(MovementType movementType, ArmPath path, double queuedTime) {
     if(isInAuto || isReturningToHome()) { // only allow queuing when: auto = anytime, teleop = when returning home
       // allow current queued command to be overwritten
+      System.out.println("ArmStateMachine: writing arm command to the queue, movement: " + movementType + " queued time: " + queuedTime);
       queuedCommand = new QueuedCommand(movementType, path, queuedTime);
     }
   }
@@ -808,6 +820,7 @@ public class ArmStateMachine {
   private void setQueuedCommand(MovementType movementType, double position, double queuedTime) {
     if(isInAuto || isReturningToHome()) { // only allow queuing when: auto = anytime, teleop = when returning home
       // allow current queued command to be overwritten
+      System.out.println("ArmStateMachine: writing wrist command to the queue, movement: " + movementType + " queued time: " + queuedTime);
       queuedCommand = new QueuedCommand(movementType, position, queuedTime);
     }
   }
