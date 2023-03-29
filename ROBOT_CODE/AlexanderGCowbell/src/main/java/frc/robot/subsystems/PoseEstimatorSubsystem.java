@@ -80,20 +80,20 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
 
     // Configure and map cameras using camera names and location on the robot
     if (photonCamera1 != null) {
-      MessageLog.add("PoseEstimatorSubsystem: Adding vision measurement from " + VisionConstants.kCameraMount1Id);
+      System.out.println("PoseEstimatorSubsystem: Adding vision measurement from " + VisionConstants.kCameraMount1Id);
       System.out.println(
           "PoseEstimatorSubsystem: Adding camera " + VisionConstants.kCameraMount1Id + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       this.cameraMap.put(VisionConstants.kCameraMount1Id, new CameraTransform(photonCamera1, CAMERA_TO_ROBOT_1));
     }
     if (photonCamera2 != null) {
-      MessageLog.add("PoseEstimatorSubsystem: Adding vision measurement from " + VisionConstants.kCameraMount2Id);
+      System.out.println("PoseEstimatorSubsystem: Adding vision measurement from " + VisionConstants.kCameraMount2Id);
       System.out.println(
           "PoseEstimatorSubsystem: Adding camera " + VisionConstants.kCameraMount2Id + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       this.cameraMap.put(VisionConstants.kCameraMount2Id, new CameraTransform(photonCamera2, CAMERA_TO_ROBOT_2));
     }
 
     if (photonCamera3 != null) {
-      MessageLog.add("PoseEstimatorSubsystem: Adding vision measurement from " + VisionConstants.kCameraMount3Id);
+      System.out.println("PoseEstimatorSubsystem: Adding vision measurement from " + VisionConstants.kCameraMount3Id);
       System.out.println(
           "PoseEstimatorSubsystem: Adding camera " + VisionConstants.kCameraMount3Id + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
       this.cameraMap.put(VisionConstants.kCameraMount3Id, new CameraTransform(photonCamera3, CAMERA_TO_ROBOT_3));
@@ -164,7 +164,7 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
             // ignore it. This should help filter out bad vision data.
              if(distanceBetweenPoseEstimations <
              VisionConstants.kMaxDistanceBetweenPoseEstimations) {
-            MessageLog.add("PoseEstimatorSubsystem: Adding vision measurement from " + cameraName);
+            System.out.println("PoseEstimatorSubsystem: Adding vision measurement from " + cameraName);
             field2d.getObject("MyRobot" + cameraName).setPose(cameraPose2d);
             SmartDashboard.putString("Vision pose", String.format("(%.2f, %.2f) %.2f",
                 cameraPose2d.getTranslation().getX(),

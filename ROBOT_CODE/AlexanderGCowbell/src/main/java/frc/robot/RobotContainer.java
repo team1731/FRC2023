@@ -209,7 +209,7 @@ public class RobotContainer {
       case AutoConstants.kDefault:
         return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
       case AutoConstants.k_Program_1:
-        return new _1_Charger_Mid_1pc(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+        return  isRedAlliance() ? new _1_Charger_Mid_1pc_Red(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine) : new _1_Charger_Mid_1pc_Blue(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
       case AutoConstants.k_Program_2:
         return isRedAlliance() ? new _2_Feeder_3pc_Red(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine)
             : new _2_Feeder_3pc_Blue(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
@@ -261,7 +261,7 @@ public class RobotContainer {
         System.out.println("\n\nSHOWING WHITE\n\n");
      }
      // delegate to FSM
-		 MessageLog.add("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
+		 System.out.println("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
 		}
 	}
 

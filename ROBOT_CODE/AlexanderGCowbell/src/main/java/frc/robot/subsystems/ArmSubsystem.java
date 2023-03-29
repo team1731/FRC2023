@@ -221,7 +221,7 @@ public class ArmSubsystem extends SubsystemBase {
     public void initializeWrist() {
         wristMotor.restoreFactoryDefaults();
         wristMotor.setSmartCurrentLimit(ArmConstants.WRIST_CURRENT_LIMIT);
-        wristMotor.setIdleMode(IdleMode.kBrake);
+        wristMotor.setIdleMode(LogWriter.isArmRecordingEnabled()? IdleMode.kCoast : IdleMode.kBrake);
         wristPIDController = wristMotor.getPIDController();
         wristEncoder = wristMotor.getAbsoluteEncoder(Type.kDutyCycle);
 
