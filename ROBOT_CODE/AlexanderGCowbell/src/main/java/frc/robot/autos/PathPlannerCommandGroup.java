@@ -50,8 +50,8 @@ public class PathPlannerCommandGroup extends SequentialCommandGroup {
         eventMap.put("DisableVisionCorrectionCube", new InstantCommand(() -> s_PoseEstimatorSubsystem.disableVisionCorrection()));
         eventMap.put("EnableVisionCorrectionCone", new InstantCommand(() -> s_PoseEstimatorSubsystem.enableVisionCorrection(GamePiece.CONE)));
         eventMap.put("DisableVisionCorrectionCone", new InstantCommand(() -> s_PoseEstimatorSubsystem.disableVisionCorrection()));
-        eventMap.put("EnableAprilTtags", new InstantCommand(() -> s_PoseEstimatorSubsystem.enableAprilTags(true)));
-        eventMap.put("DisableAprilTags", new InstantCommand(() -> s_PoseEstimatorSubsystem.enableAprilTags(false)));
+        eventMap.put("EnableAprilTags", new InstantCommand(() -> s_PoseEstimatorSubsystem.enableAprilTags(true)));
+        eventMap.put("DisableApriTags", new InstantCommand(() -> s_PoseEstimatorSubsystem.enableAprilTags(false)));
         eventMap.put("ScoreCubeHigh", new SequentialCommandGroup(new AutoCheckRemainingTime(), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CUBE)));
         //eventMap.put("intakeDown", new IntakeDown());
     
