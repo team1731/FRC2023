@@ -30,6 +30,7 @@ public class AutoPickupCommand extends CommandBase {
     @Override
 	public void initialize() {
         isFinished = false;
+        started = false;
         pickupTime = 0;
         System.out.println("AutoPickupCommand: Starting the pickup..........................................................*****************************88");
         stateMachine.setGamePiece(pieceType);
