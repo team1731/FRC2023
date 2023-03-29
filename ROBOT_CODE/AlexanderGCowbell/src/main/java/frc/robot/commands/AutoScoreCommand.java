@@ -25,6 +25,7 @@ public class AutoScoreCommand extends CommandBase {
     @Override
 	public void initialize() {
         isFinished = false;
+        started = false;
         stateMachine.setGamePiece(pieceType);
 
         // Queued time used to distinguish running path from queued path if both are present
