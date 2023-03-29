@@ -165,11 +165,12 @@ public class ArmSubsystem extends SubsystemBase {
         // Note: if disabled, the start call will automatically move the MP state to enabled
 
         proximalMPRunning = true;
+        System.out.println("Starting MotionProfile");
         proximalMotor.startMotionProfile(proximalBufferedStream, ArmConstants.minBufferedPoints, TalonFXControlMode.MotionProfile.toControlMode());
-
+        System.out.println("proximal##################" + proximalMotor.isMotionProfileFinished());
         distalMPRunning = true;
         distalMotor.startMotionProfile(distalBufferedStream, ArmConstants.minBufferedPoints, TalonFXControlMode.MotionProfile.toControlMode());
-
+        System.out.println("distal##################" + distalMotor.isMotionProfileFinished());
         stateMachine.startedPath();
     }
 
@@ -221,7 +222,7 @@ public class ArmSubsystem extends SubsystemBase {
     public void initializeWrist() {
         wristMotor.restoreFactoryDefaults();
         wristMotor.setSmartCurrentLimit(ArmConstants.WRIST_CURRENT_LIMIT);
-        wristMotor.setIdleMode(IdleMode.kBrake);
+        wristMotor.setIdleMode(LogWriter.isArmRecordingEnabled()? IdleMode.kCoast : IdleMode.kBrake);
         wristPIDController = wristMotor.getPIDController();
         wristEncoder = wristMotor.getAbsoluteEncoder(Type.kDutyCycle);
 

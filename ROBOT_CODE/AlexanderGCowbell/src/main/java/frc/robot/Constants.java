@@ -45,7 +45,7 @@ public final class Constants {
          */
         public static final boolean loggingEnabled = false;    // note: must also turn on applicable loggers below
         public static final boolean logNetworkTables = false;   // only applicable when logMode = DATA_LOG
-        public static final LogMode logMode = LogMode.DATA_LOG;
+        public static final LogMode logMode = LogMode.CSV;
 
         // list of loggers and enabled status, note: must also enable logging above
         public static final Map<Log, Boolean> loggers = Map.of(
@@ -306,8 +306,8 @@ public final class Constants {
          * **********************************************************************************************
          */
 
-         public final static int proximalAbsoluteTicsCenter = 2726; // was 2727
-         public final static int distalAbsoluteTicsCenter = 1493;   // 1714
+         public final static int proximalAbsoluteTicsCenter = 2727; // was 2727
+         public final static int distalAbsoluteTicsCenter = 1415;   // 1714
 
         /*
          ************************************************************************************************
