@@ -28,12 +28,18 @@ import java.util.List;
 import com.pathplanner.lib.PathConstraints;
 
 public class PathPlannerCommandGroup extends SequentialCommandGroup {
-    public PathPlannerCommandGroup(String pathPlannerFile,  Swerve s_Swerve, PoseEstimatorSubsystem s_PoseEstimatorSubsystem, ArmStateMachine sm_ArmStateMachine, PathConstraints pathConstraints) {
+    private String pathName;
 
-        // This will load the file "FullAuto.path" and generate it with a max velocity of 4 m/s and a max acceleration of 3 m/s^2
+    public String toString(){
+        return getClass().getSimpleName() + ": =====>>> " + pathName + " <<<=====";
+    }
+
+    public PathPlannerCommandGroup(String pathPlannerFile,  Swerve s_Swerve, PoseEstimatorSubsystem s_PoseEstimatorSubsystem, ArmStateMachine sm_ArmStateMachine, double maxVelocity, double maxAcceleration) {
+        pathName = pathPlannerFile;
+        // This will load the file pathPlannerFile and generate it with a max velocity of 4 m/s and a max acceleration of 3 m/s^2
         // for every path in the group
       //  PathConstraints pathConstraints = new PathConstraints(4, 2.0); //Constants.AutoConstants.kMaxSpeedMetersPerSecond, Constants.AutoConstants.kMaxAccelerationMetersPerSecondSquared);
-        List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(pathPlannerFile, pathConstraints); // "A1"
+        List<PathPlannerTrajectory> pathGroup = PathPlanner.loadPathGroup(pathPlannerFile, new PathConstraints(maxVelocity, maxAcceleration)); // "A1"
     
         // This is just an example event map. It would be better to have a constant, global event map
         // in your code that will be used by all path following commands.
@@ -70,6 +76,7 @@ public class PathPlannerCommandGroup extends SequentialCommandGroup {
         );
     
         Command fullAuto = autoBuilder.fullAuto(pathGroup);
+        System.out.println("PathPlannerCommandGroup: pathPlannerFile '" + pathPlannerFile + "' has been planned.");
         addCommands(fullAuto);
     }
 }

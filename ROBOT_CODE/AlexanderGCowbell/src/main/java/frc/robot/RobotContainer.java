@@ -4,7 +4,12 @@
 
 package frc.robot;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
@@ -80,6 +85,9 @@ public class RobotContainer {
   private ArmSubsystem s_armSubSystem;
   private ArmStateMachine sm_armStateMachine;
   private final LEDStringSubsystem m_ledstring;
+
+  /* Auto Paths */
+  private static List<String> autoPaths;
 
   private GamePiece storedPiece; // used to temporarily store game piece setting when using cone flip feature
 
@@ -204,30 +212,53 @@ public class RobotContainer {
   }
 
 
-  public Command getNamedAutonomousCommand(String autoCode, boolean isRedAlliance) {
-    switch (autoCode) {
-      case AutoConstants.kDefault:
-        return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
-      case AutoConstants.k_Program_1:
-        return  isRedAlliance() ? new _1_Charger_Mid_1pc_Red(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine) : new _1_Charger_Mid_1pc_Blue(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_Program_2:
-        return isRedAlliance() ? new _2_Feeder_3pc_Red(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine)
-            : new _2_Feeder_3pc_Blue(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_Program_3:
-        return isRedAlliance() ? new _3_Cable_3pc_Red(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine)
-            : new _3_Cable_3pc_Blue(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_Program_4:
-        return isRedAlliance() ? new _4_Feeder_2pc_Charger_Red(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine)
-            : new _4_Feeder_2pc_Charger_Blue(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_Program_5:
-        return isRedAlliance() ? new _5_Charger_Mid_2pc_Red(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine)
-            : new _5_Charger_Mid_2pc_Blue(s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
-      case AutoConstants.k_9_Move_Forward:
-        return new _9_Move_Forward(s_Swerve, s_poseEstimatorSubsystem);
+  public static String[] deriveAutoModes() {
+    List<String> autoModes = new ArrayList<String>();
+    autoPaths = findPaths(new File(Filesystem.getLaunchDirectory(), "src/main/deploy/pathplanner"));
+    for(String autoPath : autoPaths){
+      String autoName = autoPath.substring(0, autoPath.length() - (5 + (autoPath.contains("Red") ? 3 : 4)));
+      if(!autoModes.contains(autoName)){
+        autoModes.add(autoName);
+      }
     }
-    System.err.println(
-        "FATAL: SELECTED AUTO MODE " + autoCode + " DOES NOT MAP TO A KNOWN AUTONOMOUS CLASS -- DOING NOTHING!!!!");
-    return null;
+    return autoModes.toArray(String[]::new);
+  }
+
+  private static List<String> findPaths(File directory){
+    List<String> paths = new ArrayList<String>();
+    assert directory.exists() : "FATAL: path directory not found! " + directory.getAbsolutePath();
+    File[] files = directory.listFiles();
+    for (File file : files) {
+        String fileName = file.getName();
+        if (fileName.startsWith("_") && fileName.endsWith(".path")) {
+          System.out.println(file.getAbsolutePath());
+          if(!paths.contains(fileName)){
+            paths.add(fileName);
+          }
+        }
+    }
+    return paths;
+  }
+
+  public Command getNamedAutonomousCommand(String autoName, boolean isRedAlliance) {
+    String alliancePathName = autoName + (isRedAlliance ? "Red" : "Blue");
+    assert autoPaths.contains(alliancePathName): "ERROR: no such auto path name found in src/main/deploy/pathplanner: " + alliancePathName;
+    double maxVelocity     = 4.0;
+    double maxAcceleration = 2.0;
+    switch(alliancePathName){
+      case "_1_Charger_Mid_1pc_Blue":    maxVelocity = 3.0; maxAcceleration = 1.5; break;
+      case "_1_Charger_Mid_1pc_Red":     maxVelocity = 2.5; maxAcceleration = 1.0; break;
+      case "_2_Feeder_3pc_Blue":         maxVelocity = 3.0; maxAcceleration = 1.8; break;
+      case "_2_Feeder_3pc_Red":          maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_3_Cable_3pc_Blue":          maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_3_Cable_3pc_Red":           maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_4_Feeder_2pc_Charger_Blue": maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_4_Feeder_2pc_Charger_Red":  maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_5_Charger_Mid_2pc_Blue":    maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_5_Charger_Mid_2pc_Red":     maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      default: assert false: "WARNING: USING DEFAULT MAX VELOCITY AND MAX ACCELERATION FOR AUTO MODE: " + alliancePathName;
+    }
+    return new PathPlannerCommandGroup(alliancePathName, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine, maxVelocity, maxAcceleration);
   }
 
 

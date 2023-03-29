@@ -254,15 +254,9 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final String kDefault           = "_Default_Auto";
-        public static final String k_Program_1        = "1_Charger_Mid_1pc";
-        public static final String k_Program_2        = "2_Feeder_3pc";
-        public static final String k_Program_3        = "3_Cable_3pc";
-        public static final String k_Program_4        = "4_Feeder_2pc_Charger";
-        public static final String k_Program_5        = "5_Charge_Mid_2pc";
-        public static final String k_9_Move_Forward   = "_9_Move_Forward";
-        
-		public static final String kAutoCodeKey = "Auto Selector";
+        public static final String kAutoDefault = "_2_Feeder_3pc_";
+    	public static final String kAutoCodeKey = "Auto Selector";
+
         public static final double kMaxSpeedMetersPerSecond = 0.5; // disabled for testing = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 0.5; // disabled for testing = 3;
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;

@@ -46,7 +46,7 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   private Command m_autonomousCommand;
   private final SendableChooser<String> autoChooser = new SendableChooser<>();
-  private String autoCode = AutoConstants.kDefault;
+  private String autoCode;
   private String oldKeypadEntry = "";
   private String currentKeypadCommand = "";
   private NetworkTable keypad;
@@ -98,7 +98,7 @@ public class Robot extends TimedRobot {
 	System.out.println("\n\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  EVENT: " + DriverStation.getEventName() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
 	LiveWindow.disableAllTelemetry();
-    ctreConfigs = new CTREConfigs();
+        ctreConfigs = new CTREConfigs();
 	PortForwarder.add(5800, "10.17.31.11", 5800);
 	PortForwarder.add(5801, "10.17.31.11", 5801);
 	PortForwarder.add(5802, "10.17.31.11", 5802);
@@ -122,13 +122,10 @@ public class Robot extends TimedRobot {
 	initSubsystems();
 	s_armSubSystem.resetArmEncoders();
 
-	autoChooser.setDefaultOption(AutoConstants.kDefault,             AutoConstants.kDefault);
-	autoChooser.addOption(       AutoConstants.k_Program_1,          AutoConstants.k_Program_1);
-	autoChooser.addOption(       AutoConstants.k_Program_2,          AutoConstants.k_Program_2);
-	autoChooser.addOption(       AutoConstants.k_Program_3,          AutoConstants.k_Program_3);
-	autoChooser.addOption(       AutoConstants.k_Program_4,          AutoConstants.k_Program_4);
-	autoChooser.addOption(       AutoConstants.k_Program_5,          AutoConstants.k_Program_5);
-	autoChooser.addOption(       AutoConstants.k_9_Move_Forward,     AutoConstants.k_9_Move_Forward);
+	String[] autoModes = RobotContainer.deriveAutoModes();
+	for(String autoMode: autoModes){
+		autoChooser.addOption(autoMode, autoMode);
+	}
     SmartDashboard.putData(AutoConstants.kAutoCodeKey, autoChooser);
 	SmartDashboard.putString("Build Info - Branch", "N/A");
 	SmartDashboard.putString("Build Info - Commit Hash", "N/A");
@@ -197,24 +194,19 @@ public class Robot extends TimedRobot {
 	m_autonomousCommand = null;
 
 	String useCode = autoChooser.getSelected();
-
-  
-
-	if(useCode == null) {
-        System.out.println("\nNULL AUTO CODE : DEFAULTING TO " + AutoConstants.kDefault);
-		autoCode = AutoConstants.kDefault;
+	if(useCode == null){
+		useCode = (autoCode == null ? Constants.AutoConstants.kAutoDefault : autoCode);
+	}
+	System.out.println("\nPreloading AUTO CODE --> " + useCode);
+	m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);
+	if(m_autonomousCommand != null){
+		autoCode = useCode;
+		System.out.println("\n=====>>> PRELOADED AUTONOMOUS COMMAND: " + m_autonomousCommand);
 	}
 	else{
-		System.out.println("\nPreloading AUTO CODE --> " + useCode);
-		m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);
-		if(m_autonomousCommand != null){
-			autoCode = useCode;
-			System.out.println("\n=====>>> PRELOADED AUTONOMOUS ROUTINE: " + m_autonomousCommand.getClass().getName() + " " + (isRedAlliance?"RED":"BLUE") + " <<<=====");
-		}
-		else{
-			System.out.println("\nAUTO CODE " + useCode + " IS NOT IMPLEMENTED -- STAYING WITH AUTO CODE " + autoCode);
-		}
+		System.out.println("\nAUTO CODE " + useCode + " IS NOT IMPLEMENTED -- STAYING WITH AUTO CODE " + autoCode);
 	}
+
     System.out.println("\nAUTO CODE being used by the software --> " + autoCode + "\n");
   }
 
@@ -301,6 +293,7 @@ public class Robot extends TimedRobot {
 	}
 
 	String newCode = autoChooser.getSelected();
+	if(newCode == null) newCode = Constants.AutoConstants.kAutoDefault;
 	if(!newCode.equals(autoCode)) {
         System.out.println("New Auto Code read from dashboard. OLD: " + autoCode + ", NEW: " + newCode);
 		autoInitPreload();
@@ -345,7 +338,13 @@ public class Robot extends TimedRobot {
 		sm_armStateMachine.setIntakeHolding();
 		// If for some reason the velcro does not hold up the hand and it falls before auto starts, need to wait a half second for the wrist to lift before starting the auto
 		if (s_armSubSystem.getWristPosition() < 0.4) {
-			m_autonomousCommand.beforeStarting(new WaitCommand(0.5));
+			// TODO FIXME:
+			// TODO FIXME: this results in a stacktrace in the simulator ---- not sure what happens if Robot.isReal():
+			// TODO FIXME: Unhandled exception: java.lang.IllegalArgumentException: Commands that have been composed may not be added to another composition or scheduled individually!
+			// TODO FIXME: 
+			if(Robot.isReal()){
+				m_autonomousCommand.beforeStarting(new WaitCommand(0.5));
+			}
 		}
 		m_autonomousCommand.schedule();
 	}
