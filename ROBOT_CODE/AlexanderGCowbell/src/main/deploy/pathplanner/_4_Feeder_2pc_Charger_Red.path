@@ -127,5 +127,24 @@
       }
     }
   ],
-  "markers": []
+   "markers": [
+    {
+      "position": 0.5454545454545454,
+      "names": [
+        "StartIntakeCube"
+      ]
+    },
+    {
+      "position": 0.690909090909091,
+      "names": [
+        "EnableVisionCorrectionCube"
+      ]
+    },
+    {
+      "position": 1.4181818181818184,
+      "names": [
+        "ScoreCubeHigh"
+      ]
+    }
+  ]
 }

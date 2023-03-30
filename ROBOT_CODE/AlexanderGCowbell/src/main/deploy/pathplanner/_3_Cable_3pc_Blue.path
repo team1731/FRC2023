@@ -216,7 +216,7 @@
         "x": 2.0363268436733652,
         "y": 0.7604622784461056
       },
-      "holonomicAngle": -1.169139327907473,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": 0.5,
       "isLocked": false,
@@ -267,14 +267,12 @@
     {
       "position": 2.6999999999999997,
       "names": [
-        "ScoreCubeHigh",
-        "EnableAprilTags"
+        "ScoreCubeHigh"
       ]
     },
     {
       "position": 4.9909090909090885,
       "names": [
-        "DisableAprilTags",
         "StartIntakeCone"
       ]
     },
