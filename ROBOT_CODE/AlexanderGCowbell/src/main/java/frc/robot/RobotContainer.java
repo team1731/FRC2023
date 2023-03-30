@@ -150,9 +150,9 @@ public class RobotContainer {
     }
 
     // TRIGGERS - PICKUP LOW AND PICKUP DOWNED CONE
-    kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDisatalAxis));
+    kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDistalAxis));
    // kRightTrigger.whileTrue(new FlipConeCommand(sm_armStateMachine));
-    kRightTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_DOWNED_CONE, operator, kDisatalAxis));
+    kRightTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_DOWNED_CONE, operator, kDistalAxis));
 
     
     /*
