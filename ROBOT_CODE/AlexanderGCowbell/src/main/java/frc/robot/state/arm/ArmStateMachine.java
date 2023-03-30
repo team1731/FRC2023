@@ -260,15 +260,20 @@ public class ArmStateMachine {
     }
   }
 
-  // NOTIFY THAT PICKUP/SCORE BUTTON RELEASED
-  public void buttonReleased(double queuedTime) {
+  // NOTIFY THAT CALLING COMMAND IS ENDING
+  // e.g., driver released button, auto command closing out
+  // should kick off a retraction
+  public void handleCommandEnding(double queuedTime) {
     if(queuedTime != currentPathQueuedTime) {
       if(queuedCommand != null && queuedTime == queuedCommand.queuedTime) {
         // if button is released before the queued command has been run then clear it out
+        System.out.println("ArmStateMachine: command canceled, clearing from the queue, queued time: " + queuedTime);
         queuedCommand = null;
       }
       return;
     }
+
+    System.out.println("ArmStateMachine: command ending/interrupted, queued time: " + queuedTime);
 
     if(currentArmState == ArmState.EXTENDED || isMostlyExtended()) {
       if(movementType == MovementType.SCORE && allowScore) {
@@ -308,8 +313,9 @@ public class ArmStateMachine {
   private void initiateRetraction() {
     if(currentArmState == ArmState.EXTENDED) {
       transitionArm(Input.RETRACT);
-    } else {
-      // we are initiating a midstream retraction
+    } else if(isInInterruptibleArmState()) { // if NOT interruptible ignore this request
+      // it IS interruptible, likely the arm is still in the middle of an extension
+      // ensure the arm is stopped, then process interruption
       subsystem.stopArm();
       transitionArm(Input.INTERRUPT);
     }
@@ -490,17 +496,25 @@ public class ArmStateMachine {
      */
     if(!isInAuto && queuedCommand != null && queuedCommand.autoCommand) {
       // we are no longer in auto, this command no longer applies, clear the queued command
+      System.out.println("ArmStateMachine: auto command queued, but we are no longer in autonomous, clearing out, queued time: " + queuedCommand.queuedTime);
       queuedCommand = null;
     } else if(queuedCommand != null && isReadyToStartMovement()) {
+      System.out.println("ArmStateMachine: we have a queued command and we are ready to start movement");
       if((queuedCommand.type == MovementType.PICKUP || queuedCommand.type == MovementType.PICKUP_DOWNED_CONE) && queuedCommand.path != null) {
+        System.out.println("ArmStateMachine: loading queued arm pickup command, queued time: " + queuedCommand.queuedTime);
         pickup(queuedCommand.path, queuedCommand.type, queuedCommand.queuedTime);
         queuedCommand = null;
       } else if(queuedCommand.type == MovementType.PICKUP && queuedCommand.path == null) {
+        System.out.println("ArmStateMachine: loading queued wrist pickup command, queued time: " + queuedCommand.queuedTime);
         pickup(queuedCommand.wristFlexPosition, queuedCommand.queuedTime);
         queuedCommand = null;
       } else if(queuedCommand.type == MovementType.SCORE) {
+        System.out.println("ArmStateMachine: loading queued score command, queued time: " + queuedCommand.queuedTime);
         score(queuedCommand.path, queuedCommand.queuedTime);
         queuedCommand = null;
+      } else {
+        System.out.println("ArmStateMachine: we have a queued command, but it didn't match any of the normal criteria. Movement: " + 
+          queuedCommand.type + ", path null? " + (queuedCommand.path == null) + ", queued time: " + queuedCommand.queuedTime);
       }
     }
 
@@ -661,6 +675,14 @@ public class ArmStateMachine {
     }
   }
 
+  private boolean isInInterruptibleArmState() {
+    ArmState prevState = currentArmState;
+    ArmState newState = currentArmState.next(Input.INTERRUPT);
+    boolean isInterruptible = (prevState != newState); // if they are equal the state transition is invalid
+    System.out.println("ArmStateMachine: interruptible condition check. The current arm state " + currentArmState + " " + (isInterruptible? "is" : "is not") + " interruptible");
+    return isInterruptible;
+  }
+
   private void transitionIntake(Input input) {
     IntakeState prevState = currentIntakeState;
     IntakeState newState = currentIntakeState.next(input);
@@ -738,6 +760,10 @@ public class ArmStateMachine {
     return movementType;
   }
 
+  public double getCurrentPathQueuedTime() {
+    return currentPathQueuedTime;
+  }
+
   public void setIsInAuto(boolean inAuto) {
     System.out.println("ArmStateMachine: Setting utonomous mode " + inAuto + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     isInAuto = inAuto;
@@ -786,6 +812,7 @@ public class ArmStateMachine {
   private void setQueuedCommand(MovementType movementType, ArmPath path, double queuedTime) {
     if(isInAuto || isReturningToHome()) { // only allow queuing when: auto = anytime, teleop = when returning home
       // allow current queued command to be overwritten
+      System.out.println("ArmStateMachine: writing arm command to the queue, movement: " + movementType + " queued time: " + queuedTime);
       queuedCommand = new QueuedCommand(movementType, path, queuedTime);
     }
   }
@@ -793,6 +820,7 @@ public class ArmStateMachine {
   private void setQueuedCommand(MovementType movementType, double position, double queuedTime) {
     if(isInAuto || isReturningToHome()) { // only allow queuing when: auto = anytime, teleop = when returning home
       // allow current queued command to be overwritten
+      System.out.println("ArmStateMachine: writing wrist command to the queue, movement: " + movementType + " queued time: " + queuedTime);
       queuedCommand = new QueuedCommand(movementType, position, queuedTime);
     }
   }

@@ -25,6 +25,7 @@ public class AutoScoreCommand extends CommandBase {
     @Override
 	public void initialize() {
         isFinished = false;
+        started = false;
         stateMachine.setGamePiece(pieceType);
 
         // Queued time used to distinguish running path from queued path if both are present
@@ -43,6 +44,8 @@ public class AutoScoreCommand extends CommandBase {
             path = ScoreLowCone.getArmPath();
         } else if(sequence == ArmSequence.SCORE_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
             path = ScoreLowCube.getArmPath();
+        } else if(sequence == ArmSequence.SCORE_HIGH_FIRST_AUTO && stateMachine.getGamePiece() == GamePiece.CONE) {
+            path = ScoreHighConeFirstAuto.getArmPath();
         }
 
         if(path != null) {
@@ -54,7 +57,7 @@ public class AutoScoreCommand extends CommandBase {
 
     @Override
     public void execute() {
-        if(!started && stateMachine.getStatus() == Status.RUNNING) {
+        if(!started && stateMachine.getStatus() == Status.RUNNING && stateMachine.getCurrentPathQueuedTime() == queuedTime) {
             started = true;
         } else if(started && stateMachine.getStatus() == Status.READY) {
             // has returned to a ready state, we are done

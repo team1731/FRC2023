@@ -8,6 +8,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+import com.pathplanner.lib.commands.PPSwerveControllerCommand;
+
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.net.PortForwarder;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -20,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.LogConstants;
@@ -41,7 +46,7 @@ public class Robot extends TimedRobot {
   private RobotContainer m_robotContainer;
   private Command m_autonomousCommand;
   private final SendableChooser<String> autoChooser = new SendableChooser<>();
-  private String autoCode = AutoConstants.kDefault;
+  private String autoCode;
   private String oldKeypadEntry = "";
   private String currentKeypadCommand = "";
   private NetworkTable keypad;
@@ -93,7 +98,7 @@ public class Robot extends TimedRobot {
 	System.out.println("\n\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  EVENT: " + DriverStation.getEventName() + " <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n\n");
 
 	LiveWindow.disableAllTelemetry();
-    ctreConfigs = new CTREConfigs();
+        ctreConfigs = new CTREConfigs();
 	PortForwarder.add(5800, "10.17.31.11", 5800);
 	PortForwarder.add(5801, "10.17.31.11", 5801);
 	PortForwarder.add(5802, "10.17.31.11", 5802);
@@ -103,6 +108,7 @@ public class Robot extends TimedRobot {
 
 	s_Swerve = new Swerve();
   	s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);
+	s_poseEstimatorSubsystem.setCurrentPose(new Pose2d(1.88,5.01,new Rotation2d()));
   	s_armSubSystem = new ArmSubsystem();
 	sm_armStateMachine = s_armSubSystem.getStateMachine();
 	m_ledstring = new LEDStringSubsystem();
@@ -110,6 +116,8 @@ public class Robot extends TimedRobot {
 	// Instantiate our robot container. This will perform all of our button bindings,
 	// and put our autonomous chooser on the dashboard
 	m_robotContainer = new RobotContainer(s_Swerve, s_poseEstimatorSubsystem, s_armSubSystem, m_ledstring);
+
+	PPSwerveControllerCommand.setLoggingCallbacks(null, s_Swerve::logPose, null, s_Swerve::defaultLogError);
 
 	initSubsystems();
 	s_armSubSystem.resetArmEncoders();
@@ -186,17 +194,14 @@ public class Robot extends TimedRobot {
 	m_autonomousCommand = null;
 
 	String useCode = autoChooser.getSelected();
-
-	if(useCode == null) {
-        System.out.println("\nNULL AUTO CODE : DEFAULTING TO " + AutoConstants.kDefault);
-		useCode = AutoConstants.kDefault;
+	if(useCode == null){
+		useCode = (autoCode == null ? Constants.AutoConstants.kAutoDefault : autoCode);
 	}
-
 	System.out.println("\nPreloading AUTO CODE --> " + useCode);
 	m_autonomousCommand = m_robotContainer.getNamedAutonomousCommand(useCode, isRedAlliance);
 	if(m_autonomousCommand != null){
 		autoCode = useCode;
-		System.out.println("\n=====>>> PRELOADED AUTONOMOUS COMMAND: " + m_autonomousCommand + " " + (isRedAlliance?"RED":"BLUE") + " <<<=====");
+		System.out.println("\n=====>>> PRELOADED AUTONOMOUS COMMAND: " + m_autonomousCommand);
 	}
 	else{
 		System.out.println("\nAUTO CODE " + useCode + " IS NOT IMPLEMENTED -- STAYING WITH AUTO CODE " + autoCode);
@@ -288,7 +293,8 @@ public class Robot extends TimedRobot {
 	}
 
 	String newCode = autoChooser.getSelected();
-	if(newCode == null || !newCode.equals(autoCode)) {
+	if(newCode == null) newCode = Constants.AutoConstants.kAutoDefault;
+	if(!newCode.equals(autoCode)) {
         System.out.println("New Auto Code read from dashboard. OLD: " + autoCode + ", NEW: " + newCode);
 		autoInitPreload();
 	}
@@ -321,7 +327,7 @@ public class Robot extends TimedRobot {
 	s_armSubSystem.resetArmEncodersForAuto();
 
 	if(m_autonomousCommand == null) {
-		System.err.println("SOMETHING WENT WRONG - UNABLE TO RUN AUTONOMOUS! CHECK SOFTWARE!");
+		System.out.println("SOMETHING WENT WRONG - UNABLE TO RUN AUTONOMOUS! CHECK SOFTWARE!");
 	} else {
         System.out.println("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand + " <----------");
 		m_robotContainer.zeroHeading();
@@ -330,6 +336,10 @@ public class Robot extends TimedRobot {
 		sm_armStateMachine.initializeArm();
 		sm_armStateMachine.setGamePiece(GamePiece.CONE);
 		sm_armStateMachine.setIntakeHolding();
+		// If for some reason the velcro does not hold up the hand and it falls before auto starts, need to wait a half second for the wrist to lift before starting the auto
+		if (s_armSubSystem.getWristPosition() < 0.4) {
+			m_autonomousCommand = m_autonomousCommand.beforeStarting(new WaitCommand(0.5));
+		}
 		m_autonomousCommand.schedule();
 	}
     System.out.println("autonomousInit: End");

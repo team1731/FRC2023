@@ -2,49 +2,50 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.829923568938047,
-        "y": 5.046597547740551
+        "x": 14.61949569353684,
+        "y": 5.064816311450805
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.945487465148974,
-        "y": 5.086648535421882
+        "x": 11.739920684427476,
+        "y": 4.851699145258755
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 180.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ScoreConeHigh"
+          "ScoreConeHigh",
+          "EnableAprilTtags"
         ],
         "executionBehavior": "parallelDeadline",
         "waitBehavior": "deadline",
-        "waitTime": 3.0
+        "waitTime": 1.5
       }
     },
     {
       "anchorPoint": {
-        "x": 7.423084027986238,
-        "y": 4.88
+        "x": 9.532207400729648,
+        "y": 4.58891221896934
       },
       "prevControl": {
-        "x": 5.190144763766515,
-        "y": 4.665204360943768
+        "x": 11.253880571348715,
+        "y": 4.58891221896934
       },
       "nextControl": {
-        "x": 5.190144763766515,
-        "y": 4.665204360943768
+        "x": 11.253880571348715,
+        "y": 4.58891221896934
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 180.0,
       "isReversal": true,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "AutoWaitForGamePiece"
+          "DisableVisionCorrectionCube"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -53,46 +54,43 @@
     },
     {
       "anchorPoint": {
-        "x": 1.8390329507931746,
-        "y": 4.21
+        "x": 14.628605075391967,
+        "y": 4.445378345302146
       },
       "prevControl": {
-        "x": 3.3017487205896523,
-        "y": 4.9270175342139595
+        "x": 13.945401436257416,
+        "y": 4.5820190731290555
       },
       "nextControl": {
-        "x": 3.3017487205896523,
-        "y": 4.9270175342139595
+        "x": 13.945401436257416,
+        "y": 4.5820190731290555
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": 179.84394346175213,
       "isReversal": true,
       "velOverride": null,
       "isLocked": false,
-      "isStopPoint": true,
+      "isStopPoint": false,
       "stopEvent": {
-        "names": [
-          "ScoreCubeHigh",
-          "AutoScoreHighWait"
-        ],
-        "executionBehavior": "parallelDeadline",
-        "waitBehavior": "deadline",
+        "names": [],
+        "executionBehavior": "sequential",
+        "waitBehavior": "none",
         "waitTime": 3.0
       }
     },
     {
       "anchorPoint": {
-        "x": 4.653831944027524,
-        "y": 4.618456600549566
+        "x": 13.936292054402289,
+        "y": 3.361361904541991
       },
       "prevControl": {
-        "x": 3.4765756295201795,
-        "y": 4.602255825579281
+        "x": 14.885791284595543,
+        "y": 3.355196325125152
       },
       "nextControl": {
-        "x": 6.639677188445286,
-        "y": 4.6457847461149475
+        "x": 12.53344724871268,
+        "y": 3.3704712863971182
       },
-      "holonomicAngle": 0,
+      "holonomicAngle": -178.95837332399003,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -106,22 +104,22 @@
     },
     {
       "anchorPoint": {
-        "x": 7.524558304930563,
-        "y": 3.6137683724383556
+        "x": 12.18729073821784,
+        "y": 3.288486849700973
       },
       "prevControl": {
-        "x": 5.323591504395563,
-        "y": 3.3774133197965543
+        "x": 12.81143820589804,
+        "y": 3.3378632844434346
       },
       "nextControl": null,
-      "holonomicAngle": 0,
+      "holonomicAngle": 179.59507130573587,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "AutoWaitForGamePiece"
+          "AutoBalanceSwerve"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -129,22 +127,5 @@
       }
     }
   ],
-  "maxVelocity": null,
-  "maxAcceleration": 1.5,
-  "isReversed": null,
-  "markers": [
-    {
-      "position": 0.5818181818181816,
-      "names": [
-        "StartIntakeCube"
-      ]
-    },
-    {
-      "position": 3.3745454545452667,
-      "names": [
-        "event",
-        "StartIntakeCone"
-      ]
-    }
-  ]
+  "markers": []
 }

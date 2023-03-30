@@ -150,9 +150,9 @@ public class RobotContainer {
     }
 
     // TRIGGERS - PICKUP LOW AND PICKUP DOWNED CONE
-    kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDistalAxis));
-    kRightTrigger.whileTrue(new FlipConeCommand(sm_armStateMachine));
-    //kRightTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_DOWNED_CONE, operator, kDistalAxis));
+    kLeftTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_LOW, operator, kDisatalAxis));
+   // kRightTrigger.whileTrue(new FlipConeCommand(sm_armStateMachine));
+    kRightTrigger.whileTrue(new ArmPickupCommand(sm_armStateMachine, ArmSequence.PICKUP_DOWNED_CONE, operator, kDisatalAxis));
 
     
     /*
@@ -214,8 +214,9 @@ public class RobotContainer {
     List<String> autoModes = new ArrayList<String>();
     autoPaths = findPaths(new File(Filesystem.getLaunchDirectory(), "src/main/deploy/pathplanner"));
     for(String autoPath : autoPaths){
-      if(!autoPath.endsWith("R")) {
-        autoModes.add(autoPath);
+      String autoName = autoPath.substring(0, autoPath.length() - (5 + (autoPath.contains("Red") ? 3 : 4)));
+      if(!autoModes.contains(autoName)){
+        autoModes.add(autoName);
       }
     }
     return autoModes.toArray(String[]::new);
@@ -223,27 +224,39 @@ public class RobotContainer {
 
   private static List<String> findPaths(File directory){
     List<String> paths = new ArrayList<String>();
-    if (!directory.exists()) {
-        System.out.println("FATAL: path directory not found! " + directory.getAbsolutePath());
-        return paths;
-    }
+    assert directory.exists() : "FATAL: path directory not found! " + directory.getAbsolutePath();
     File[] files = directory.listFiles();
     for (File file : files) {
         String fileName = file.getName();
-        if (fileName.startsWith("Program_") && fileName.endsWith(".path")) {
+        if (fileName.startsWith("_") && fileName.endsWith(".path")) {
           System.out.println(file.getAbsolutePath());
-          paths.add(file.getName().substring(0, file.getName().length() - 5));
+          if(!paths.contains(fileName)){
+            paths.add(fileName);
+          }
         }
     }
     return paths;
   }
 
   public Command getNamedAutonomousCommand(String autoName, boolean isRedAlliance) {
-    String alliancePathName = autoName + (isRedAlliance ? "R" : "");
-    if (!autoPaths.contains(alliancePathName)) {
-      alliancePathName = autoName;
+    String alliancePathName = autoName + (isRedAlliance ? "Red" : "Blue");
+    assert autoPaths.contains(alliancePathName): "ERROR: no such auto path name found in src/main/deploy/pathplanner: " + alliancePathName;
+    double maxVelocity     = 4.0;
+    double maxAcceleration = 2.0;
+    switch(alliancePathName){
+      case "_1_Charger_Mid_1pc_Blue":    maxVelocity = 4.0; maxAcceleration = 1.8; break;
+      case "_1_Charger_Mid_1pc_Red":     maxVelocity = 2.5; maxAcceleration = 1.0; break;
+      case "_2_Feeder_3pc_Blue":         maxVelocity = 3.0; maxAcceleration = 1.8; break;
+      case "_2_Feeder_3pc_Red":          maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_3_Cable_3pc_Blue":          maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_3_Cable_3pc_Red":           maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_4_Feeder_2pc_Charger_Blue": maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_4_Feeder_2pc_Charger_Red":  maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_5_Charger_Mid_2pc_Blue":    maxVelocity = 4.0; maxAcceleration = 1.8; break;
+      case "_5_Charger_Mid_2pc_Red":     maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      default: System.out.println("WARNING: USING DEFAULT MAX VELOCITY AND MAX ACCELERATION FOR AUTO MODE: " + alliancePathName);
     }
-    return new PathPlannerCommandGroup(alliancePathName, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine);
+    return new PathPlannerCommandGroup(alliancePathName, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine, maxVelocity, maxAcceleration);
   }
 
 
@@ -277,12 +290,11 @@ public class RobotContainer {
         System.out.println("\n\nSHOWING WHITE\n\n");
      }
      // delegate to FSM
-		 MessageLog.add("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
+		 System.out.println("SENDING NEW COMMAND FROM NETWORK TABLES TO FSM: " + newKeypadCommand + "\n\n");
 		}
 	}
 
   private boolean isRedAlliance(){
     return DriverStation.getAlliance().equals(DriverStation.Alliance.Red);
-  }
-
+    }
 }

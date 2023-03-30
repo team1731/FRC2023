@@ -46,9 +46,9 @@ public class AutoBalanceSwerve extends CommandBase {
  
         rotation = headingController.calculate(s_Swerve.getHeading().getDegrees(), desiredHeading);  
         if (s_Swerve.getPitch() > 9) {
-            translation = new Translation2d(-0.3, 0.0); // Speed is in Meters/s
+            translation = new Translation2d(-0.25, 0.0); // Speed is in Meters/s
         } else if (s_Swerve.getPitch() < -9) {
-            translation = new Translation2d(0.3, 0);
+            translation = new Translation2d(0.25, 0);
         } else {
             translation = new Translation2d(0 , 0);
             if(Timer.getMatchTime() <= 0.1) {
