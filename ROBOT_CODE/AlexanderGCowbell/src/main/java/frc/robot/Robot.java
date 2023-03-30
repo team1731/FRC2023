@@ -327,9 +327,9 @@ public class Robot extends TimedRobot {
 	s_armSubSystem.resetArmEncodersForAuto();
 
 	if(m_autonomousCommand == null) {
-		System.err.println("SOMETHING WENT WRONG - UNABLE TO RUN AUTONOMOUS! CHECK SOFTWARE!");
+		System.out.println("SOMETHING WENT WRONG - UNABLE TO RUN AUTONOMOUS! CHECK SOFTWARE!");
 	} else {
-        System.out.println("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand.getClass().getSimpleName() + " <----------");
+        System.out.println("------------> RUNNING AUTONOMOUS COMMAND: " + m_autonomousCommand + " <----------");
 		m_robotContainer.zeroHeading();
 		m_ledstring.setColor(OpConstants.LedOption.WHITE); // reset color to default from red/green set during disabled
 		sm_armStateMachine.setIsInAuto(true);
@@ -338,13 +338,7 @@ public class Robot extends TimedRobot {
 		sm_armStateMachine.setIntakeHolding();
 		// If for some reason the velcro does not hold up the hand and it falls before auto starts, need to wait a half second for the wrist to lift before starting the auto
 		if (s_armSubSystem.getWristPosition() < 0.4) {
-			// TODO FIXME:
-			// TODO FIXME: this results in a stacktrace in the simulator ---- not sure what happens if Robot.isReal():
-			// TODO FIXME: Unhandled exception: java.lang.IllegalArgumentException: Commands that have been composed may not be added to another composition or scheduled individually!
-			// TODO FIXME: 
-			if(Robot.isReal()){
-				m_autonomousCommand.beforeStarting(new WaitCommand(0.5));
-			}
+			m_autonomousCommand = m_autonomousCommand.beforeStarting(new WaitCommand(0.5));
 		}
 		m_autonomousCommand.schedule();
 	}
