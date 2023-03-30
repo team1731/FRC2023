@@ -15,7 +15,6 @@ public class ArmPath {
     private int wristExtendIndex;
     private BufferedTrajectoryPointStream proximalBufferedStream;
     private BufferedTrajectoryPointStream distalBufferedStream;
-    private int autoStartIndex;
 
     public enum ArmMotor {
         PROXIMAL, DISTAL, WRIST
@@ -26,10 +25,6 @@ public class ArmPath {
     }
 
     public ArmPath(int numberOfPoints, double[][] proximalPoints, double[][] distalPoints, int wristFlexIndex, double wristFlexPosition, int wristExtendIndex, double wristMaxVelocity) {
-        this(numberOfPoints, proximalPoints, distalPoints, wristFlexIndex, wristFlexPosition, wristExtendIndex, wristMaxVelocity, 0);
-    }
-    
-    public ArmPath(int numberOfPoints, double[][] proximalPoints, double[][] distalPoints, int wristFlexIndex, double wristFlexPosition, int wristExtendIndex, double wristMaxVelocity, int autoStartIndex) {
         this.numberOfPoints = numberOfPoints;
         this.proximalPoints = proximalPoints;
         this.distalPoints = distalPoints;
@@ -39,8 +34,8 @@ public class ArmPath {
         this.wristMaxVelocity = wristMaxVelocity;
         this.proximalBufferedStream = new BufferedTrajectoryPointStream();
         this.distalBufferedStream = new BufferedTrajectoryPointStream();
-        this.autoStartIndex = autoStartIndex;
     }
+    
     public int getNumberOfPoints() {
         return numberOfPoints;
     }
@@ -59,10 +54,6 @@ public class ArmPath {
 
     public double getWristMaxVelocity() {
         return wristMaxVelocity;
-    }
-
-    public int getAutoStartIndex() {
-        return autoStartIndex;
     }
 
 
