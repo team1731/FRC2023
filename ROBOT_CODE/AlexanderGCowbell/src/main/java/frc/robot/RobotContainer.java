@@ -212,7 +212,7 @@ public class RobotContainer {
 
   public static String[] deriveAutoModes() {
     List<String> autoModes = new ArrayList<String>();
-    autoPaths = findPaths(new File(Filesystem.getLaunchDirectory(), "home/lvuser/deploy/pathplanner"));
+    autoPaths = findPaths(new File(Filesystem.getLaunchDirectory(), (Robot.isReal() ? "home/lvuser" : "src/main") + "/deploy/pathplanner"));
     for(String autoPath : autoPaths){
       String autoName = autoPath.substring(0, autoPath.length() - (5 + (autoPath.contains("Red") ? 3 : 4)));
       if(!autoModes.contains(autoName)){
@@ -224,16 +224,26 @@ public class RobotContainer {
 
   private static List<String> findPaths(File directory){
     List<String> paths = new ArrayList<String>();
-    assert directory.exists() : "FATAL: path directory not found! " + directory.getAbsolutePath();
-    File[] files = directory.listFiles();
-    for (File file : files) {
-        String fileName = file.getName();
-        if (fileName.startsWith("_") && fileName.endsWith(".path")) {
-          System.out.println(file.getAbsolutePath());
-          if(!paths.contains(fileName)){
-            paths.add(fileName);
-          }
+    if(!directory.exists()){
+      System.out.println("FATAL: path directory not found! " + directory.getAbsolutePath());
+    }
+    else {
+      File[] files = directory.listFiles();
+      if(files == null){
+        System.out.println("FATAL: I/O error or NOT a directory: " + directory);
+      }
+      else
+      {
+        for (File file : files) {
+            String fileName = file.getName();
+            if (fileName.startsWith("_") && fileName.endsWith(".path")) {
+              System.out.println(file.getAbsolutePath());
+              if(!paths.contains(fileName)){
+                paths.add(fileName);
+              }
+            }
         }
+      }
     }
     return paths;
   }
