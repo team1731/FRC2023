@@ -43,7 +43,7 @@ public final class Constants {
          * 2. Set the desired logMode (CSV, DATA_LOG)
          * 2. Set the desired loggers below = true
          */
-        public static final boolean loggingEnabled = false;    // note: must also turn on applicable loggers below
+        public static final boolean loggingEnabled =false;    // note: must also turn on applicable loggers below
         public static final boolean logNetworkTables = false;   // only applicable when logMode = DATA_LOG
         public static final LogMode logMode = LogMode.CSV;
 
@@ -288,6 +288,7 @@ public final class Constants {
     public static final class ArmStateConstants {       
         public final static double coneFlipFlexPosition = 0.31;
         public final static double wristOnlyFlexMaxVelocity = 2000;
+        public final static double autoScoreConeDelay = 0.5;
     }
 
     public static final class ArmConstants {
@@ -319,8 +320,8 @@ public final class Constants {
         public final static int[] distalAbsoluteBounds = new int[] {distalAbsoluteTicsCenter - 790, distalAbsoluteTicsCenter + 710}; // 1000, 2500
         // these second set of bounds are used when we are starting from auto where we do know about where we are
         // we want to keep the range checking narrower for this situation
-        public final static int[] proximalAbsoluteBoundsAuto = new int[] {proximalAbsoluteTicsCenter - 150, proximalAbsoluteTicsCenter + 150};  // {2430, 2585}
-        public final static int[] distalAbsoluteBoundsAuto = new int[] {distalAbsoluteTicsCenter - 100, distalAbsoluteTicsCenter + 100};   //  {1925, 2060}
+        public final static int[] proximalAbsoluteBoundsAuto = new int[] {proximalEstimatedAutoAbsolute - 150, proximalEstimatedAutoAbsolute + 150};  // {2430, 2585}
+        public final static int[] distalAbsoluteBoundsAuto = new int[] {distalEstimatedAutoAbsolute - 100, distalEstimatedAutoAbsolute + 100};   //  {1925, 2060}
 
 
 
@@ -329,7 +330,7 @@ public final class Constants {
         public final static int distalCancoderId = 10;
         public final static int wristCancoderId = 12;
         public final static int intakeCancoderId = 13;
-        public final static double proximalRelativeTicsPerAbsoluteTick = 140;
+        public final static double proximalRelativeTicsPerAbsoluteTick = 135;  // theoretically this should be 140
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;

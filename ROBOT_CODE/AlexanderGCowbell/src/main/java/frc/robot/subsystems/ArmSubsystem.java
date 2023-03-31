@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.state.arm.ArmStateMachine;
+import frc.robot.state.arm.ArmStateMachine.MovementType;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.LogConstants;
@@ -275,7 +276,18 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void intake() {
         intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
-        intakeMotor.set((stateMachine.getGamePiece() == GamePiece.CONE)? 0.8: -0.7);
+        double intakeSpeed = 0.8;
+        if(stateMachine.getMovementType() == MovementType.PICKUP_DOWNED_CONE) {
+            intakeSpeed = 0.8;
+            System.out.println("ArmSubsystem: intaking DOWNED CONE, speed = " + intakeSpeed);
+        } else if(stateMachine.getGamePiece() == GamePiece.CONE) {
+            intakeSpeed = 0.8;
+            System.out.println("ArmSubsystem: intaking CONE, speed = " + intakeSpeed);
+        } else {
+            intakeSpeed = -0.7;
+            System.out.println("ArmSubsystem: intaking CUBE, speed = " + intakeSpeed);
+        }
+        intakeMotor.set(intakeSpeed);
     }
 
     public void eject() {

@@ -27,6 +27,8 @@ public class ArmStateMachine {
   private boolean allowScore = true;
   private boolean emergencyModeTriggeredNotConfirmed = false;
   private boolean processAutoRecoveryOnRetraction = false;
+  private boolean autoDelayScore = false; // should be set to true when autonmous path should add delay before scoring
+  private double autoDelayStartTime = 0;
 
   private ArmPath currentPath; // used if running full arm path
   private double currentWristFlexPosition = 0; // used if running wrist only movement
@@ -132,6 +134,8 @@ public class ArmStateMachine {
     pathStartedIndex = 0;
     pathStartedTime = 0;
     wristMovementStartedTime = 0;
+    autoDelayScore = false;
+    autoDelayStartTime = 0;
     movementType = null;
     proximalJoystickControl = null;
     distalJoystickControl = null;
@@ -235,6 +239,11 @@ public class ArmStateMachine {
     pathStartedIndex = 0;
     movementType = MovementType.SCORE;
     transitionArm(Input.EXTEND);
+
+    // For cone scores in auto, add a delay to allow arm to stop bouncing before scoring
+    if(isInAuto && gamePiece == GamePiece.CONE) {
+      autoDelayScore = true;
+    }
   }
 
   // SCORE BASED ON OPERATOR ENTRY (KEYPAD OR SWITCH)
@@ -532,8 +541,10 @@ public class ArmStateMachine {
          (currentArmState == ArmState.EXTENDED || currentArmState == ArmState.WRIST_ONLY_FLEXED)) {
         transitionArm(Input.RETRACT);
       } else if(movementType == MovementType.SCORE && currentArmState == ArmState.EXTENDED) {
-        transitionIntake(Input.RELEASE);
-        transitionArm(Input.RETRACT);
+        if(!autoDelayScore || (autoDelayStartTime != 0 && Timer.getFPGATimestamp() - autoDelayStartTime >= ArmStateConstants.autoScoreConeDelay)) {
+          transitionIntake(Input.RELEASE);
+          transitionArm(Input.RETRACT);
+        }
       }
     }
 
@@ -644,6 +655,11 @@ public class ArmStateMachine {
       case EXTENDING:
         subsystem.startArmMovement(currentPath);
         break;
+      case EXTENDED:
+        if(autoDelayScore) {
+          autoDelayStartTime = Timer.getFPGATimestamp();
+        }
+        break;
       case WRIST_ONLY_FLEXING:
         subsystem.moveWrist(currentWristFlexPosition, ArmStateConstants.wristOnlyFlexMaxVelocity);
         wristMovementStartedTime = Timer.getFPGATimestamp();
@@ -664,7 +680,6 @@ public class ArmStateMachine {
       case HOME:
         resetState();
         break;
-      case EXTENDED:
       case WRIST_ONLY_FLEXED:
       case EMERGENCY_RECOVERY:
         // these cases represent valid transition states that don't have a corresponding subsystem call

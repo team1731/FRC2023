@@ -212,7 +212,7 @@ public class RobotContainer {
 
   public static String[] deriveAutoModes() {
     List<String> autoModes = new ArrayList<String>();
-    autoPaths = findPaths(new File(Filesystem.getLaunchDirectory(), "src/main/deploy/pathplanner"));
+    autoPaths = findPaths(new File(Filesystem.getLaunchDirectory(), "home/lvuser/deploy/pathplanner"));
     for(String autoPath : autoPaths){
       String autoName = autoPath.substring(0, autoPath.length() - (5 + (autoPath.contains("Red") ? 3 : 4)));
       if(!autoModes.contains(autoName)){
