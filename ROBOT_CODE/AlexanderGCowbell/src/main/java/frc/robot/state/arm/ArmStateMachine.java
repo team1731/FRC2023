@@ -338,7 +338,7 @@ public class ArmStateMachine {
 
   public void intake() {
     System.out.println("ArmStateMachine: Full intake requested!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    subsystem.intake();
+    subsystem.intake(ArmConstants.onDemandIntakeSpeed);
   }
 
   public void releaseIntake() {

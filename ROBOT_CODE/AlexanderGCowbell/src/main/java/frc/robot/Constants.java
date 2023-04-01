@@ -300,9 +300,9 @@ public final class Constants {
          * 
          * **********************************************************************************************
          */
-
-         public final static int proximalAbsoluteTicsCenter = 2727; // was 2727
-         public final static int distalAbsoluteTicsCenter = 1415;   // 1714
+         public final static int distalAbsoluteTicsOffset = 15;
+         public final static int proximalAbsoluteTicsCenter = 2671; 
+         public final static int distalAbsoluteTicsCenter = 1120 + distalAbsoluteTicsOffset;
 
         /*
          ************************************************************************************************
@@ -345,7 +345,11 @@ public final class Constants {
         public final static double emergencyModeMaxArmVelocity = 2000; // max for Falcon motors is 6800 velocity units
         public final static double mostlyExtendedThreshold = 0.5; // percentage of the path completed to consider mostly extended
         public final static double proximalOutOfPositionThreshold = -37500;
-
+        
+        public final static double onDemandIntakeSpeed = 0.8; // used when intake button is pressed on operator controller
+        public final static double downedConeIntakeSpeed = 0.75;
+        public final static double coneIntakeSpeed = 0.75;
+        public final static double cubeIntakeSpeed = -0.7;
 
 
         // Arm PID constants

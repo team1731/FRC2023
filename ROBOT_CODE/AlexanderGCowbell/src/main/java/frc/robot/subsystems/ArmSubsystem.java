@@ -275,18 +275,22 @@ public class ArmSubsystem extends SubsystemBase {
      */
 
     public void intake() {
-        intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
-        double intakeSpeed = 0.8;
+        double intakeSpeed = 0.75;
         if(stateMachine.getMovementType() == MovementType.PICKUP_DOWNED_CONE) {
-            intakeSpeed = 0.8;
+            intakeSpeed = ArmConstants.downedConeIntakeSpeed;
             System.out.println("ArmSubsystem: intaking DOWNED CONE, speed = " + intakeSpeed);
         } else if(stateMachine.getGamePiece() == GamePiece.CONE) {
-            intakeSpeed = 0.8;
+            intakeSpeed =  ArmConstants.coneIntakeSpeed;
             System.out.println("ArmSubsystem: intaking CONE, speed = " + intakeSpeed);
         } else {
-            intakeSpeed = -0.7;
+            intakeSpeed = ArmConstants.cubeIntakeSpeed;
             System.out.println("ArmSubsystem: intaking CUBE, speed = " + intakeSpeed);
         }
+        intake(intakeSpeed);
+    }
+
+    public void intake(double intakeSpeed) {
+        intakeMotor.setSmartCurrentLimit(ArmConstants.INTAKE_CURRENT_LIMIT_A);
         intakeMotor.set(intakeSpeed);
     }
 
