@@ -219,6 +219,7 @@ public class RobotContainer {
         autoModes.add(autoName);
       }
     }
+    autoModes.sort((p1, p2) -> p1.compareTo(p2));
     return autoModes.toArray(String[]::new);
   }
 
