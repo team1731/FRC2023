@@ -33,7 +33,7 @@ public class AutoScoreCommand extends CommandBase {
 
         ArmPath path = null;
         if(sequence == ArmSequence.SCORE_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {
-            path = ScoreHighCone.getArmPath();
+            path = ScoreHighConeAuto.getArmPath();
         } else if(sequence == ArmSequence.SCORE_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE) {
             path = ScoreHighCube.getArmPath();
         } else if(sequence == ArmSequence.SCORE_MEDIUM && stateMachine.getGamePiece() == GamePiece.CONE) {
