@@ -121,7 +121,7 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "DisableVisionCorrectionCone"
+          "DisableVisionCorrectionCube"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
