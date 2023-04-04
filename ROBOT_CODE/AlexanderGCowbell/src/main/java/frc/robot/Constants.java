@@ -301,8 +301,8 @@ public final class Constants {
          * **********************************************************************************************
          */
          public final static int distalAbsoluteTicsOffset = 15;
-         public final static int proximalAbsoluteTicsCenter = 2671; 
-         public final static int distalAbsoluteTicsCenter = 1120 + distalAbsoluteTicsOffset;
+         public final static int proximalAbsoluteTicsCenter = 2667;   
+         public final static int distalAbsoluteTicsCenter = 1113 + distalAbsoluteTicsOffset;  
 
         /*
          ************************************************************************************************
@@ -349,7 +349,8 @@ public final class Constants {
         public final static double onDemandIntakeSpeed = 0.8; // used when intake button is pressed on operator controller
         public final static double downedConeIntakeSpeed = 0.75;
         public final static double coneIntakeSpeed = 0.75;
-        public final static double cubeIntakeSpeed = -0.7;
+        public final static double cubeIntakeSpeed = -0.7
+        ;
 
 
         // Arm PID constants

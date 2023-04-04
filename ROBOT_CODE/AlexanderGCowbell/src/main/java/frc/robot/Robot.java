@@ -381,6 +381,7 @@ public class Robot extends TimedRobot {
 	}
 	currentKeypadCommand = "";
 	SmartDashboard.getString("keypadCommand", currentKeypadCommand);
+	s_poseEstimatorSubsystem.disableVisionCorrection();   // if for some reason auto does not put it back in driver mode
   }
 
 

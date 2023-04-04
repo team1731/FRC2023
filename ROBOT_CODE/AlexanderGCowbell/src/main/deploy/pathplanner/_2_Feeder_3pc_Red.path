@@ -17,7 +17,8 @@
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "ScoreConeHigh"
+          "ScoreConeHigh",
+          "SetVisionPipelineCube"
         ],
         "executionBehavior": "parallelDeadline",
         "waitBehavior": "deadline",
@@ -44,7 +45,7 @@
       "isStopPoint": true,
       "stopEvent": {
         "names": [
-          "DisableVisionCorrectionCube"
+          "SetVisionPipelineCone"
         ],
         "executionBehavior": "sequential",
         "waitBehavior": "none",
@@ -214,7 +215,7 @@
     {
       "position": 0.7636363636363637,
       "names": [
-        "EnableVisionCorrectionCube"
+        "EnableVisionCorrection"
       ]
     },
     {
@@ -233,7 +234,7 @@
     {
       "position": 3.2727272727272716,
       "names": [
-        "EnableVisionCorrectionCone"
+        "EnableVisionCorrection"
       ]
     }
   ]

@@ -221,7 +221,12 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
     if (visionResult.hasTargets()) {
       double slantRange = robotToCamera.getZ()/Math.cos(cameraAngleOutFromFloor + Units.degreesToRadians(visionResult.getBestTarget().getPitch()));
       double lateralErrorCorrection = Units.inchesToMeters(-7.5) +robotToCamera.getZ()*Math.tan(Units.degreesToRadians(visionResult.getBestTarget().getYaw() ));
-
+      if (lateralErrorCorrection > 0.254) {   // if we are more than 10 inches off clamp it to 10 inches so a rougue piece doesn't lead us too far off track
+        lateralErrorCorrection = 0.254 ;
+      } else if (lateralErrorCorrection < -0.254) {
+        lateralErrorCorrection = -0.254;
+      }
+      
       SmartDashboard.putNumber("Slant Range to piece (inches)", Units.metersToInches(slantRange));
       SmartDashboard.putNumber("Lateral Correction (inches)", Units.metersToInches(lateralErrorCorrection));
       Pose2d adjustedPose = new Pose2d(
@@ -277,15 +282,22 @@ public class PoseEstimatorSubsystem extends SubsystemBase {
        m_swerve.getHeading(), m_swerve.getPositions(), new Pose2d());
   }
 
-  public void enableVisionCorrection(GamePiece pieceType) {
+  public void setVisionPipeline(GamePiece pieceType) {
     
-    System.out.println("Enabling Vision Correction: Game Piece Detected:" + gamePieceDetected);
+    System.out.println("Setting Vision Pipeline for  " + pieceType + " Game Piece Detected:" + gamePieceDetected);
     cameraAngleOutFromFloor = pieceType == GamePiece.CONE? Units.degreesToRadians(VisionConstants.ConeAutoAngle): Units.degreesToRadians(VisionConstants.CubeAutoAngle);
     photonCamera3.setDriverMode(false);
     gamePieceDetected = false;
-    useVisionCorrection = true;
+    useVisionCorrection = false;
     int pipelineIndex = pieceType == GamePiece.CONE? 0: 1;
     photonCamera3.setPipelineIndex(pipelineIndex);
+    
+  }
+
+  public void enableVisionCorrection() {
+    
+    System.out.println("Enabling Vision Correction: Game Piece Detected:" + gamePieceDetected);
+    useVisionCorrection = true;
     
   }
 

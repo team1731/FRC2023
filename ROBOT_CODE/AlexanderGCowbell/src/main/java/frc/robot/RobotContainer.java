@@ -258,13 +258,17 @@ public class RobotContainer {
       case "_1_Charger_Mid_1pc_Blue":    maxVelocity = 4.0; maxAcceleration = 1.8; break;
       case "_1_Charger_Mid_1pc_Red":     maxVelocity = 2.5; maxAcceleration = 1.0; break;
       case "_2_Feeder_3pc_Blue":         maxVelocity = 3.0; maxAcceleration = 1.8; break;
-      case "_2_Feeder_3pc_Red":          maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_2_Feeder_3pc_Red":          maxVelocity = 4.0; maxAcceleration = 1.8; break;
       case "_3_Cable_3pc_Blue":          maxVelocity = 4.0; maxAcceleration = 2.0; break;
       case "_3_Cable_3pc_Red":           maxVelocity = 4.0; maxAcceleration = 2.0; break;
       case "_4_Feeder_2pc_Charger_Blue": maxVelocity = 4.0; maxAcceleration = 2.0; break;
       case "_4_Feeder_2pc_Charger_Red":  maxVelocity = 4.0; maxAcceleration = 2.0; break;
       case "_5_Charger_Mid_2pc_Blue":    maxVelocity = 4.0; maxAcceleration = 1.8; break;
       case "_5_Charger_Mid_2pc_Red":     maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_7_Charger_Mid_2pc_Blue":    maxVelocity = 4.2; maxAcceleration = 2.3; break;
+      case "_7_Charger_Mid_2pc_Red":     maxVelocity = 4.2; maxAcceleration = 2.3; break;
+      
+
       default: System.out.println("WARNING: USING DEFAULT MAX VELOCITY AND MAX ACCELERATION FOR AUTO MODE: " + alliancePathName);
     }
     return new PathPlannerCommandGroup(alliancePathName, s_Swerve, s_poseEstimatorSubsystem, sm_armStateMachine, maxVelocity, maxAcceleration);

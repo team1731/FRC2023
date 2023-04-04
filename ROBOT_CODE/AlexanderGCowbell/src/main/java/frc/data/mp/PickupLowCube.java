@@ -7,7 +7,7 @@ public class PickupLowCube {
 
     public static final int kNumPoints = 57;
     public static final int kWristFlexIndex = 5;
-    public static final double kWristFlexPosition = 0.339;
+    public static final double kWristFlexPosition = 0.38;
     public static final int kWristExtendIndex = 56;
     public static final double kWristMaxVelocity = 2000;
 
