@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -23,10 +24,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Swerve extends SubsystemBase {
 
-  
-
     public SwerveModule[] mSwerveMods;
-  //  public PigeonIMU gyro;
     private final AHRS m_gyro = new AHRS(SPI.Port.kMXP, (byte) 200); // NavX connected over MXP
     public Double lockedHeading = null;
     private boolean s_lockWheels = false;
@@ -34,7 +32,6 @@ public class Swerve extends SubsystemBase {
     public Swerve() {
 
         zeroGyro();
-
 
         mSwerveMods = new SwerveModule[] {
             new SwerveModule(0, Constants.Swerve.Mod0.constants),
@@ -47,7 +44,6 @@ public class Swerve extends SubsystemBase {
 
     public void drive(Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
 
- 
         SwerveModuleState[] swerveModuleStates =
             Constants.Swerve.swerveKinematics.toSwerveModuleStates(
                 fieldRelative ? ChassisSpeeds.fromFieldRelativeSpeeds(
@@ -61,12 +57,13 @@ public class Swerve extends SubsystemBase {
                                     translation.getY(), 
                                     rotation)
                                 );
+
         SwerveDriveKinematics.desaturateWheelSpeeds(swerveModuleStates, Constants.Swerve.maxSpeed);
         if (s_lockWheels && 
             (swerveModuleStates[0].speedMetersPerSecond == 0.0 &&
-            swerveModuleStates[1].speedMetersPerSecond == 0.0 &&
-            swerveModuleStates[2].speedMetersPerSecond == 0.0 &&
-            swerveModuleStates[3].speedMetersPerSecond == 0.0 )
+             swerveModuleStates[1].speedMetersPerSecond == 0.0 &&
+             swerveModuleStates[2].speedMetersPerSecond == 0.0 &&
+             swerveModuleStates[3].speedMetersPerSecond == 0.0 )
             ) {
             swerveModuleStates = new SwerveModuleState[] {
                 new SwerveModuleState(0.0, Rotation2d.fromDegrees(45.0)),
@@ -105,7 +102,7 @@ public class Swerve extends SubsystemBase {
         return positions;
     }
 
-        /**
+    /**
 	 * Returns the heading of the robot.
 	 *
 	 * @return the robot's heading in degrees, from -180 to 180
@@ -120,19 +117,16 @@ public class Swerve extends SubsystemBase {
             }
 		}
         return Rotation2d.fromDegrees(m_heading);
-
 	}
 
     public void zeroGyro(){
-
         lockedHeading = null;
         m_gyro.reset();
        // m_gyro.zeroYaw();
- 
     }
 
     public void adjustWheelEncoders(){
-              for(SwerveModule mod : mSwerveMods){
+        for(SwerveModule mod : mSwerveMods){
             mod.resetToAbsolute();
             System.out.println("Adjusting Wheel Encoders!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
         }  
@@ -142,19 +136,21 @@ public class Swerve extends SubsystemBase {
         return m_gyro.getRoll(); // pitch is roll given the way the board is mounted.
     }
 
-  //  public Rotation2d getYaw() {
-  //  if (m_gyro.isMagnetometerCalibrated()) {
-      // We will only get valid fused headings if the magnetometer is calibrated
-  //    return Rotation2d.fromDegrees(m_gyro.getFusedHeading());
-  //  }
+    /*
+    public Rotation2d getYaw() {
+      if (m_gyro.isMagnetometerCalibrated()) {
+        // We will only get valid fused headings if the magnetometer is calibrated
+        return Rotation2d.fromDegrees(m_gyro.getFusedHeading());
+      }
 
-    // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
-   // return Rotation2d.fromDegrees(360.0 - m_gyro.getYaw());
-   // }
+      // We have to invert the angle of the NavX so that rotating the robot counter-clockwise makes the angle increase.
+      return Rotation2d.fromDegrees(360.0 - m_gyro.getYaw());
+    }
+    */
 
     @Override
     public void periodic(){
-    //    SmartDashboard.putNumber("Yaw in degrees" , getYaw().getDegrees()) ; 
+        // SmartDashboard.putNumber("Yaw in degrees" , getYaw().getDegrees()) ; 
         SmartDashboard.putNumber("getHeading",getHeading().getDegrees());
         SmartDashboard.putNumber("Pitch", getPitch());
         SmartDashboard.putString("Alliance Color", DriverStation.getAlliance().toString());
@@ -173,4 +169,17 @@ public class Swerve extends SubsystemBase {
     public void setLockWheels(boolean b) {
         s_lockWheels = b;
     }
+
+    public void logPose(Pose2d pose) {
+      SmartDashboard.putNumber("PSwerveControllerCommand/targetposeX", pose.getX());
+      SmartDashboard.putNumber("PSwerveControllerCommand/targetposey", pose.getY());
+      SmartDashboard.putNumber("PSwerveControllerCommand/targetrot", pose.getRotation().getDegrees());
+    }
+    public void defaultLogError(Translation2d translationError, Rotation2d rotationError) {
+        SmartDashboard.putNumber("PPSwerveControllerCommand/xErrorMeters", translationError.getX());
+        SmartDashboard.putNumber("PPSwerveControllerCommand/yErrorMeters", translationError.getY());
+        SmartDashboard.putNumber(
+            "PPSwerveControllerCommand/rotationErrorDegrees", rotationError.getDegrees());
+      }
+ 
 }

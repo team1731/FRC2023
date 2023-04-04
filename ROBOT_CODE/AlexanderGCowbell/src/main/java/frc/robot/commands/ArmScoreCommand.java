@@ -32,7 +32,7 @@ public class ArmScoreCommand extends CommandBase {
 
         ArmPath path = null;
         if(sequence == ArmSequence.SCORE_HIGH && stateMachine.getGamePiece() == GamePiece.CONE) {
-            path = ScoreHighCone.getArmPath();
+            path = ScoreHighConeAuto.getArmPath();
         } else if(sequence == ArmSequence.SCORE_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE) {
             path = ScoreHighCube.getArmPath();
         } else if(sequence == ArmSequence.SCORE_MEDIUM && stateMachine.getGamePiece() == GamePiece.CONE) {
@@ -56,7 +56,7 @@ public class ArmScoreCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        stateMachine.buttonReleased(queuedTime);
+        stateMachine.handleCommandEnding(queuedTime);
         isFinished = true;
     }
 

@@ -35,7 +35,7 @@ public class ArmPath {
         this.proximalBufferedStream = new BufferedTrajectoryPointStream();
         this.distalBufferedStream = new BufferedTrajectoryPointStream();
     }
-
+    
     public int getNumberOfPoints() {
         return numberOfPoints;
     }
@@ -56,6 +56,7 @@ public class ArmPath {
         return wristMaxVelocity;
     }
 
+
     public BufferedTrajectoryPointStream getInitializedBuffer(ArmMotor motor, int startFrom, Direction direction) {
         BufferedTrajectoryPointStream bufferedStream = (motor == ArmMotor.PROXIMAL)? proximalBufferedStream : distalBufferedStream;
         TrajectoryPoint point = new TrajectoryPoint(); 
@@ -67,19 +68,19 @@ public class ArmPath {
         if(direction == Direction.FORWARD) {
             for (int i = startFrom; i < numberOfPoints; ++i) {
                 boolean isLastPoint = ((i + 1) == numberOfPoints);
-                populateBufferPoint(motor, bufferedStream, point, i, isLastPoint);
+                populateBufferPoint(motor, bufferedStream, point, i, isLastPoint, direction);
             }
         } else {
             for (int i = startFrom; i >= 0; --i) {
                 boolean isLastPoint = (i == 0);
-                populateBufferPoint(motor, bufferedStream, point, i, isLastPoint);
+                populateBufferPoint(motor, bufferedStream, point, i, isLastPoint, direction);
             }
         }
 
         return bufferedStream;
     }
 
-    private void populateBufferPoint(ArmMotor motor, BufferedTrajectoryPointStream bufferedStream, TrajectoryPoint point, int index, boolean isLastPoint) {
+    private void populateBufferPoint(ArmMotor motor, BufferedTrajectoryPointStream bufferedStream, TrajectoryPoint point, int index, boolean isLastPoint, Direction direction) {
         double proximalPosition = proximalPoints[index][0];
         double distalPosition = distalPoints[index][0];
         double position = (motor == ArmMotor.PROXIMAL)? proximalPosition : distalPosition;
@@ -92,7 +93,7 @@ public class ArmPath {
         // populate point values
         point.timeDur = durationMilliseconds;
         point.position = position;
-        point.velocity = velocityRPM;
+        point.velocity = direction == Direction.FORWARD? velocityRPM: -velocityRPM;
         point.auxiliaryPos = 0;
         point.auxiliaryVel = 0;
         point.profileSlotSelect0 = ArmConstants.kPrimaryPIDSlot; // set of gains you would like to use

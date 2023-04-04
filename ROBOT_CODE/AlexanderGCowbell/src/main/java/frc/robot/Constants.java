@@ -43,7 +43,7 @@ public final class Constants {
          * 2. Set the desired logMode (CSV, DATA_LOG)
          * 2. Set the desired loggers below = true
          */
-        public static final boolean loggingEnabled = false;     // note: must also turn on applicable loggers below
+        public static final boolean loggingEnabled =false;    // note: must also turn on applicable loggers below
         public static final boolean logNetworkTables = false;   // only applicable when logMode = DATA_LOG
         public static final LogMode logMode = LogMode.CSV;
 
@@ -86,10 +86,10 @@ public final class Constants {
 
         public static final AprilTagPoseValues kAprilTagPose1 = new AprilTagPoseValues(1, 610.77, 42.19, 18.22, 180);
         public static final AprilTagPoseValues kAprilTagPose2 = new AprilTagPoseValues(2, 610.77, 108.19, 18.22, 180);
-        public static final AprilTagPoseValues kAprilTagPose3 = new AprilTagPoseValues(3, 610.77, 147.19, 18.22, 180);
+        public static final AprilTagPoseValues kAprilTagPose3 = new AprilTagPoseValues(3, 610.77, 174.19, 18.22, 180);
         public static final AprilTagPoseValues kAprilTagPose4 = new AprilTagPoseValues(4, 636.96, 265.74, 27.38, 180);
         public static final AprilTagPoseValues kAprilTagPose5 = new AprilTagPoseValues(5, 14.25, 265.74, 27.38, 0);
-        public static final AprilTagPoseValues kAprilTagPose6 = new AprilTagPoseValues(6, 40.45, 147.19, 18.22, 0);
+        public static final AprilTagPoseValues kAprilTagPose6 = new AprilTagPoseValues(6, 40.45, 174.19, 18.22, 0);
         public static final AprilTagPoseValues kAprilTagPose7 = new AprilTagPoseValues(7, 40.45, 108.19, 18.22, 0);
         public static final AprilTagPoseValues kAprilTagPose8 = new AprilTagPoseValues(8, 40.45, 42.19, 18.22, 0);
     }
@@ -254,23 +254,16 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final String kDefault           = "_Default_Auto";
-        public static final String k_0_Example        = "_0_Example_Auto";
-        public static final String k_Program_1        = "1_ChargerMiddle";
-        public static final String k_Program_2        = "2_FeederSide";
-        public static final String k_Program_3        = "3_RailSide";
-        public static final String k_Program_4        = "4_Program_4";
-        public static final String k_Program_5        = "5_ChargerCube";
-        public static final String k_9_Move_Forward   = "_9_Move_Forward";
-        
-		public static final String kAutoCodeKey = "Auto Selector";
+        public static final String kAutoDefault = "_2_Feeder_3pc_";
+    	public static final String kAutoCodeKey = "Auto Selector";
+
         public static final double kMaxSpeedMetersPerSecond = 0.5; // disabled for testing = 3;
         public static final double kMaxAccelerationMetersPerSecondSquared = 0.5; // disabled for testing = 3;
         public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
         public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
     
-        public static final double kPXController = 0.1;
-        public static final double kPYController = 1;
+        public static final double kPXController = 3.0;
+        public static final double kPYController = 3.0;
         public static final double kPThetaController = 2;
     
         // Constraint for the motion profilied robot angle controller
@@ -295,6 +288,7 @@ public final class Constants {
     public static final class ArmStateConstants {       
         public final static double coneFlipFlexPosition = 0.31;
         public final static double wristOnlyFlexMaxVelocity = 2000;
+        public final static double autoScoreConeDelay = 0.5;
     }
 
     public static final class ArmConstants {
@@ -306,9 +300,9 @@ public final class Constants {
          * 
          * **********************************************************************************************
          */
-
-         public final static int proximalAbsoluteTicsCenter = 2750; // was 2727
-         public final static int distalAbsoluteTicsCenter = 1717;
+         public final static int distalAbsoluteTicsOffset = 15;
+         public final static int proximalAbsoluteTicsCenter = 2667;   
+         public final static int distalAbsoluteTicsCenter = 1113 + distalAbsoluteTicsOffset;  
 
         /*
          ************************************************************************************************
@@ -316,8 +310,8 @@ public final class Constants {
          * **********************************************************************************************
          */
 
-         public final static int proximalEstimatedAutoAbsolute = proximalAbsoluteTicsCenter - 205; //  2509; // only used if we are not getting reasonable values from absolute encoder
-         public final static int distalEstimatedAutoAbsolute = distalAbsoluteTicsCenter + 206; //1996; // only used if we are not getting reasonable values from absolute encoder
+         public final static int proximalEstimatedAutoAbsolute = proximalAbsoluteTicsCenter - 205; //  2565; // only used if we are not getting reasonable values from absolute encoder
+         public final static int distalEstimatedAutoAbsolute = distalAbsoluteTicsCenter + 206; //1926; // only used if we are not getting reasonable values from absolute encoder
 
                  // bounds checking for absolute encoder values, work around for spotty values we are receiving
         // these first set of bounds are used when we don't know where the arm is and we mainly want to make sure that
@@ -326,8 +320,8 @@ public final class Constants {
         public final static int[] distalAbsoluteBounds = new int[] {distalAbsoluteTicsCenter - 790, distalAbsoluteTicsCenter + 710}; // 1000, 2500
         // these second set of bounds are used when we are starting from auto where we do know about where we are
         // we want to keep the range checking narrower for this situation
-        public final static int[] proximalAbsoluteBoundsAuto = new int[] {proximalAbsoluteTicsCenter - 150, proximalAbsoluteTicsCenter + 150};  // {2430, 2585}
-        public final static int[] distalAbsoluteBoundsAuto = new int[] {distalAbsoluteTicsCenter - 100, distalAbsoluteTicsCenter + 100};   //  {1925, 2060}
+        public final static int[] proximalAbsoluteBoundsAuto = new int[] {proximalEstimatedAutoAbsolute - 150, proximalEstimatedAutoAbsolute + 150};  // {2430, 2585}
+        public final static int[] distalAbsoluteBoundsAuto = new int[] {distalEstimatedAutoAbsolute - 100, distalEstimatedAutoAbsolute + 100};   //  {1925, 2060}
 
 
 
@@ -336,13 +330,13 @@ public final class Constants {
         public final static int distalCancoderId = 10;
         public final static int wristCancoderId = 12;
         public final static int intakeCancoderId = 13;
-        public final static double proximalRelativeTicsPerAbsoluteTick = 140;
+        public final static double proximalRelativeTicsPerAbsoluteTick = 135;  // theoretically this should be 140
         public final static double distalRelativeTicsPerAbsoluteTick = 90;
         public final static int pointDurationMS = 10;
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
         public final static double distalHomePosition = 10300;
-        public final static double wristHomePosition = 0.5;
+        public final static double wristHomePosition = 0.54;
         public final static double intakeStartedVelocityThreshold = 1000;
         public final static double intakeHoldingVelocityThreshold = 60;
         public final static double wristResetPostionThreshold = 0.2;
@@ -351,7 +345,12 @@ public final class Constants {
         public final static double emergencyModeMaxArmVelocity = 2000; // max for Falcon motors is 6800 velocity units
         public final static double mostlyExtendedThreshold = 0.5; // percentage of the path completed to consider mostly extended
         public final static double proximalOutOfPositionThreshold = -37500;
-
+        
+        public final static double onDemandIntakeSpeed = 0.8; // used when intake button is pressed on operator controller
+        public final static double downedConeIntakeSpeed = 0.75;
+        public final static double coneIntakeSpeed = 0.75;
+        public final static double cubeIntakeSpeed = -0.7
+        ;
 
 
         // Arm PID constants
@@ -368,7 +367,7 @@ public final class Constants {
         public final static double wristMaxRPM = 5700;
 
         // Wrist limits
-        public static final int WRIST_CURRENT_LIMIT = 20;
+        public static final int WRIST_CURRENT_LIMIT = 24;
 
         // Wrist Smart Motion Coefficients
         public final static double wristMaxVel = 2000;
@@ -377,7 +376,7 @@ public final class Constants {
         public final static double wristAllowedErr = 0;
 
          // Hand limits
-        public static final int INTAKE_CURRENT_LIMIT_A = 15;
+        public static final int INTAKE_CURRENT_LIMIT_A = 18;
         public static final int INTAKE_HOLD_CURRENT_LIMIT_A = 5;
         public static final int EJECT_CURRENT_LIMIT = 20;
         public static final double INTAKE_OUTPUT_POWER = 1.0;
@@ -411,7 +410,7 @@ public final class Constants {
         /**
          * PID Gains may have to be adjusted based on the responsiveness of control loop
          * 	                                    			  kP   kI    kD     kF             Iz    PeakOut */
-        public final static Gains kGains_MotProf = new Gains( 0.2, 0.0,  0.0, 1023.0/7200.0,  400,  1.00 ); /* measured 6800 velocity units at full motor output */
+        public final static Gains kGains_MotProf = new Gains( 0.25, 0.0,  0.0, 1023.0/15200.0,  400,  1.00 ); /* measured 6800 velocity units at full motor output */
         public final static int kPrimaryPIDSlot = 0; // any slot [0,3]
     }
 
@@ -430,25 +429,35 @@ public final class Constants {
             public double y;
             public double z;
             public double yaw;
+            public double pitch;
 
             // Note: this constructor assumes the camera is mounted parallel to the floor
-            public CameraMountPoseValues(String cameraId, double xInches, double yInches, double zInches, double yawDegrees) {
+            public CameraMountPoseValues(String cameraId, double xInches, double yInches, double zInches, double yawDegrees, double pitchDegrees) {
                 id = cameraId;
                 x = Units.inchesToMeters(xInches);
                 y = Units.inchesToMeters(yInches);
                 z = Units.inchesToMeters(zInches);
                 yaw = Units.degreesToRadians(yawDegrees);
+                pitch = Units.degreesToRadians(pitchDegrees);
             }
 
             public Transform3d getPoseTransform() {
-                return new Transform3d(new Translation3d(x, y, z), new Rotation3d(0.0,0.0,yaw));
+                return new Transform3d(new Translation3d(x, y, z), new Rotation3d(0.0,pitch,yaw));
             }
         }
 
         public static final String kCameraMount1Id = "leftcamera";  //camera on the left looking back
         public static final String kCameraMount2Id = "Global_Shutter_Camera";  // camera on the right looking back
-        public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, -5.3033,10.253, 17.0, 135);
-        public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, -5.3033, -10.253, 17.0, 225);
+        public static final String kCameraMount3Id = "USB_Camera2";  // camera on the arm
+        public static final CameraMountPoseValues kCameraMount1Pose = new CameraMountPoseValues(kCameraMount1Id, -5.3,10.253, 17.0, 135.0,0.0);
+        public static final CameraMountPoseValues kCameraMount2Pose = new CameraMountPoseValues(kCameraMount2Id, -5.3, -10.253, 17.0, 225.0,0.0);
+        public static final CameraMountPoseValues kCameraMount3Pose = new CameraMountPoseValues(kCameraMount3Id, -11, -5.0, 37, 0.0,-80.0);
+/*
+ * The Auto angles are measured as the angle between a line from the camera perpendicular to the ground plane and the boresight of the camera.  This could be calculated from 
+ * the arm geometry and arm relative encoders but it is easier to just run the pickup paths and measure it. 
+ */
+        public static final double ConeAutoAngle = 23.0; // degrees   Note: 
+        public static final double CubeAutoAngle = 23.0; //degrees
 
 		// #region TurnPID
 		public static final double kTurnP = 0.05;
