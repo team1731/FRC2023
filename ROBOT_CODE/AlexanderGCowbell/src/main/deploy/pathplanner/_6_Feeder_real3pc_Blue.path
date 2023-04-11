@@ -131,18 +131,18 @@
     },
     {
       "anchorPoint": {
-        "x": 4.197596946177792,
-        "y": 4.717975375127853
+        "x": 4.427042557126259,
+        "y": 4.5745718682850605
       },
       "prevControl": {
-        "x": 6.0886089151862155,
-        "y": 4.633936036586668
+        "x": 6.3180545261346825,
+        "y": 4.490532529743875
       },
       "nextControl": {
-        "x": 2.2541861031030566,
-        "y": 4.804343396294534
+        "x": 2.4836317140515236,
+        "y": 4.6609398894517415
       },
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -156,15 +156,15 @@
     },
     {
       "anchorPoint": {
-        "x": 1.8888004860088439,
-        "y": 4.77533677786497
+        "x": 1.8601197846402857,
+        "y": 4.646273621706457
       },
       "prevControl": {
-        "x": 2.9362754391454264,
-        "y": 4.748115125353147
+        "x": 2.9075947377768685,
+        "y": 4.619051969194634
       },
       "nextControl": null,
-      "holonomicAngle": 180.0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
@@ -213,9 +213,9 @@
       ]
     },
     {
-      "position": 5.75,
+      "position": 4.909090909090908,
       "names": [
-        "SpitCube"
+        "SpitCubeLowAuto"
       ]
     }
   ]

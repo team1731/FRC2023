@@ -60,6 +60,7 @@ public class PathPlannerCommandGroup extends SequentialCommandGroup {
         eventMap.put("DisableApriTags", new InstantCommand(() -> s_PoseEstimatorSubsystem.enableAprilTags(false)));
         eventMap.put("ScoreCubeHigh", new SequentialCommandGroup(new AutoCheckRemainingTime(), new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_HIGH, GamePiece.CUBE)));
         eventMap.put("SpitCube", new InstantCommand(() -> sm_ArmStateMachine.release()));
+        eventMap.put("SpitCubeLowAuto",  new AutoScoreCommand(sm_ArmStateMachine, ArmSequence.SCORE_LOW, GamePiece.CUBE));
         //eventMap.put("intakeDown", new IntakeDown());
     
         // Create the AutoBuilder. This only needs to be created once when robot code starts, not every time you want to create an auto command. A good place to put this is in RobotContainer along with your subsystems.

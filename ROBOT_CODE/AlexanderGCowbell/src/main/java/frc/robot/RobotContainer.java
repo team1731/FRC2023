@@ -265,8 +265,12 @@ public class RobotContainer {
       case "_4_Feeder_2pc_Charger_Red":  maxVelocity = 4.0; maxAcceleration = 2.0; break;
       case "_5_Charger_Mid_2pc_Blue":    maxVelocity = 4.0; maxAcceleration = 1.8; break;
       case "_5_Charger_Mid_2pc_Red":     maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_6_Feeder_real3pc_Blue":     maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_6_Feeder_real3pc_Red":      maxVelocity = 4.0; maxAcceleration = 2.0; break;
       case "_7_Charger_Mid_2pc_Blue":    maxVelocity = 4.2; maxAcceleration = 2.3; break;
       case "_7_Charger_Mid_2pc_Red":     maxVelocity = 4.2; maxAcceleration = 2.3; break;
+      case "_8_Cable_real3pc_Red":       maxVelocity = 4.0; maxAcceleration = 2.0; break;
+      case "_8_Cable_real3pc_Blue":      maxVelocity = 4.0; maxAcceleration = 2.0; break;
       
 
       default: System.out.println("WARNING: USING DEFAULT MAX VELOCITY AND MAX ACCELERATION FOR AUTO MODE: " + alliancePathName);

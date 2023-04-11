@@ -15,6 +15,7 @@ public class AutoCheckRemainingTime extends CommandBase {
 
     @Override
 	public void initialize() {
+        System.out.println("Match Time Remaining init" +  Timer.getMatchTime());
 
 	}
 
@@ -24,6 +25,8 @@ public class AutoCheckRemainingTime extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return Timer.getMatchTime() > 3.0;
+        System.out.println("Match Time Remaining finished" +  Timer.getMatchTime());
+        return Timer.getMatchTime() > 2.5;
+        
     }
 }
