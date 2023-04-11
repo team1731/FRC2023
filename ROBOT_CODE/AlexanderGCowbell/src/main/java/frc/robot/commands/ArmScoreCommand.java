@@ -42,7 +42,7 @@ public class ArmScoreCommand extends CommandBase {
         } else if(sequence == ArmSequence.SCORE_LOW && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = ScoreLowCone.getArmPath();
         } else if(sequence == ArmSequence.SCORE_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
-            path = ScoreLowCube.getArmPath();
+            path = SpitLowCube.getArmPath();
         }
 
         stateMachine.addJoystickControl(joystick, distalAxis, false);
