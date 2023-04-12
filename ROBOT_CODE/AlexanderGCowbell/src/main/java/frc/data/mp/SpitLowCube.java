@@ -7,7 +7,7 @@ public class SpitLowCube{
 
     public static final int kNumPoints = 70;
     public static final int kWristFlexIndex = 35;
-    public static final double kWristFlexPosition = 0.37;
+    public static final double kWristFlexPosition = 0.57;
     public static final int kWristExtendIndex = 69;
     public static final double kWristMaxVelocity = 2000;
 

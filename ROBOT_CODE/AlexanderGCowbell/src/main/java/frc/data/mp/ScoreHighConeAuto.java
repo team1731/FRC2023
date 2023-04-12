@@ -7,7 +7,7 @@ public class ScoreHighConeAuto {
 
     public static final int kNumPoints = 100;
     public static final int kWristFlexIndex = 50;
-    public static final double kWristFlexPosition = 0.35;
+    public static final double kWristFlexPosition = 0.55;
     public static final int kWristExtendIndex = 90;
     public static final double kWristMaxVelocity = 2000;
 

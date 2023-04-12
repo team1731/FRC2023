@@ -7,7 +7,7 @@ public class PickupLowThiefInternal {
 
     public static final int kNumPoints = 46;
     public static final int kWristFlexIndex = 2;
-    public static final double kWristFlexPosition = 0.25;
+    public static final double kWristFlexPosition = 0.45;
     public static final int kWristExtendIndex = 44;
     public static final double kWristMaxVelocity = 2000;
 

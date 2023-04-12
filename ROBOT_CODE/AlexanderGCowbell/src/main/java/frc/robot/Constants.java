@@ -286,7 +286,7 @@ public final class Constants {
     }
 
     public static final class ArmStateConstants {       
-        public final static double coneFlipFlexPosition = 0.31;
+        public final static double coneFlipFlexPosition = 0.51;
         public final static double wristOnlyFlexMaxVelocity = 2000;
         public final static double autoScoreConeDelay = 0.5;
     }
@@ -336,7 +336,7 @@ public final class Constants {
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
         public final static double distalHomePosition = 10300;
-        public final static double wristHomePosition = 0.54;
+        public final static double wristHomePosition = 0.74;
         public final static double intakeStartedVelocityThreshold = 1000;
         public final static double intakeHoldingVelocityThreshold = 60;
         public final static double wristResetPostionThreshold = 0.2;
