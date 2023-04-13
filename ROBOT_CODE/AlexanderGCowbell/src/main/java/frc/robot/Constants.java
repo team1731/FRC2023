@@ -137,6 +137,8 @@ public final class Constants {
 
         // Switches
         public static int kHighPickupSwitch = 1;
+        public static int kThiefOnSwitchId = 2;
+        public static int kThiefOffSwitchId = 3;
         public static int kConeSwitchId = 4;
         public static int kCubeSwitchId = 5;
         public static int kScoreMediumSwitchId = 8;

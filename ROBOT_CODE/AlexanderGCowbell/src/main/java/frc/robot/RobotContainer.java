@@ -25,7 +25,6 @@ import frc.robot.state.arm.ArmSequence;
 import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.subsystems.*;
 import frc.robot.util.log.LogWriter;
-import frc.robot.util.log.MessageLog;
 import frc.robot.Constants.OperatorConsoleConstants;
 import frc.robot.Constants.GamePiece;
 import frc.robot.Constants.HighPickup;
@@ -72,6 +71,8 @@ public class RobotContainer {
   private final JoystickButton kHighPickupSwitch = new JoystickButton(operator,OperatorConsoleConstants.kHighPickupSwitch);
   private final JoystickButton kHighScoreSwitch = new JoystickButton(operator,OperatorConsoleConstants.kScoreHighSwitchId);
   private final JoystickButton kMediumScoreSwitch = new JoystickButton(operator,OperatorConsoleConstants.kScoreMediumSwitchId);
+  private final JoystickButton kThiefOnSwitch = new JoystickButton(operator,OperatorConsoleConstants.kThiefOnSwitchId);
+  private final JoystickButton kThiefOffSwitch = new JoystickButton(operator,OperatorConsoleConstants.kThiefOffSwitchId);
   // Operator sticks
   public final int kDistalAxis = OperatorConsoleConstants.kDistalAxisId;
   public final int kProximalAxis = OperatorConsoleConstants.kProximalAxisId;
@@ -207,6 +208,10 @@ public class RobotContainer {
     // HIGH/MED/LOW SCORE PRE-LOAD SWITCH
     kHighScoreSwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.setOperatorSequence(OperatorConsoleConstants.kScoreHighSwitchId)));
     kMediumScoreSwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.setOperatorSequence(OperatorConsoleConstants.kScoreMediumSwitchId)));
+
+    // THIEF MODE ON/OFF SWITCH
+    kThiefOnSwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.setIsInThiefMode(true)));
+    kThiefOffSwitch.onTrue(new InstantCommand(() -> sm_armStateMachine.setIsInThiefMode(false)));
   }
 
 

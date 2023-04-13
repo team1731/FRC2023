@@ -19,6 +19,7 @@ public class ArmStateMachine {
   private HighPickup highPickup = HighPickup.FEEDER;
   private MovementType movementType;
   private boolean isInAuto = false;
+  private boolean isInThiefMode = false;
   private boolean isWaitingForIntakeToSlow = false;
   private boolean isRunningOperatorEntry = false;
   private ArmSequence operatorSequence = ArmSequence.SCORE_HIGH; // sequence pre-loaded by operator via keypad/switch
@@ -798,8 +799,17 @@ public class ArmStateMachine {
   }
 
   public void setIsInAuto(boolean inAuto) {
-    System.out.println("ArmStateMachine: Setting utonomous mode " + inAuto + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    System.out.println("ArmStateMachine: Setting autonomous mode " + inAuto + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     isInAuto = inAuto;
+  }
+
+  public boolean isInThiefMode() {
+    return isInThiefMode;
+  }
+
+  public void setIsInThiefMode(boolean inThiefMode) {
+    System.out.println("ArmStateMachine: Setting thief mode " + inThiefMode + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    isInThiefMode = inThiefMode;
   }
 
   public void setAllowScore(boolean allow) {
