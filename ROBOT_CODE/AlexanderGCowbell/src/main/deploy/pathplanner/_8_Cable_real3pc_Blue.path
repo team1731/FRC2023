@@ -53,15 +53,15 @@
     {
       "anchorPoint": {
         "x": 7.065667083033629,
-        "y": 0.8460806903724735
+        "y": 0.9321227944781477
       },
       "prevControl": {
         "x": 6.03630693303363,
-        "y": 0.8734088363724732
+        "y": 0.9594509404781475
       },
       "nextControl": {
         "x": 6.03630693303363,
-        "y": 0.8734088363724732
+        "y": 0.9594509404781475
       },
       "holonomicAngle": 0.0,
       "isReversal": true,
@@ -169,7 +169,7 @@
       },
       "holonomicAngle": 0.0,
       "isReversal": false,
-      "velOverride": null,
+      "velOverride": 0.5,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
@@ -181,12 +181,12 @@
     },
     {
       "anchorPoint": {
-        "x": 2.2329689024315442,
-        "y": 0.989484197215265
+        "x": 2.032203992851636,
+        "y": 1.204589457479453
       },
       "prevControl": {
-        "x": 3.0216881900668993,
-        "y": 0.7743789369510772
+        "x": 2.820923280486991,
+        "y": 0.989484197215265
       },
       "nextControl": null,
       "holonomicAngle": 0.0,
@@ -237,7 +237,7 @@
       ]
     },
     {
-      "position": 5.9,
+      "position": 5.818181818181816,
       "names": [
         "ScoreCubeHigh"
       ]
