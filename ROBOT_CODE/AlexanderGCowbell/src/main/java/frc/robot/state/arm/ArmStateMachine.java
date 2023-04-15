@@ -333,6 +333,7 @@ public class ArmStateMachine {
   }
 
   private void initiateRetraction() {
+    System.out.println("ArmStateMachine: retraction initiated by a command ending or an interruption");
     if(currentArmState == ArmState.EXTENDED) {
       transitionArm(Input.RETRACT);
     } else if(isInInterruptibleArmState()) { // if NOT interruptible ignore this request
@@ -552,6 +553,7 @@ public class ArmStateMachine {
     if(isInAuto) {
       if(movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING && 
          (currentArmState == ArmState.EXTENDED || currentArmState == ArmState.WRIST_ONLY_FLEXED)) {
+        System.out.println("ArmStateMachine: kicking off retraction - we are in auto, picking up, arm extended, and the intake is in a holding state");
         transitionArm(Input.RETRACT);
       } else if(movementType == MovementType.SCORE && currentArmState == ArmState.EXTENDED) {
         if(!autoDelayScore || (autoDelayStartTime != 0 && Timer.getFPGATimestamp() - autoDelayStartTime >= ArmStateConstants.autoScoreConeDelay)) {
@@ -606,6 +608,7 @@ public class ArmStateMachine {
       if(movementType == MovementType.PICKUP_DOWNED_CONE) {
         transitionArm(Input.RETRACT);
       } else {
+        System.out.println("ArmStateMachine: moving intake to holding state, it looks like we have retrieved a piece.");
         transitionIntake(Input.RETRIEVED);
       }
     }
