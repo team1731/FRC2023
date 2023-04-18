@@ -19,6 +19,8 @@ public class ArmStateMachine {
   private HighPickup highPickup = HighPickup.FEEDER;
   private MovementType movementType;
   private boolean isInAuto = false;
+  private boolean isInThiefMode = false;
+  private boolean isWaitingForIntakeToSlow = false;
   private boolean isRunningOperatorEntry = false;
   private ArmSequence operatorSequence = ArmSequence.SCORE_HIGH; // sequence pre-loaded by operator via keypad/switch
 
@@ -143,6 +145,7 @@ public class ArmStateMachine {
     allowScore = true;
     emergencyModeTriggeredNotConfirmed = false;
     processAutoRecoveryOnRetraction = false;
+    isWaitingForIntakeToSlow = false;
 
     if(isRunningOperatorEntry) {
       isRunningOperatorEntry = false;
@@ -201,7 +204,7 @@ public class ArmStateMachine {
     movementType = movement;
     // make sure the intake is stopped before attempting to start it
     transitionIntake(Input.STOP); 
-    transitionIntake(Input.START);
+    startPickupIntake();
     // start the arm path
     transitionArm(Input.EXTEND);
   }
@@ -219,10 +222,19 @@ public class ArmStateMachine {
     movementType = MovementType.PICKUP;
     // make sure the intake is stopped before attempting to start it
     transitionIntake(Input.STOP);
-    transitionIntake(Input.START);
+    startPickupIntake();
     // move the wrist into position
     transitionArm(Input.FLEX_WRIST);
     status = Status.RUNNING;
+  }
+
+  private void startPickupIntake() {
+    if(isInAuto && !subsystem.isIntakeBelowStartedVelocity()) {
+      isWaitingForIntakeToSlow = true;
+      System.out.println("ArmStateMachine: want to start, but intake hasn't slowed down enough. Waiting for intake to slow.");
+    } else {
+      transitionIntake(Input.START);
+    }
   }
 
   // SCORE
@@ -310,16 +322,18 @@ public class ArmStateMachine {
     if(status != Status.READY ||
        currentArmState != ArmState.HOME ||
        currentPath != null) {
+      /* Commenting out for the moment to prevent logging during periodic
       System.out.println("WARNING: state machine failed on readiness check --> Status: " + status + 
         ", ArmState: " + currentArmState + 
         ", Path Already Loaded? " + (currentPath != null)
-      );
+      );*/
       return false;
     }
     return true;
   }
 
   private void initiateRetraction() {
+    System.out.println("ArmStateMachine: retraction initiated by a command ending or an interruption");
     if(currentArmState == ArmState.EXTENDED) {
       transitionArm(Input.RETRACT);
     } else if(isInInterruptibleArmState()) { // if NOT interruptible ignore this request
@@ -539,6 +553,7 @@ public class ArmStateMachine {
     if(isInAuto) {
       if(movementType == MovementType.PICKUP && currentIntakeState == IntakeState.HOLDING && 
          (currentArmState == ArmState.EXTENDED || currentArmState == ArmState.WRIST_ONLY_FLEXED)) {
+        System.out.println("ArmStateMachine: kicking off retraction - we are in auto, picking up, arm extended, and the intake is in a holding state");
         transitionArm(Input.RETRACT);
       } else if(movementType == MovementType.SCORE && currentArmState == ArmState.EXTENDED) {
         if(!autoDelayScore || (autoDelayStartTime != 0 && Timer.getFPGATimestamp() - autoDelayStartTime >= ArmStateConstants.autoScoreConeDelay)) {
@@ -579,6 +594,12 @@ public class ArmStateMachine {
     /*
      * Logic for handling intake cases
      */
+    if(isWaitingForIntakeToSlow && subsystem.isIntakeBelowStartedVelocity()) {
+      isWaitingForIntakeToSlow = false;
+      transitionIntake(Input.START);
+      System.out.println("ArmStateMachine: Intake has slowed down enough, kicked off intake start for pickup.");
+    }
+
     if(currentIntakeState == IntakeState.STARTING && subsystem.isIntakeAtStartedVelocity()) {
       transitionIntake(Input.STARTED);
     }
@@ -587,6 +608,7 @@ public class ArmStateMachine {
       if(movementType == MovementType.PICKUP_DOWNED_CONE) {
         transitionArm(Input.RETRACT);
       } else {
+        System.out.println("ArmStateMachine: moving intake to holding state, it looks like we have retrieved a piece.");
         transitionIntake(Input.RETRIEVED);
       }
     }
@@ -780,8 +802,17 @@ public class ArmStateMachine {
   }
 
   public void setIsInAuto(boolean inAuto) {
-    System.out.println("ArmStateMachine: Setting utonomous mode " + inAuto + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    System.out.println("ArmStateMachine: Setting autonomous mode " + inAuto + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     isInAuto = inAuto;
+  }
+
+  public boolean isInThiefMode() {
+    return isInThiefMode;
+  }
+
+  public void setIsInThiefMode(boolean inThiefMode) {
+    System.out.println("ArmStateMachine: Setting thief mode " + inThiefMode + "!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    isInThiefMode = inThiefMode;
   }
 
   public void setAllowScore(boolean allow) {

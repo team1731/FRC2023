@@ -39,15 +39,18 @@ public class ArmPickupCommand extends CommandBase {
             path = PickupHighConeFeeder.getArmPath();
         } else if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CONE && stateMachine.getHighPickup() == HighPickup.SHELF) {
             path = PickupHighCone.getArmPath();
-        } if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE) {
+        } else if(sequence == ArmSequence.PICKUP_HIGH && stateMachine.getGamePiece() == GamePiece.CUBE) {
             path = PickupHighCube.getArmPath();
+        } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.isInThiefMode()) {
+            path = PickupLowThiefInternal.getArmPath();
+            adjustWrist = true;
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CONE) {
             path = PickupLowCone.getArmPath();
             adjustWrist = true;
         } else if(sequence == ArmSequence.PICKUP_LOW && stateMachine.getGamePiece() == GamePiece.CUBE) {
             path = PickupLowCube.getArmPath();
             adjustWrist = true;
-        } else if (sequence == ArmSequence.PICKUP_DOWNED_CONE) {
+        } else if(sequence == ArmSequence.PICKUP_DOWNED_CONE) {
             stateMachine.pickup(PickupFloorCone.getArmPath(), MovementType.PICKUP_DOWNED_CONE, queuedTime);
             adjustWrist = true;
         }

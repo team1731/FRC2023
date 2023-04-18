@@ -137,6 +137,8 @@ public final class Constants {
 
         // Switches
         public static int kHighPickupSwitch = 1;
+        public static int kThiefOnSwitchId = 2;
+        public static int kThiefOffSwitchId = 3;
         public static int kConeSwitchId = 4;
         public static int kCubeSwitchId = 5;
         public static int kScoreMediumSwitchId = 8;
@@ -254,7 +256,7 @@ public final class Constants {
     }
 
     public static final class AutoConstants {
-        public static final String kAutoDefault = "_2_Feeder_3pc_";
+        public static final String kAutoDefault = "_6_Feeder_real3pc_";
     	public static final String kAutoCodeKey = "Auto Selector";
 
         public static final double kMaxSpeedMetersPerSecond = 0.5; // disabled for testing = 3;
@@ -286,7 +288,7 @@ public final class Constants {
     }
 
     public static final class ArmStateConstants {       
-        public final static double coneFlipFlexPosition = 0.31;
+        public final static double coneFlipFlexPosition = 0.51;
         public final static double wristOnlyFlexMaxVelocity = 2000;
         public final static double autoScoreConeDelay = 0.5;
     }
@@ -301,8 +303,8 @@ public final class Constants {
          * **********************************************************************************************
          */
          public final static int distalAbsoluteTicsOffset = 15;
-         public final static int proximalAbsoluteTicsCenter = 2667;   
-         public final static int distalAbsoluteTicsCenter = 1113 + distalAbsoluteTicsOffset;  
+         public final static int proximalAbsoluteTicsCenter = 2662;   // 2660 2664    
+         public final static int distalAbsoluteTicsCenter = 1106 + distalAbsoluteTicsOffset; // 1105 1106  was 1113
 
         /*
          ************************************************************************************************
@@ -336,7 +338,7 @@ public final class Constants {
         public final static int minBufferedPoints = 10;
         public final static double proximalHomePosition = -4388;
         public final static double distalHomePosition = 10300;
-        public final static double wristHomePosition = 0.54;
+        public final static double wristHomePosition = 0.74;
         public final static double intakeStartedVelocityThreshold = 1000;
         public final static double intakeHoldingVelocityThreshold = 60;
         public final static double wristResetPostionThreshold = 0.2;

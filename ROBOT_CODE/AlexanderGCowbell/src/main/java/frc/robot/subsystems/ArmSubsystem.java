@@ -313,6 +313,10 @@ public class ArmSubsystem extends SubsystemBase {
         return (Math.abs(intakeMotor.getEncoder().getVelocity()) > ArmConstants.intakeStartedVelocityThreshold);
     }
 
+    public boolean isIntakeBelowStartedVelocity() {
+        return (Math.abs(intakeMotor.getEncoder().getVelocity()) < ArmConstants.intakeStartedVelocityThreshold);
+    }
+
     public boolean isIntakeAtHoldingVelocity() {
         return (Math.abs(intakeMotor.getEncoder().getVelocity()) < ArmConstants.intakeHoldingVelocityThreshold);
     }

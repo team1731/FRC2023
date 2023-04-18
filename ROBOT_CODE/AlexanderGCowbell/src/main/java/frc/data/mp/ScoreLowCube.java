@@ -7,7 +7,7 @@ public class ScoreLowCube {
 
     public static final int kNumPoints = 111;
     public static final int kWristFlexIndex = 75;
-    public static final double kWristFlexPosition = 0.36;
+    public static final double kWristFlexPosition = 0.56;
     public static final int kWristExtendIndex = 106;
     public static final double kWristMaxVelocity = 3000;
 
