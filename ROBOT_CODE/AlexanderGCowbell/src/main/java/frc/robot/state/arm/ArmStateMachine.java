@@ -109,7 +109,7 @@ public class ArmStateMachine {
       if(adjustWrist){
         return startPosition + (joystick.getRawAxis(axis) * ArmConstants.wristMaxAdjustment);
       } else {
-        return startPosition + (joystick.getRawAxis(axis) * ArmConstants.distalMaxAdjustmentTicks);
+        return startPosition + (joystick.getRawAxis(axis) * ArmConstants.distalMaxAdjustmentTicks * -1);
       }
     }
 
@@ -835,8 +835,6 @@ public class ArmStateMachine {
   }
 
   public void setOperatorSequence(int switchId) {
-    if(isRunningOperatorEntry) return; // do not allow switch change if running an operator sequence
-
     ArmSequence sequence = ArmSequence.valueForSwitch(switchId);
     if(sequence != null) {
       operatorSequence = sequence;

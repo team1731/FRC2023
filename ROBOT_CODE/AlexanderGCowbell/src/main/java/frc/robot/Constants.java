@@ -299,12 +299,12 @@ public final class Constants {
         /*
          ************************************************************************************************
          * THESE VALUES NEED TO CHANGE IF WE WORK ON THE ARM!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-         * 
+         *   the better proximal should be 2443    Auto starting absolute numbers at start of houston 2436   1310
          * **********************************************************************************************
          */
          public final static int distalAbsoluteTicsOffset = 15;
-         public final static int proximalAbsoluteTicsCenter = 2662;   // 2660 2664    
-         public final static int distalAbsoluteTicsCenter = 1106 + distalAbsoluteTicsOffset; // 1105 1106  was 1113
+         public final static int proximalAbsoluteTicsCenter = 2732;   // 2660 2664   2652 
+         public final static int distalAbsoluteTicsCenter = 1009 + distalAbsoluteTicsOffset; // 1105 1106  was 1113
 
         /*
          ************************************************************************************************
