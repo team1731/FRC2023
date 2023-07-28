@@ -218,7 +218,7 @@ public final class Constants {
             public static final int driveMotorID = 1;
             public static final int angleMotorID = 2;
             public static final int canCoderID = 1;
-            public static final double angleOffset = 288.72;
+            public static final double angleOffset = 286.17;
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -228,7 +228,7 @@ public final class Constants {
             public static final int driveMotorID = 3;
             public static final int angleMotorID = 4;
             public static final int canCoderID = 2;
-            public static final double angleOffset = 25.75;
+            public static final double angleOffset = 38.67;  
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -238,7 +238,7 @@ public final class Constants {
             public static final int driveMotorID = 5;
             public static final int angleMotorID = 6;
             public static final int canCoderID = 3;
-            public static final double angleOffset = 264.99;
+            public static final double angleOffset = 265.42; 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -248,7 +248,7 @@ public final class Constants {
             public static final int driveMotorID = 7;
             public static final int angleMotorID = 8;
             public static final int canCoderID = 4;
-            public static final double angleOffset = 133.5;
+            public static final double angleOffset = 132.28; 
             public static final SwerveModuleConstants constants = 
                 new SwerveModuleConstants(driveMotorID, angleMotorID, canCoderID, angleOffset);
         }
@@ -305,7 +305,7 @@ public final class Constants {
          public final static int distalAbsoluteTicsOffset = 15;
 
          public final static int proximalAbsoluteTicsCenter = 2732;   // 2660 2664   2652 
-         public final static int distalAbsoluteTicsCenter = 1009 + distalAbsoluteTicsOffset; // 1105 1106  was 1113
+         public final static int distalAbsoluteTicsCenter = 970 + distalAbsoluteTicsOffset; // 1105 1106  was 1113
 
         /*
          ************************************************************************************************
