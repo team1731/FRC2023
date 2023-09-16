@@ -304,8 +304,8 @@ public final class Constants {
          */
          public final static int distalAbsoluteTicsOffset = 15;
 
-         public final static int proximalAbsoluteTicsCenter = 2732;   // 2660 2664   2652 
-         public final static int distalAbsoluteTicsCenter = 970 + distalAbsoluteTicsOffset; // 1105 1106  was 1113
+         public final static int proximalAbsoluteTicsCenter = 2657;   // 2660 2664   2652 
+         public final static int distalAbsoluteTicsCenter = 1004 + distalAbsoluteTicsOffset; // 1105 1106  was 1113
 
         /*
          ************************************************************************************************
