@@ -12,6 +12,7 @@ import com.ctre.phoenix.motion.*;
 import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
@@ -51,6 +52,7 @@ public class ArmSubsystem extends SubsystemBase {
     private CANSparkMax intakeMotor;
     private SparkMaxPIDController wristPIDController; 
     private AbsoluteEncoder wristEncoder;
+    private RelativeEncoder wristRelativeEncoder;
 
     // arm recording
     Logger armPathLogger;
@@ -226,6 +228,9 @@ public class ArmSubsystem extends SubsystemBase {
         wristMotor.setIdleMode(LogWriter.isArmRecordingEnabled()? IdleMode.kCoast : IdleMode.kBrake);
         wristPIDController = wristMotor.getPIDController();
         wristEncoder = wristMotor.getAbsoluteEncoder(Type.kDutyCycle);
+        wristRelativeEncoder = wristMotor.getEncoder();
+        wristRelativeEncoder.setPositionConversionFactor(1.0/((42/18)*5*5)); //gear ratio
+        wristRelativeEncoder.setPosition(0.74);
 
         // set PID coefficients
         wristPIDController.setP(ArmConstants.wristP);
@@ -235,6 +240,7 @@ public class ArmSubsystem extends SubsystemBase {
         wristPIDController.setFF(ArmConstants.wristFF);
         wristPIDController.setOutputRange(ArmConstants.wristMinOutput, ArmConstants.wristMaxOutput);
         wristPIDController.setFeedbackDevice(wristEncoder);
+    //    wristPIDController.setFeedbackDevice(wristRelativeEncoder);
 
         // set smart motion coefficients
         int smartMotionSlot = 0;

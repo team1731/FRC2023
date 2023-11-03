@@ -7,7 +7,7 @@ public class ScoreHighCone {
 
     public static final int kNumPoints = 100;
     public static final int kWristFlexIndex = 50;
-    public static final double kWristFlexPosition = 0.5;
+    public static final double kWristFlexPosition = 0.50;
     public static final int kWristExtendIndex = 90;
     public static final double kWristMaxVelocity = 2000;
 
