@@ -29,7 +29,7 @@ import frc.robot.state.arm.ArmStateMachine;
 import frc.robot.util.log.LogWriter;
 import frc.robot.util.log.MessageLog;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.LEDStringSubsystem;
+// import frc.robot.subsystems.LEDStringSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -66,8 +66,8 @@ public class Robot extends TimedRobot {
   }
 
   // SUBSYSTEM DECLARATION
-  private LEDStringSubsystem m_ledstring;
-  private boolean ledBlinking;
+//   private LEDStringSubsystem m_ledstring;
+   private boolean ledBlinking;
 
   // NOTE: FOR TESTING PURPOSES ONLY!
   private final Joystick driver = new Joystick(0);
@@ -98,11 +98,13 @@ public class Robot extends TimedRobot {
   	s_poseEstimatorSubsystem = new PoseEstimatorSubsystem(s_Swerve);
   	s_armSubSystem = new ArmSubsystem();
 	sm_armStateMachine = s_armSubSystem.getStateMachine();
-	m_ledstring = new LEDStringSubsystem();
+	// m_ledstring = new LEDStringSubsystem();
 
 	// Instantiate our robot container. This will perform all of our button bindings,
 	// and put our autonomous chooser on the dashboard
-	m_robotContainer = new RobotContainer(s_Swerve, s_poseEstimatorSubsystem, s_armSubSystem, m_ledstring);
+	m_robotContainer = new RobotContainer(s_Swerve, s_poseEstimatorSubsystem, s_armSubSystem
+	//,m_ledstring
+	);
 
 	initSubsystems();
 
@@ -211,7 +213,7 @@ public class Robot extends TimedRobot {
 //   █▀ ▀██ ██▄ █▀ ▀███ ██████ ▀▀▀ ██▄▀▀▄██ ▀▀ ██ ▀▀▀ ████ ████ ▀▀▀ ███ ████ ▀▀▀██ ███ ██ ▀▀▀ 
 //   ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
   private void initSubsystems() {
-	m_ledstring.init();
+	//m_ledstring.init();
 	m_robotContainer.resetEncoders();
   }
 
@@ -395,10 +397,10 @@ public class Robot extends TimedRobot {
 	}
 
 	if(!ledBlinking && sm_armStateMachine.isHoldingGamePiece()) {
-		m_ledstring.setBlink(true);
+		//m_ledstring.setBlink(true);
 		ledBlinking = true;
 	} else if(ledBlinking && !sm_armStateMachine.isHoldingGamePiece()) {
-		m_ledstring.setBlink(false);
+		//m_ledstring.setBlink(false);
 		ledBlinking = false;
 	}
   }

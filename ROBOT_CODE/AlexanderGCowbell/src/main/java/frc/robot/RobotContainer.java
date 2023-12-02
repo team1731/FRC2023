@@ -62,14 +62,15 @@ public class RobotContainer {
   private PoseEstimatorSubsystem s_poseEstimatorSubsystem;
   private ArmSubsystem s_armSubSystem;
   private ArmStateMachine sm_armStateMachine;
-  private final LEDStringSubsystem m_ledstring;
+  // private final LEDStringSubsystem m_ledstring;
 
   // The container for the robot. Contains subsystems, OI devices, and commands. 
   public RobotContainer(
           Swerve swerve,
           PoseEstimatorSubsystem poseEstimatorSubsystem,
-          ArmSubsystem armSubsystem,
-          LEDStringSubsystem m_ledstring) {
+          ArmSubsystem armSubsystem
+  //          ,LEDStringSubsystem m_ledstring
+         ) {
     
 	  boolean fieldRelative = true;
     boolean openLoop = false;
@@ -83,7 +84,7 @@ public class RobotContainer {
     //s_armSubSystem.setDefaultCommand(new TestArm(s_armSubSystem, xboxController.getHID(), translationAxis, distalAxis)); 
  
 
-    this.m_ledstring = m_ledstring;
+    //this.m_ledstring = m_ledstring;
 
     // Configure the button bindings
     configureButtonBindings();
@@ -167,20 +168,20 @@ public class RobotContainer {
 		if(newKeypadCommand.length() > 0){
       System.out.println(newKeypadCommand + "\n");
       if (newKeypadCommand.toLowerCase().contains("cone")){
-        m_ledstring.setBlink(false);
-        m_ledstring.setColor(LedOption.YELLOW);
+      //  m_ledstring.setBlink(false);
+       // m_ledstring.setColor(LedOption.YELLOW);
         sm_armStateMachine.setGamePiece(GamePiece.CONE);
         System.out.println("\n\nSHOWING YELLOW\n\n");
       }
       else if (newKeypadCommand.toLowerCase().contains("cube")){
-        m_ledstring.setBlink(false);
-        m_ledstring.setColor(LedOption.PURPLE);
+       // m_ledstring.setBlink(false);
+       // m_ledstring.setColor(LedOption.PURPLE);
         sm_armStateMachine.setGamePiece(GamePiece.CUBE);
         System.out.println("\n\nSHOWING PURPLE\n\n");
       }
       else if (newKeypadCommand.toLowerCase().contains("clear")){
-        m_ledstring.setBlink(false);
-        m_ledstring.setColor(LedOption.WHITE);
+       // m_ledstring.setBlink(false);
+       // m_ledstring.setColor(LedOption.WHITE);
         sm_armStateMachine.setGamePiece(null);
         System.out.println("\n\nSHOWING WHITE\n\n");
      }
